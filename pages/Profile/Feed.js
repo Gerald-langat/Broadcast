@@ -1,0 +1,496 @@
+import React, { useEffect, useRef, useState } from 'react';
+import { ArrowCircleRightIcon, ArrowLeftIcon, CameraIcon, PencilIcon, PhotographIcon, SunIcon } from '@heroicons/react/outline';
+import { auth, db, storage } from '../../firebase';
+import { collection,  doc, getDocs, onSnapshot, query, updateDoc, where } from 'firebase/firestore';
+import { Button, Dropdown, Popover, Spinner } from 'flowbite-react';
+import { getDownloadURL, ref, uploadString } from 'firebase/storage';
+import { useRouter } from 'next/router';
+import Head from 'next/head'; // Adjust the path to your script.js
+import axios from 'axios';
+import ModeButton from '../../components/ModeButton';
+
+
+function Feed() {
+  const [post, setPost] = useState(null);
+  const [userPosts, setUserPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const categories = ['citizen', 'leadership', 'business','company', 'organization'];
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [userDetails, setUserDetails] = useState(null);
+  const filePickerRef = useRef(null);
+  const IFilePickerRef = useRef(null);
+  const [selectedBFile, setSelectedBFile] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const router = useRouter();
+  const [backImg, setBackImg] = useState(null);
+  const [userImg, setUserImg] = useState(null);
+  const [followingCount, setFollowingCount] = useState(0);
+  const [followerCount, setFollowerCount] = useState(0);
+  const [followers, setFollowers] = useState([]);
+  const [postId, setPostId] = useState(null);
+  const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [organization, setOrganization] = useState('');
+  const [status, setStatus] = useState('');
+
+  // following
+  const getFollowingCount = () => {
+    if (!userDetails?.uid) return;
+  
+    try {
+      const q = query(collection(db, "following"), where('followingId', '==', userDetails.uid));
+  
+      // Set up real-time listener
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        const followingCount = snapshot.size; // Get the number of documents (i.e., following count)
+        setFollowingCount(followingCount); // Update the state with the real-time following count
+        console.log(`User is following ${followingCount} users.`);
+      });
+  
+      return unsubscribe; // Return unsubscribe to clean up listener later
+    } catch (error) {
+      console.log("Error fetching following count:", error);
+    }
+  };
+  
+  // Set up useEffect to listen for changes in userDetails.uid and update in real-time
+  useEffect(() => {
+    if (userDetails?.uid) {
+      const unsubscribe = getFollowingCount(userDetails.uid);
+  
+      // Clean up listener when the component unmounts or userDetails.uid changes
+      return () => {
+        if (unsubscribe) unsubscribe();
+      };
+    }
+  }, [userDetails?.uid]); 
+
+
+
+const getFollowerCount = () => {
+  if (!userDetails?.uid) return;
+
+  try {
+    const q = query(collection(db, "following"), where('followerId', '==', userDetails.uid));
+
+    // Set up real-time listener
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const followerCount = snapshot.size; // Get number of documents in the collection
+      setFollowerCount(followerCount); // Update the state with the real-time count
+      console.log(`User is following ${followerCount} users.`);
+    });
+
+    return unsubscribe; // Return unsubscribe to clean up listener later
+  } catch (error) {
+    console.log("Error fetching following count:", error);
+  }
+};
+
+// Set up useEffect to listen for changes in postId and set up real-time updates
+useEffect(() => {
+  if (userDetails || userDetails?.uid) {
+    const unsubscribe = getFollowerCount(userDetails.uid);
+
+    // Clean up listener when userDetails.uid changes or component unmounts
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }
+}, [userDetails]); 
+
+
+// authentication
+    const fetchUserData = async () => {
+      auth.onAuthStateChanged(async (user) => {
+        setUserDetails(user);
+      });
+    };
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
+ 
+// category
+  const handleSelect = (category) => {
+    setSelectedCategory(category);
+  };
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (userDetails) {
+        const q = query(collection(db, 'userPosts'), where('id', '==', userDetails.uid));
+        const querySnapshot = await getDocs(q);
+        if (!querySnapshot.empty) {
+          const userData = querySnapshot.docs[0].data();  // Store the document data
+          setPost(userData);  // Set the post data to state
+          setBackImg(userData.backImg || null);
+          setUserImg(userData.userImg || null);
+         
+        }
+      }
+    };
+
+    fetchUserData();
+  }, [userDetails]);
+
+
+// fetching posts count && posts
+  useEffect(() => {
+    const fetchPost = async () => {
+      if (userDetails) {
+        const q = query(collection(db, "posts"), where("id", "==", userDetails.uid));
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+          const posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data()}));
+          setUserPosts(posts);
+          setLoading(false);
+        });
+        return () => unsubscribe();
+      }
+    };
+
+    fetchPost();
+  }, [userDetails]);
+
+  // Handle image upload
+  const addImageToPost = (e) => {
+    const reader = new FileReader();
+    if (e.target.files[0]) {
+      reader.readAsDataURL(e.target.files[0]);
+    }
+
+    reader.onload = (readerEvent) => {
+      setSelectedFile(readerEvent.target.result);
+    };
+  };
+
+  const addImage = (e) => {
+    const reader = new FileReader();
+    if (e.target.files[0]) {
+      reader.readAsDataURL(e.target.files[0]);
+    }
+
+    reader.onload = (readerEvent) => {
+      setSelectedBFile(readerEvent.target.result);
+    };
+  };
+
+  // background image
+  const sendBackImg = async () => {
+    if (loading) return;
+    setLoading(true);
+  
+    try {
+      const userQuery = query(collection(db, 'userPosts'), where("id", "==", userDetails.uid));
+      const querySnapshot = await getDocs(userQuery);
+      if (!querySnapshot.empty) {
+        const userDoc = querySnapshot.docs[0];
+        const docRef = userDoc.ref;
+        const imageRef = ref(storage, `userPosts/${docRef.id}/backImg`);
+  
+        if (selectedBFile) {
+          await uploadString(imageRef, selectedBFile, "data_url").then(async () => {
+            const downloadURL = await getDownloadURL(imageRef);
+            await updateDoc(doc(db, "userPosts", docRef.id), {
+              backImg: downloadURL,
+            });
+            // Update state with the new image URL
+            setBackImg(downloadURL);  // Assuming you have a backImg state to hold the current image URL
+          });
+          setSelectedBFile(null);
+        }
+      } else {
+        console.log("No matching user posts found.");
+      }
+    } catch (error) {
+      console.error("Error updating document: ", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // User image
+  const sendUserImg = async () => {
+    if (loading) return;
+    setLoading(true);
+
+    try {
+      const userQuery = query(collection(db, 'userPosts'), where("id", "==", userDetails.uid));
+      const querySnapshot = await getDocs(userQuery);
+      if (!querySnapshot.empty) {
+        const userDoc = querySnapshot.docs[0];
+        const docRef = userDoc.ref;
+        const imageRef = ref(storage, `userPosts/${docRef.id}/userImg`);
+
+        if (selectedFile) {
+          await uploadString(imageRef, selectedFile, "data_url").then(async () => {
+            const downloadURL = await getDownloadURL(imageRef);
+            await updateDoc(doc(db, "userPosts", docRef.id), {
+              userImg: downloadURL,
+            });
+            setUserImg(downloadURL)
+          });
+          setSelectedFile(null);
+        }
+      } else {
+        console.log("No matching user posts found.");
+      }
+    } catch (error) {
+      console.error("Error updating document: ", error);
+    } finally {
+      setLoading(false);
+    }
+
+  };
+
+  const sendImage = () => {
+    filePickerRef.current.click();
+  };
+
+  const changeImage = () => {
+    IFilePickerRef.current.click();
+  };
+
+  useEffect(() => {
+    if (selectedBFile) {
+      sendBackImg();
+    }
+  }, [selectedBFile]);
+
+  useEffect(() => {
+    if (selectedFile) {
+      sendUserImg();
+    }
+  }, [selectedFile]);
+
+
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await axios.post('http://localhost:3000/api/send-email', {
+        email,
+        name,
+        organization,
+        phone,
+        selectedCategory
+      });
+
+      if (response.data.success) {
+        setStatus('Email sent successfully!');
+      } else {
+        setStatus('Failed to send email.');
+      }
+      setEmail("");
+      setName("");
+      setOrganization("");
+      setPhone("");
+      setSelectedCategory("");
+    } catch (error) {
+      console.error('There was an error sending the email:', error);
+      setStatus('Failed to send email.');
+    }
+  };
+
+  const formatNumber = (number) => {
+    if (number >= 1000000) {
+      return (number / 1000000).toFixed(1) + 'M'; // 1 million and above
+    } else if (number >= 1000) {
+      return (number / 1000).toFixed(1) + 'k'; // 1 thousand and above
+    } else {
+      return number; // below 1 thousand
+    }
+  };
+
+
+  return (
+    <div>
+    <Head>
+      <title>Profile</title>
+      <meta name="description" content="Generated and created by redAntTech" />
+      <link rel="icon" href="../../images/Brod.png" />
+    </Head>
+  
+    <div className='flex flex-col h-screen w-screen dark:bg-gray-950'>
+    <div className='p-2 flex space-x-1 items-center justify-center dark:text-gray-100 mt-4 z-40'>
+    <ArrowLeftIcon className='sm:h-8 sm:w-8 h-10 animate-pulse cursor-pointer' onClick={() => router.push('/home')}/>
+      <p className='sm:text-lg text-2xl'>post</p>
+    </div>
+
+    <div className='w-full px-2 sm:p-14 md:px-16 xl:px-28'>
+        <input type="file" accept="image/*" hidden ref={IFilePickerRef} onChange={addImage} />
+        {backImg ? (
+          <img
+            src={backImg}
+            className={`${
+              loading && "animate-pulse"
+            } rounded-b-md h-[200px] sm:h-[320px] w-full lg:w-[1000px] object-cover`}
+          />
+        ) : (
+          <img
+            src="https://helpx.adobe.com/content/dam/help/en/photoshop/using/convert-color-image-black-white/jcr_content/main-pars/before_and_after/image-before/Landscape-Color.jpg"
+            className="rounded-b-md h-[400px] sm:h-[320px] w-full object-cover"
+          />
+        )}
+      </div>
+        <div className="ml-2">
+          <div className=" w-full items-center justify-center flex">
+            <input type="file" accept="image/*" hidden ref={filePickerRef} onChange={addImageToPost} />
+            {userImg && (
+              <img
+                src={userImg}
+                className={`${loading && "animate-pulse"} sm:h-[200px] sm:w-[200px] h-[150px] w-[150px] -mt-20 sm:-mt-40 sm:-ml-[300px] md:-ml-[400px] lg:-ml-[500px] xl:-ml-[500px] rounded-3xl object-cover`}
+              />
+            )}
+        
+          </div>
+          <div className='w-16 flex items-center sm:ml-10 md:ml-16 lg:ml-28 mt-2'>
+            <ModeButton />
+          </div>
+
+          <div className="sm:ml-10 md:ml-16 lg:ml-28 mt-3">
+      <Popover
+        aria-labelledby="profile-popover"
+        className='z-50 dark:bg-gray-600 bg-gray-50 rounded-md shadow-sm dark:shadow-gray-400 shadow-gray-600 dark:placeholder:text-gray-300'
+        content={
+          <form className="flex flex-col space-y-4 p-6 z-50" onSubmit={handleSubmit}>
+            <input
+              type="text"
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Enter your name"
+              className="border-x-0 border-t-0 focus:ring-0 dark:bg-gray-600 dark:placeholder:text-gray-300"
+            />
+            <input
+              type="email"
+              id="email1"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+              className="border-x-0 border-t-0 focus:ring-0 dark:bg-gray-600 dark:placeholder:text-gray-300"
+            />
+            <input
+              type="text"
+              id="phone"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="Enter your phone"
+              className="border-x-0 border-t-0 focus:ring-0 dark:bg-gray-600 dark:placeholder:text-gray-300"
+            />
+            <input
+              type="text"
+              id="organization"
+              value={organization}
+              onChange={(e) => setOrganization(e.target.value)}
+              placeholder="Enter your organization"
+              className="border-x-0 border-t-0 focus:ring-0 dark:bg-gray-600 dark:placeholder:text-gray-300"
+            />
+            <Dropdown
+              label={selectedCategory || "Select category"}
+              name="category"
+              className="w-14 m-4 mb-3"
+            >
+              <div className="overflow-hidden">
+                {categories.map((category, index) => (
+                  <Dropdown.Item key={index} onClick={() => handleSelect(category)}>
+                    {category}
+                  </Dropdown.Item>
+                ))}
+              </div>
+            </Dropdown>
+            <button type="submit" className="w-28 mt-4 border dark:border-gray-50 border-gray-500 rounded-md">
+              Submit
+            </button>
+            {status && <p>{status}</p>}
+          </form>
+        }
+      >
+        <Button className='z-50'>
+          Verify Account
+        </Button>
+      </Popover>
+      </div>
+      <div className="sm:px-40 space-y-4 absolute md:-mt-20 mt-4 px-2">
+        <div className="flex items-center justify-between space-x-4 sm:ml-[300px] md:ml-[280px] xl:ml-[600px]">
+          <div>
+            <p className="font-bold">{post?.name}</p>
+          </div>
+          <div className="cursor-pointer text-nowrap border-[1px] dark:border-gray-900 p-2 rounded-md border-gray-200" onClick={sendImage}>
+            <p className="">
+              Edit Profile
+            </p>
+          </div>
+          <div className="cursor-pointer text-nowrap border-[1px] dark:border-gray-900 p-2 rounded-md border-gray-200">
+            <p className="">
+              View Catalogue
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center justify-between space-x-4 sm:ml-[300px] md:ml-[280px] xl:ml-[600px]">
+          <div className='text-nowrap'>
+            <span className="flex space-x-2">{formatNumber(userPosts.length)}{" "}posts</span>
+          </div>
+          <div className="cursor-pointer" onClick={() => router.push("/followers")}>
+            <p className="">
+              <span className="font-bold mr-1">{formatNumber(followerCount)}</span>Followers
+            </p>
+          </div>
+          <div className="" onClick={() => router.push("/following")}>
+            <p className="">
+              <span className="font-bold mr-1">{formatNumber(followingCount)}</span>following
+            </p>
+          </div>
+        </div>
+
+
+        <div className="border-b-[1px] my-2 dark:border-gray-700 -mt-20 sm:-mt-0 w-full"></div>  
+          <div className="flex justify-between items-center">
+            <div className="dark:text-gray-200 sm:text-lg text-2xl flex items-center cursor-pointer text-gray-600 hover:scale-105 transition transform duration-400 hover:text-gray-900">
+              <PhotographIcon className="h-6" />
+              <h2>Posts</h2>
+            </div>
+            <div className="dark:text-gray-200 flex sm:text-lg text-2xl items-center cursor-pointer text-gray-600 hover:scale-105 transition transform duration-400 hover:text-gray-900">
+              <ArrowCircleRightIcon className="h-6" />
+              <h2>Replies</h2>
+            </div>
+            <div className="dark:text-gray-200 flex sm:text-lg text-2xl items-center cursor-pointer text-gray-600 hover:scale-105 transition transform duration-400 hover:text-gray-900">
+              <CameraIcon className="h-6" />
+              <h2>Media</h2>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+            {userPosts.map((post) => (
+              <>
+              {(post.image || post.video) && (
+                <div key={post.id}>
+                {post.image && <img src={post.image} alt="" className="sm:h-[150px] sm:w-[200px] h-[200px] w-[400px] rounded-md object-cover" />}
+                {post.video && <video autoPlay controls src={post.video} className="sm:h-[150px] sm:w-[200px] h-[200px] w-[400px] rounded-md object-cover" />}
+              </div>
+              )}
+              </>
+            ))}
+          </div>
+
+        </div>
+
+        </div>
+        <PencilIcon  onClick={userDetails?.uid && changeImage}
+              className="h-10 w-10 p-2 hover:text-gray-800 hover:bg-gray-100 bg-gray-800 text-gray-100 
+              rounded-full dark:bg-neutral-200 dark:text-gray-950 -mt-56 sm:-mt-96  ml-6 sm:ml-32 cursor-pointer dark:hover:bg-gray-800 dark:hover:text-gray-100"
+            />
+      </div>
+
+     
+  
+      
+    </div>
+  
+ 
+  );
+}
+
+export default Feed;

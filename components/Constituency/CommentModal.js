@@ -1,0 +1,208 @@
+import { useRecoilState } from "recoil";
+import { modalConstituencyState, postIdConstituency } from "../../atoms/modalAtom";
+import Modal from "react-modal";
+import {
+  EmojiHappyIcon,
+  PhotographIcon,
+  XIcon,
+} from "@heroicons/react/outline";
+import { useEffect, useState } from "react";
+import { auth, db } from "../../firebase";
+import {
+  addDoc,
+  collection,
+  doc,
+  getDocs,
+  onSnapshot,
+  query,
+  serverTimestamp,
+  where,
+} from "firebase/firestore";
+import Moment from "react-moment";
+import Picker from 'emoji-picker-react'
+import { Popover, Tooltip } from "flowbite-react";
+
+
+export default function CommentModal() {
+  
+  const [open, setOpen] = useRecoilState(modalConstituencyState);
+  const [postId] = useRecoilState(postIdConstituency);
+  const [post, setPost] = useState({});
+  const [input, setInput] = useState("");
+  const [userDetails, setUserDetails] = useState(null);
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [emoji, setEmoji] = useState("");
+
+  
+
+  const fetchUserData = async () => {
+    auth.onAuthStateChanged(async (user) => {
+      console.log(user)
+      setUserDetails(user)
+
+    })
+  }
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (userDetails) {
+        const q = query(collection(db, 'userPosts'), where('id', '==', userDetails.uid));
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+          setUserData(querySnapshot.docs[0].data());
+        }
+      }
+    };
+    fetchUserData();
+  }, [userDetails]);
+
+  useEffect(() => {
+    if  (userData){
+    onSnapshot(doc(db, "constituency", userData.constituency, postId), (snapshot) => {
+      setPost(snapshot);
+    });
+  }
+  }, [postId, userData, db]);
+
+
+  async function sendComment() {
+    if (!loading) {
+      setLoading(true);
+    }
+
+    await addDoc(collection(db, "constituency", userData.constituency, postId, "comments"), {
+      comment: input,
+      userImg: userData.userImg,
+      name: userData.name,
+      nickname:userData.nickname,
+      timestamp: serverTimestamp(),
+      userId: userDetails.uid,
+    });
+    setLoading(false);
+    setOpen(false);
+    setInput("");
+    setShowEmojiPicker(false);
+  }
+
+  const closeMode = () => {
+    setOpen(false);
+    setShowEmojiPicker(false);
+    setInput("");
+  }
+
+  return (
+    <div>
+      {open && (
+        <Modal
+          isOpen={open}
+          onRequestClose={() => setOpen(false)}
+          className="max-w-lg w-[90%]  absolute top-24 left-[50%] translate-x-[-50%] bg-white dark:bg-gray-950 rounded-xl shadow-md"
+        >
+          <div className="p-1">
+            <div className="border-b-[1px] border-gray-300 dark:border-gray-600 py-2 px-1.5">
+            <Tooltip content='close' arrow={false} placement="right" className="p-1 text-xs bg-gray-500">
+              <div
+                onClick={closeMode}
+                className="rounded-full w-10 h-10 flex items-center justify-center  dark:hover:bg-neutral-700 cursor-pointer"
+              >
+                <XIcon className="h-[23px] text-gray-700 p-0 dark:text-gray-100" />
+              </div>
+            </Tooltip>
+            </div>
+            <div className="p-2 flex items-center space-x-1 relative">
+              <span className="w-0.5 h-full z-[-1] absolute left-8 top-11 bg-gray-300" />
+              <img
+                className="h-11 w-11 rounded-full mr-4"
+                src={post?.data()?.userImg}
+                alt="user-img"
+              />
+              <h4 className="font-bold text-[15px] sm:text-[16px] hover:underline">
+                {post?.data()?.name}
+              </h4>
+              <h4 className="font-bold">
+                {post?.data()?.lastname}
+              </h4>
+              <span className="text-sm sm:text-[15px] font-bold">
+                @{post?.data()?.nickname} -{" "}
+              </span>
+              <span className="text-sm sm:text-[15px] hover:underline">
+                <Moment fromNow>{post.timestamp?.toDate()}</Moment>
+              </span>
+            </div>
+            <p className="text-gray-500 text-[15px] sm:text-[16px] ml-16 mb-2 dark:text-gray-100">
+              {post?.data()?.text}
+            </p>
+
+            <div className="flex  p-3 space-x-3">
+              
+              <div className="w-full divide-y border-gray-300 dark:divide-gray-600">
+                <div className="">
+                  <textarea
+                    className="w-full border-none focus:ring-0 text-lg placeholder-gray-700 tracking-wide min-h-[50px] text-gray-700 dark:bg-gray-950 dark:text-gray-100 dark:placeholder:text-gray-100"
+                    rows="2"
+                    placeholder="Post your reply..."
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onClick={() => setShowEmojiPicker(false)}
+                  ></textarea>
+                </div>
+
+                <div className="flex items-center justify-between pt-2.5">
+                  <div className="flex">
+                    <div
+                      className=""
+                      // onClick={() => filePickerRef.current.click()}
+                    >
+                    <Tooltip content='image' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
+                      <PhotographIcon className="h-10 w-10 rounded-full p-2 cursor-pointer text-sky-500 hover:bg-sky-100 dark:hover:bg-neutral-700" />
+                      {/* <input
+                        type="file"
+                        hidden
+                        ref={filePickerRef}
+                        onChange={addImageToPost}
+                      /> */}
+                      </Tooltip>
+                    </div>
+                    <Popover
+                      aria-labelledby="profile-popover"
+                       placement="left"
+                      content={
+                        <div className="w-64 ">
+                          {emoji.emoji}
+                          {emoji && <a href={emoji.getImageUrl()}></a>}
+                          {showEmojiPicker && <Picker className="dark:bg-gray-950" height={400} width={300} emojiStyle="twitter" onEmojiClick={(e) => {
+                            setInput(input + e.emoji)
+                          }}/>}
+                        </div>
+                      }>
+             
+                      <EmojiHappyIcon
+                        className="hidden md:inline h-14 w-14 md:h-10 md:w-10 rounded-full cursor-pointer p-2 text-sky-500 dark:hover:bg-neutral-700 hover:bg-blue-100"
+                        onClick={() => setShowEmojiPicker(true)}
+                      />
+                   
+                    </Popover>
+                  </div>
+                  <button
+                    onClick={sendComment}
+                    disabled={!input.trim()}
+                    className="bg-blue-400 text-white px-4 py-1.5 rounded-full font-bold shadow-md hover:brightness-95 disabled:opacity-50"
+                  >
+                   {loading ? <p>Replying...</p> : <p>Reply</p> }
+                  </button>
+                </div>
+         
+              </div>
+            </div>
+          </div>
+        </Modal>
+      )}
+    </div>
+  );
+}

@@ -1,0 +1,224 @@
+import React, { useState, useEffect } from 'react';
+import { collection, getDocs, onSnapshot, where } from 'firebase/firestore';
+import { db } from '../../firebase';
+import Trends from './Trends';
+import { query } from 'firebase/database';
+import SearchComponent from './Search';
+import { SearchIcon, XIcon } from '@heroicons/react/outline';
+import { useRouter } from 'next/router';
+import { Button, Spinner } from 'flowbite-react';
+
+
+export default function Widgets() {
+  const [posts, setPosts] = useState([]); 
+  const [querySearch, setQuery] = useState('');
+  const [trends, setTrendPosts] = useState([]);
+  const [trendingTopics, setTrendingTopics] = useState([]);
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const unsubscribe = onSnapshot(collection(db, 'posts'), (snapshot) => {
+          setTrendPosts(snapshot.docs.map((doc) => doc.data()));
+        });
+
+        return () => unsubscribe();
+      } catch (error) {
+        console.error('Error fetching posts:', error);
+      }
+    };
+
+    fetchData();
+  }, []);;
+
+  useEffect(() => {
+    // Find trending topics
+    const findTrendingTopics = () => {
+      if (!trends.length) return;
+      const commonWords = new Set(['what', 'how', 'why', 'my', 'when', 'who', 'is', 'are', 'that', 'a', 'in', 'and', 'okay' ]); // Define common words to exclude
+      const allWords = trends.flatMap((post) => {
+        if (typeof post.text === 'string') {
+          return post.text.toLowerCase().split(/\b/).filter(word => {
+            const trimmedWord = word.trim();
+            return trimmedWord.length > 0 && !commonWords.has(trimmedWord); // Exclude common words
+          });
+        } else {
+          return [];
+        }
+      });
+  
+      const wordFrequency = {}; 
+
+      allWords.forEach(word => {
+        wordFrequency[word] = (wordFrequency[word] || 0) + 1;
+      });
+  
+      // Convert word frequency object to array of objects with { topic, postCount } structure
+      const trendingTopics = Object.entries(wordFrequency)
+        .map(([topic, postCount]) => ({ topic, postCount }));
+  
+      // Sort trending topics by postCount in descending order
+      trendingTopics.sort((a, b) => b.postCount - a.postCount);
+  
+      // Get top 5 trending topics
+      const topTrendingTopics = trendingTopics.slice(0, 5);
+  
+      setTrendingTopics(topTrendingTopics);
+      setLoading(false);
+    };
+  
+    setLoading(true);
+    findTrendingTopics();
+  }, [trends]);
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (!querySearch) {
+          setPosts([]); // Clear results if no search query
+          return;
+        }
+    
+        // Query for matching names
+        const q1 = query(
+          collection(db, 'userPosts'),
+          where('name', '>=', querySearch),
+          where('name', '<=', querySearch + '\uf8ff')
+        );
+    
+        // Query for matching nickname
+        const q2 = query(
+          collection(db, 'userPosts'),
+          where('nickname', '>=', querySearch),
+          where('nickname', '<=', querySearch + '\uf8ff')
+        );
+    
+        
+        // Fetch both queries separately
+        const [snapshot1, snapshot2] = await Promise.all([getDocs(q1), getDocs(q2)]);
+    
+        const docs = []; 
+        // Process first query results (products)
+        snapshot1.forEach((doc) => docs.push(doc));
+        // Process second query results (categories)
+        snapshot2.forEach((doc) => docs.push(doc));
+    
+        setPosts(docs); // Update your state with combined results
+  
+      } catch (error) {
+        console.error('Error searching Firestore:', error);
+      } 
+    };
+  
+    fetchData();
+    
+  }, [querySearch]);
+  
+  const handleCountyClick = () => {
+    router.push('/county');
+  };
+
+  const handleConstituencyClick = () => {
+    router.push('/constituency');
+  };
+
+  const handleWardClick = () => {
+    router.push('/ward');
+  };
+
+  const clearQuery = () => {
+    setQuery("");
+  }
+
+  return (
+    <div className="dark:bg-gray-950 -z-50 xl:inline h-full space-y-5">
+     {loading ? (
+        <Button color="gray" className="border-0 items-center flex mt-4 sm:mt-0">
+          <Spinner aria-label="Loading spinner" size="md" />
+          <span className="pl-3 animate-pulse sm:text-[16px] text-[28px]">Loading...</span>
+        </Button>
+      ) : (
+     
+      <div className=" dark:bg-gray-950  bg-white w-full">
+      <div className='flex  dark:bg-gray-950 bg-gray-200 items-center -ml-12 dark:border-gray-900 xl:w-[335px] sm:w-[88%] w-[466px] border-b-[1px] rounded-md top-2 fixed '>
+        <SearchIcon className='sm:h-6 h-8 text-gray-500 z-40 dark:text-gray-300 '/>
+      <input
+        className="border-0 dark:bg-gray-950 bg-gray-200 w-full text-2xl sm:text-lg placeholder:text-2xl  sm:placeholder:text-lg 
+        dark:placeholder:text-gray-400 dark:text-gray-100 focus:ring-0 focus:outline-none 
+          border-gray-50 sm:py-2 py-6 z-50"
+        type="text"
+        value={querySearch}
+        onChange={e => setQuery(e.target.value)}
+        placeholder="Search name/nickname..."
+      />
+      <div className={`p-1 bg-sky-500 mr-1 sm:mr-6 rounded-full cursor-pointer hover:bg-sky-400 ${!querySearch ? 'hidden' : 'inline'}`}>
+        <XIcon className='sm:h-4 h-8' onClick={clearQuery}/>
+      </div>
+      </div>
+           
+      <div className='dark:bg-gray-950 dark:shadow-gray-400 -ml-12 shadow-md shadow-gray-400 overflow-y-auto container
+       bg-slate-50 md:mt-2 xl:w-[335px] sm:w-[88%] w-[464px]  fixed top-24 sm:top-12 z-50 fit max-h-80 rounded-lg flex flex-grow'>
+      <div className=" dark:bg-gray-950 w-full ">
+        {posts.map((post) => (
+          <>
+          <div key={post.id}>  
+        <SearchComponent 
+          key={post.id} 
+          post={post} 
+          name={querySearch} 
+          nickname={querySearch} 
+           />
+        </div>
+        </>
+    ))}
+      </div>
+     
+      </div>
+      
+      <div>
+      <div className='dark:bg-gray-950 bg-white space-x-2 mt-2 top-24 sm:top-12 fixed  -ml-12 p-2 w-full rounded-t-md'>
+          <button className='border-gray-200 bg-green-700 p-2 rounded-full hover:bg-gray-400 text-white font-semibold hover:text-white text-xl sm:text-sm'
+          onClick={handleCountyClick}>All</button>
+          <button className='dark:hover:bg-gray-900 dark:border-gray-900 dark:bg-gray-950 border-[1px] dark:text-gray-200 border-gray-200 bg-gray-200 text-xl sm:text-sm
+           p-2 rounded-full hover:bg-gray-400 text-gray-500 font-semibold hover:text-white'
+          onClick={handleCountyClick}>myCounty</button>
+          <button className='dark:hover:bg-gray-900 dark:border-gray-900 dark:bg-gray-950 dark:text-gray-200 border-[1px] border-gray-200 bg-gray-200 text-xl sm:text-sm
+           p-2 rounded-full hover:bg-gray-400 text-gray-500 font-semibold hover:text-white'
+          onClick={handleConstituencyClick}>myConstituency</button>
+          <button className='dark:hover:bg-gray-900 dark:border-gray-900 dark:bg-gray-950 border-[1px] border-gray-200 bg-gray-200 text-xl sm:text-sm
+          p-2 rounded-full hover:bg-gray-400 text-gray-500
+           dark:text-gray-200 font-semibold hover:text-white'
+          onClick={handleWardClick}>myWard</button>
+      </div>
+      <br></br>
+      <div className="dark:bg-gray-950  text-gray-700  bg-slate-50 rounded-xl pt-2 mt-36 sm:mt-20 fixed -ml-12 w-[90%] xl:w-[75%] min-h-full">
+      <h4 className="font-bold text-3xl sm:text-xl px-4 text-black dark:text-gray-300">Trends for you</h4>
+      {loading ? (
+            <Button color="gray" className="border-0">
+              <Spinner aria-label="Loading spinner" size="sm" />
+              <span className="pl-3 animate-pulse">Loading...</span>
+            </Button>
+          ): (
+            <div>
+            <div className="items-center justify-center  -mt-2 ">
+            
+            {trendingTopics.map((topic) => (
+              <>
+                <div key={topic.topic}>
+                  <Trends topic={topic} postCount={topic.postCount}/> 
+                </div>
+              </>
+        ))}          
+            </div>
+            
+          </div>
+          )}  
+    </div>
+    </div>
+    </div>
+ 
+      )}
+    </div>
+)}

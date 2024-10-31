@@ -1,0 +1,83 @@
+import { SparklesIcon } from "@heroicons/react/outline";
+import Input from "./Input";
+import Post from "./Post";
+import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
+import { useEffect, useState } from "react";
+import { db } from "../../firebase";
+import { AnimatePresence, motion } from "framer-motion";
+import Stories from "../Stories";
+import { Button, Spinner } from "flowbite-react";
+
+
+export default function Feed() {
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPost = async () => {
+    const q = query(collection(db, "posts"), orderBy("timestamp", "desc"));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setPosts(snapshot.docs);
+      setLoading(false);
+    });
+   
+    return () => unsubscribe();
+  }
+  fetchPost();
+  }, []);
+
+
+
+  return (
+    <div className="dark:bg-gray-950  dark:border-gray-700
+     border-gray-200 xl:min-w-[576px] min-w-[600px] sm:w-screen xl:max-w-[620px] sm:px-10 md:px-24 px-4 xl:px-0 min-h-screen">
+     <div className=" dark:border-gray-700 border-gray-200">
+    {loading ? (
+        <Button color="gray" className="border-0 items-center flex mt-4 sm:mt-0">
+          <Spinner aria-label="Loading spinner" size="md" />
+          <span className="pl-3 animate-pulse sm:text-[16px] text-[28px]">Loading...</span>
+        </Button>
+      ) : (
+        <>
+      <div className="flex items-center dark:bg-gray-950 md:py-2 xl:px-3 sticky top-0 border-[1px] rounded-md
+       border-gray-200 bg-white  dark:border-gray-900">
+        <h2 className="text-2xl md:text-xl font-bold cursor-pointer top-0 fixed dark:text-gray-300 xl:p-0 ">National</h2>
+        <div className="flex items-center justify-center px-0 ml-auto w-9 h-9 ">
+          <SparklesIcon className="text-2xl sm:text-sm h-6 md:h-5 dark:text-gray-300" />
+        </div>
+      </div>
+      
+      <div className=" z-50">
+        <Stories />
+      </div>
+      
+      <div className="top-8 sticky bg-white dark:bg-gray-950">
+        <Input />
+      </div>
+
+      {loading ? (
+        <Button color="gray" className="border-0">
+          <Spinner aria-label="Loading spinner" size="sm" />
+          <span className="pl-3 animate-pulse">Loading...</span>
+        </Button>
+      ) : (
+        <AnimatePresence>
+          {posts.map((post) => (
+            <motion.div
+              key={post.id}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1 }}
+            >
+              <Post key={post.id} id={post.id} post={post} />
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      )}
+      </>
+      )}
+    </div>
+    </div>
+  );
+}

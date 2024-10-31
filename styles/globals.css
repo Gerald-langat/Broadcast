@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Apply a base dark background for the whole app */
+@layer base {
+  html {
+    @apply bg-white; /* Default light background */
+  }
+
+  .dark {
+    @apply bg-gray-950; /* Dark mode background */
+  }
+}
+
+/* Specific styling for the .str-video class */
+.str-video {
+  @apply bg-gray-900 text-white flex flex-col h-[100dvh] w-full min-w-0 max-w-full;
+}
