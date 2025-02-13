@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import MediaFeed from '../components/Media/MediaFeed'
-import { HomeIcon, MenuAlt1Icon, OfficeBuildingIcon, PauseIcon, SearchIcon, UserIcon } from '@heroicons/react/outline'
+import { HomeIcon, MenuAlt1Icon, SearchIcon } from '@heroicons/react/outline'
 import Widgets from '../components/National/Widgets';
 import Sidebar from '../components/National/Sidebar';
 import { useRouter } from 'next/router';
@@ -27,7 +27,7 @@ function media() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen justify-between w-full px-4">
+    <div className="flex flex-col min-h-screen justify-between w-full">
    
    <div className='min-w-[580px] sm:w-full'>
    <MediaFeed />
@@ -52,11 +52,23 @@ function media() {
         </div>
       )}
 
-    <div className="sm:hidden justify-between bottom-0 z-40 fixed bg-slate-50 dark:bg-gray-900 flex py-6 min-w-[580px]">
-      <MenuAlt1Icon className="pl-4 h-10 cursor-pointer" onClick={toggleSidebar} />
-      <HomeIcon className="h-10 cursor-pointer" onClick={toggleHome} />
-      <SearchIcon className="pr-6 h-10 cursor-pointer" onClick={toggleWidgets} />
-    </div>
+      <div
+        className="xl:hidden justify-between bottom-0 z-40 fixed bg-slate-50
+        dark:bg-gray-900 w-full flex py-4 sm:px-10 md:px-24 px-4"
+      >
+        <MenuAlt1Icon
+          className="pl-4 h-10 cursor-pointer"
+          onClick={toggleSidebar}
+        />
+        <HomeIcon
+          className="h-10 cursor-pointer"
+          onClick={toggleHome}
+        />
+        <SearchIcon
+          className="pr-6 h-10 cursor-pointer"
+          onClick={toggleWidgets}
+        />
+      </div>
   </div>
   )
 }  

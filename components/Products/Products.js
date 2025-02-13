@@ -35,7 +35,7 @@ function Products({data, id}) {
         className="max-w-sm hover:scale-105 transition transform duration-300 dark:bg-gray-950 border-[1px] 
         dark:border-gray-800 rounded-md border-gray-300 relative"
         >
-   <p className='absolute bg-yellow-500 text-white px-1'>{post?.reserved && 'Reserved'}</p>
+   <p className='absolute bg-yellow-500 text-white px-1 rounded-tl-md'>{post?.reserved && 'Reserved'}</p>
            {data?.data()?.images?.length > 1 ? (
             <Carousel className="top-0 h-[130px] w-full">
               {data?.data()?.images.map((imageUrl, index) => (

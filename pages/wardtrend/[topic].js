@@ -72,10 +72,12 @@ export default function TopicPostsPage() {
   
   const toggleSidebar = () => {
     setIsSidebarVisible(!isSidebarVisible);
+    setIsWidgetsVisible(false);
   };
 
   const toggleWidgets = () => {
     setIsWidgetsVisible(!isWidgetsVisible);
+    setIsSidebarVisible(false);
   }
 
   const toggleHome = () => {
@@ -91,7 +93,7 @@ export default function TopicPostsPage() {
       <Head>
         <title>{topic ? topic : 'loading...'}</title>
         <meta name="description" content="Generated and created by redAndttech" />
-        <link rel="icon" href="../../images/Brod.png" />
+        <link rel="icon" href="../../images/Brodcast.jpg" />
       </Head>
       <main className="flex min-h-screen mx-auto dark:bg-gray-950 sm:w-screen min-w-[580px] flex-grow sm:px-10 md:px-24 xl:px-0">
         {/* Sidebar */}
@@ -112,8 +114,8 @@ export default function TopicPostsPage() {
         </div>
         {/* Feed */}
         <div className="xl:ml-[370px] xl:min-w-[576px] min-w-[580px] sm:min-w-full flex-grow max-w-xl">
-          <div className="flex items-center space-x-2  py-2 px-3  top-0 bg-white border-[1px] rounded-md border-gray-300 dark:border-gray-900 dark:bg-gray-950">
-            <div className="" onClick={() => router.replace("/ward")}>
+          <div className="flex items-center space-x-2  py-2 px-3 sticky top-0 bg-white border-[1px] rounded-md border-gray-300 dark:border-gray-900 dark:bg-gray-950">
+            <div className="" onClick={() => router.push("/ward")}>
           <Tooltip content='back' arrow={false} placement="bottom" className="p-1 flex text-xs bg-gray-500 -mt-1">
               <ArrowLeftIcon className="h-8 cursor-pointer animate-pulse" />
             </Tooltip>
@@ -129,7 +131,7 @@ export default function TopicPostsPage() {
                     </Button>):(
                       <div>
               {posts.map((post) => (
-               <div key={post.id} className='dark:bg-gray-950 bg-gray-100'>
+               <div key={post.id} className='dark:bg-gray-950 bg-white'>
                
                  <WardTrends  key={post.id} id={post.id} post={post}/>
                    
@@ -152,8 +154,10 @@ export default function TopicPostsPage() {
        </div>
         <CommentModal />
       </main>
-      <div className='xl:hidden justify-between bottom-0 z-40 sticky bg-slate-50
-       dark:bg-neutral-700 sm:w-screen min-w-[580px] flex p-2  sm:px-10 md:px-24 px-4 flex-grow'>
+      <div
+        className="xl:hidden justify-between bottom-0 z-40 fixed bg-slate-50
+        dark:bg-gray-900 w-full flex py-4 sm:px-10 md:px-24 px-4"
+      >
           <MenuAlt1Icon className='pl-4 h-8 cursor-pointer' onClick={toggleSidebar} />
           <HomeIcon className='h-8 cursor-pointer' onClick={toggleHome}/>
           <SearchIcon className='pr-6 h-8 cursor-pointer' onClick={toggleWidgets}/>

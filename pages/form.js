@@ -38,7 +38,6 @@ function Form() {
 
   const fetchUserData = async () => {
     auth.onAuthStateChanged(async (user) => {
-      console.log(user)
       setUserDetails(user)
 
     })
@@ -206,7 +205,7 @@ function Form() {
     <Head>
         <title>Broadcast</title>
         <meta name="description" content="Generated and created by redAnttech" />
-        <link rel="icon" href="../../images/Brod.png" />
+        <link rel="icon" href="../../images/Brodcast.jpg" />
       </Head>
       <img src='../images/taxi.jpg' className='absolute -z-20 object-cover w-full hidden sm:inline h-full' alt='' />
    
@@ -288,8 +287,7 @@ function Form() {
               </div>
             )}
           </div>
-
-        
+      
 
           <div className='flex items-center'>
             <Popover 

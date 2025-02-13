@@ -80,7 +80,6 @@ const userId = userDetails?.uid;
  
   return (
 <div className='relative flex flex-col pt-2'>
-
   {message.recipientId === userId ? (
     <div className='flex items-center w-full'>
       {/* Message bubble */}

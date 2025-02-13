@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { db } from '../../firebase';
-import { collection, query, orderBy, onSnapshot, where, getDocs } from 'firebase/firestore';
-import { Button, Dropdown, Navbar, Popover, Spinner } from 'flowbite-react'; 
-import { ArrowCircleDownIcon, ArrowLeftIcon, HeartIcon, HomeIcon, SearchIcon, TrashIcon, UserIcon, XIcon } from '@heroicons/react/outline';
+import { collection, query, orderBy, onSnapshot, where } from 'firebase/firestore';
+import { Button, Popover, Spinner } from 'flowbite-react'; 
+import {  ArrowLeftIcon, HomeIcon, SearchIcon, UserIcon, XIcon } from '@heroicons/react/outline';
 import Products from './Products';
 import { useRouter } from 'next/router';
 import SearchProducts from './SearchProducts';

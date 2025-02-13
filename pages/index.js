@@ -12,7 +12,6 @@ function signInWithGoogle() {
   function googleLogin(){
     const provider = new GoogleAuthProvider();
     signInWithPopup(auth, provider).then(async(result)=>{
-      console.log(result)
  
       if (result.user) {
         const userEmail = result.user.email;

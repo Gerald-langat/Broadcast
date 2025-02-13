@@ -174,7 +174,7 @@ export default function Input() {
           <div className="w-full divide-y divide-gray-200 dark:divide-gray-900">
             <div className="">
               <textarea
-                className="dark:bg-gray-950 dark:border-gray-700 dark:placeholder:text-gray-100 dark:text-gray-300 w-full border-none focus:ring-0 text-lg placeholder-gray-700 tracking-wide min-h-[50px] text-gray-700"
+                className="dark:bg-gray-950 dark:border-gray-700 dark:placeholder:text-gray-100 dark:text-gray-300 w-full border-none focus:ring-0 placeholder-gray-700 tracking-wide min-h-[50px] text-gray-700 text-2xl sm:text-lg placeholder:text-2xl"
                 rows="2"
                 placeholder="type here...."
                 value={input}
@@ -230,7 +230,7 @@ export default function Input() {
                   <div className="flex">
                     <div onClick={() => filePickerRef.current.click()}>
                     <Tooltip content='image' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-                      <PhotographIcon className="h-10 w-10 rounded-full cursor-pointer p-2 text-sky-500 dark:hover:bg-neutral-700 hover:bg-sky-100" />
+                      <PhotographIcon className="h-14 w-14 md:h-10 md:w-10 rounded-full cursor-pointer p-2 text-sky-500 dark:hover:bg-neutral-700 hover:bg-sky-100" />
                       <input
                         type="file"
                         hidden
@@ -242,7 +242,7 @@ export default function Input() {
                     </div>
                     <div onClick={() => videoPickerRef.current.click()}>
                     <Tooltip content='video' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-                      <CameraIcon className="h-10 w-10 rounded-full cursor-pointer p-2 text-sky-500 hover:bg-sky-100 dark:hover:bg-neutral-700" />
+                      <CameraIcon className="h-14 w-14 md:h-10 md:w-10 rounded-full cursor-pointer p-2 text-sky-500 hover:bg-sky-100 dark:hover:bg-neutral-700" />
                       <input
                         type="file"
                         accept="video/*"
@@ -274,7 +274,7 @@ export default function Input() {
                   <button
                     onClick={sendPost}
                     disabled={!input.trim()}
-                    className="bg-blue-400 text-white px-4 py-1.5 rounded-full font-bold shadow-md hover:brightness-95 disabled:opacity-50"
+                    className="bg-blue-400 text-white px-4 py-1.5 rounded-full font-bold shadow-md hover:brightness-95 disabled:opacity-50 text-2xl sm:text-lg"
                   >
                     Cast
                   </button>

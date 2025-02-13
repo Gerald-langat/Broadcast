@@ -23,7 +23,6 @@ const [productName, setProductName] = useState(null);
 
   const fetchUserData = async () => {
     auth.onAuthStateChanged(async (user) => {
-      console.log(user)
       setUserDetails(user)
     })
   }
@@ -139,7 +138,7 @@ const removeSelectedFile = (index) => {
     <Head>
     <title>MarketPlace</title>
     <meta name="description" content="Generated and created by redAnttech" />
-    <link rel="icon" href="../../images/Brod.png" />
+    <link rel="icon" href="../../images/Brodcast.jpg" />
   </Head>
 
     <div className="bg-gray-100 h-screen dark:bg-gray-950">

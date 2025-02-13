@@ -62,8 +62,8 @@ export default function Feed() {
 
 
   return (
-    <div className="dark:bg-gray-950 xl:ml-[380px] 
-     border-gray-200 xl:min-w-[576px] min-w-[580px] sm:w-screen xl:w-[576px] sm:px-10 md:px-24 px-4 xl:p-0  min-h-screen">
+    <div className="dark:bg-gray-950  dark:border-gray-700 xl:ml-[340px]
+     border-gray-200 xl:min-w-[576px] min-w-[600px] sm:w-screen xl:max-w-[620px] sm:px-10 md:px-24 px-4 xl:px-0 min-h-screen">
      <div className="xl:border-0 sm:border-x-[1px] dark:border-gray-700 border-gray-200">
      {loading ? (
         <Button color="gray" className="border-0 items-center flex mt-4 sm:mt-0">

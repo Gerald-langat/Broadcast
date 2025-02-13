@@ -6,8 +6,8 @@ import {
   PhotographIcon,
   XIcon,
 } from "@heroicons/react/outline";
-import { useEffect, useState } from "react";
-import { auth, db } from "../../firebase";
+import { useEffect, useRef, useState } from "react";
+import { auth, db, storage } from "../../firebase";
 import {
   addDoc,
   collection,
@@ -16,11 +16,13 @@ import {
   onSnapshot,
   query,
   serverTimestamp,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import Moment from "react-moment";
 import Picker from 'emoji-picker-react'
 import { Popover, Tooltip } from "flowbite-react";
+import { getDownloadURL, ref, uploadString } from "firebase/storage";
 
 
 export default function CommentModal() {
@@ -34,7 +36,8 @@ export default function CommentModal() {
   const [loading, setLoading] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [emoji, setEmoji] = useState("");
-
+  const filePickerRef = useRef(null);
+  const [selectedFile, setSelectedFile] = useState(null);
   
 
   const fetchUserData = async () => {
@@ -76,17 +79,29 @@ export default function CommentModal() {
       setLoading(true);
     }
 
-    await addDoc(collection(db, "constituency", userData.constituency, postId, "comments"), {
+    const docRef = await addDoc(collection(db, "constituency", userData.constituency, postId, "comments"), {
       comment: input,
       userImg: userData.userImg,
       name: userData.name,
       nickname:userData.nickname,
       timestamp: serverTimestamp(),
-      userId: userDetails.uid,
+      id: userDetails.uid,
     });
+
+    const RepImage = ref(storage, `constreply/${docRef.id}/image`);
+    if (selectedFile) {
+       await uploadString(RepImage, selectedFile, "data_url").then(async () => {
+         const downloadURL = await getDownloadURL(RepImage);
+         await updateDoc(doc(db, "constituency", userData.constituency, postId, "comments", docRef.id), {
+           image: downloadURL,
+         });
+       });
+     }
+
     setLoading(false);
     setOpen(false);
     setInput("");
+    setSelectedFile(null); 
     setShowEmojiPicker(false);
   }
 
@@ -95,6 +110,17 @@ export default function CommentModal() {
     setShowEmojiPicker(false);
     setInput("");
   }
+
+    //  images
+    const addImageReply = (e) => {
+      const reader = new FileReader();
+      if (e.target.files[0]) {
+        reader.readAsDataURL(e.target.files[0]);
+      }
+      reader.onload = (readerEvent) => {
+        setSelectedFile(readerEvent.target.result);
+      };
+    };
 
   return (
     <div>
@@ -150,23 +176,25 @@ export default function CommentModal() {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onClick={() => setShowEmojiPicker(false)}
-                  ></textarea>
+                  >
+                  </textarea>
                 </div>
 
                 <div className="flex items-center justify-between pt-2.5">
                   <div className="flex">
                     <div
                       className=""
-                      // onClick={() => filePickerRef.current.click()}
+                       onClick={() => filePickerRef.current.click()}
                     >
                     <Tooltip content='image' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
                       <PhotographIcon className="h-10 w-10 rounded-full p-2 cursor-pointer text-sky-500 hover:bg-sky-100 dark:hover:bg-neutral-700" />
-                      {/* <input
+                      <input
                         type="file"
                         hidden
+                        accept="image/*"
                         ref={filePickerRef}
-                        onChange={addImageToPost}
-                      /> */}
+                        onChange={addImageReply}
+                      />
                       </Tooltip>
                     </div>
                     <Popover
@@ -188,6 +216,19 @@ export default function CommentModal() {
                       />
                    
                     </Popover>
+                    {selectedFile && (
+                    <div className="relative">
+                      <XIcon
+                        onClick={() => setSelectedFile(null)}
+                        className="border h-7 text-black absolute cursor-pointer shadow-md border-white m-1 rounded-full"
+                      />
+                      <img
+                        src={selectedFile}
+                        controls
+                        className={`${loading && "animate-pulse"} h-[200px] w-[300px] object-cover` }
+                      />
+                    </div>
+                  )}
                   </div>
                   <button
                     onClick={sendComment}

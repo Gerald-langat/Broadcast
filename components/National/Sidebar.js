@@ -7,6 +7,7 @@ import { modalStatus } from '../../atoms/modalAtom';
 import { Button, Spinner, Tooltip } from 'flowbite-react';
 import { HomeIcon, InboxInIcon, NewspaperIcon, OfficeBuildingIcon, PauseIcon, PlusIcon, UserIcon } from '@heroicons/react/outline';
 import { useFollow } from '../FollowContext';
+import Link from 'next/link';
 
 
 export default function Sidebar() {
@@ -16,7 +17,7 @@ export default function Sidebar() {
   const [open, setOpen] = useRecoilState(modalStatus);
   const [userDetails, setUserDetails] = useState(null);
   const [posts, setPosts] = useState([]);
-  const { hasFollowed, followMember } = useFollow();
+  const { hasFollowed, followMember, followloading } = useFollow();
   const [userPosts, setUserPosts] = useState(null);
 
   // Fetch user details
@@ -73,13 +74,9 @@ export default function Sidebar() {
   }, [db]);
   
 
-
-
-
-  
   return (
     <div className="dark:bg-gray-950 bg-white xl:flex flex-col px-28 md:p-2 items-start 
-      fixed h-full sm:w-1/4 w-3/4 ">
+      fixed h-full lg:w-1/4 w-3/4 ">
       {loading ? (
         <Button color="gray" className="border-0 ml-20 items-center flex mt-4 sm:mt-0">
           <Spinner aria-label="Loading spinner" size="md" />
@@ -89,10 +86,11 @@ export default function Sidebar() {
         <div className='md:-ml-[50px]'>
           {userPosts && (
             <div className="flex space-x-3 items-center w-[400px] sm:w-[300px] mb-1 p-2 -ml-20 md:ml-16 cursor-pointer">
-              <Tooltip content="profile" arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
+              <Tooltip content="logout" arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
                 <img
                   src={userPosts.userImg}
                   className="sm:h-11 sm:w-11 h-20 w-20 rounded-md cursor-pointer hover:brightness-95 shadow-gray-800 shadow-sm dark:shadow-gray-600"
+                  onClick={() => router.replace('/')}
                 />
               </Tooltip>
               <div className="flex-1 flex-col">
@@ -115,30 +113,42 @@ export default function Sidebar() {
           )}
           
           <div className='-ml-20 md:ml-16 w-[292px]'>
-            <div className='flex cursor-pointer items-center space-x-4 dark:text-gray-200 dark:hover:bg-gray-900 hover:bg-gray-200 rounded-full w-full px-2 sm:py-2 py-4' onClick={() => router.push('/home')}>
+          <Link href='/home'>
+            <div className='flex cursor-pointer items-center space-x-4 dark:text-gray-200 dark:hover:bg-gray-900 hover:bg-gray-200 rounded-full w-full px-2 sm:py-2 py-4'>
               <HomeIcon className='h-9'/>
               <span className='text-2xl sm:text-lg'>Home</span>
             </div>
-            <div className='flex  items-center space-x-4 dark:text-gray-200 cursor-pointer dark:hover:bg-gray-900 hover:bg-gray-200 rounded-full w-full px-2 sm:py-2 py-4' onClick={() => router.push('/media')}>
+            </Link>
+            <Link href='/media'>
+            <div className='flex  items-center space-x-4 dark:text-gray-200 cursor-pointer dark:hover:bg-gray-900 hover:bg-gray-200 rounded-full w-full px-2 sm:py-2 py-4'>
               <PauseIcon className='h-9'/>
               <span className='text-2xl sm:text-lg'>Media</span>
             </div>
-            <div className='flex  items-center space-x-4 dark:text-gray-200 cursor-pointer dark:hover:bg-gray-900 hover:bg-gray-200 rounded-full w-full px-2 sm:py-2 py-4' onClick={() => router.push('/news')}>
+            </Link>
+            <Link href='/news'>
+            <div className='flex  items-center space-x-4 dark:text-gray-200 cursor-pointer dark:hover:bg-gray-900 hover:bg-gray-200 rounded-full w-full px-2 sm:py-2 py-4'>
               <NewspaperIcon className='h-9'/>
               <span className='text-2xl sm:text-lg'>News</span>
             </div>
-            <div className='flex  items-center space-x-4 dark:text-gray-200 dark:hover:bg-gray-900 hover:bg-gray-200 rounded-full w-full px-2 sm:py-2 py-4 cursor-pointer' onClick={() => router.push('/marketplace')}>
+            </Link>
+            <Link href='/marketplace'>
+            <div className='flex  items-center space-x-4 dark:text-gray-200 dark:hover:bg-gray-900 hover:bg-gray-200 rounded-full w-full px-2 sm:py-2 py-4 cursor-pointer'>
               <OfficeBuildingIcon className='h-9'/>
               <span className='text-2xl sm:text-lg'>MarketPlace</span>
             </div>
+            </Link>
+            <Link href='/messages'>
             <div className='flex  items-center space-x-4 dark:text-gray-200 dark:hover:bg-gray-900 hover:bg-gray-200 rounded-full w-full px-2 sm:py-2 py-4 cursor-pointer' onClick={() => router.push('/messages')}>
               <InboxInIcon className='h-9'/>
               <span className='text-2xl sm:text-lg'>Message</span>
             </div>
+            </Link>
+            <Link href='/profile'>
             <div className='flex items-center space-x-4 dark:text-gray-200 dark:hover:bg-gray-900 hover:bg-gray-200 rounded-full w-full px-2 sm:py-2 py-4 cursor-pointer' onClick={() => router.push('/profile')}>
               <UserIcon className='h-9'/>
               <span className='text-2xl sm:text-lg'>Profile</span>
             </div>
+            </Link>
           </div>
           
           <div className="mt-2 mb-2.5 xl:items-start w-[292px] md:ml-14 -ml-20">
@@ -161,19 +171,30 @@ export default function Sidebar() {
           </div>
         </div>
         <div className="ml-auto">
-          <p  
-        className={`${
-          userPosts?.name === post?.name 
-            ? 'hidden' 
-            : 'font-bold text-blue-500 sm:text-sm text-2xl cursor-pointer space-y-2'
-        }`}
-        onClick={() => followMember(post?.id, userDetails, userPosts)}
-      >
-        {hasFollowed[post?.id] ? 'Unfollow' : 'Follow'}
-      </p>
-          
+
+        <p  
+  className={`${
+    userPosts?.name === post?.name 
+      ? 'hidden' 
+      : 'font-bold text-blue-500 sm:text-sm text-2xl cursor-pointer space-y-2'
+  }`}
+  onClick={() => {
+  
+    followMember(post?.id);
+    
+  }}
+>
+ {followloading[post?.id] ? (
+    <Spinner aria-label="Loading spinner" size="sm" />
+  ) : hasFollowed[post?.id] ? (
+    <p>Unfollow</p>
+  ) : (
+    "Follow"
+  )}
+</p>
         </div>
       </div>
+      
     ))}
   </div>
 </div>

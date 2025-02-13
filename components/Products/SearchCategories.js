@@ -5,30 +5,9 @@ import { db } from '../../firebase';
 import { Card, Carousel } from 'flowbite-react';
 
 
-function SearchCategories({ data, category, id }) {
-  const [searchResults, setPost] = useState(null);
+function SearchCategories({ data, id }) {
   const router = useRouter();
-  
-  useEffect(() => {
-    const fetchPostsByName = async () => {
-      try {
-        const q = query(collection(db, 'marketplace'), where('category', '==', category));
-        const querySnapshot = await getDocs(q);
-        
-        const postsData = [];
-        querySnapshot.forEach((doc) => {
-          postsData.push(doc.data());
-        });
-        
-        setPost(postsData);
-      } catch (error) {
-        console.error('Error fetching posts:', error);
-      }
-    };
-  
-    fetchPostsByName();
-  }, [category]);
-  
+
 
 
   return (

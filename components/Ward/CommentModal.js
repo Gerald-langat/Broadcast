@@ -6,8 +6,8 @@ import {
   PhotographIcon,
   XIcon,
 } from "@heroicons/react/outline";
-import { useEffect, useState } from "react";
-import { auth, db } from "../../firebase";
+import { useEffect, useRef, useState } from "react";
+import { auth, db, storage } from "../../firebase";
 import {
   addDoc,
   collection,
@@ -16,11 +16,13 @@ import {
   onSnapshot,
   query,
   serverTimestamp,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import Moment from "react-moment";
 import Picker from 'emoji-picker-react'
 import { Popover, Tooltip } from "flowbite-react";
+import { getDownloadURL, ref, uploadString } from "firebase/storage";
 
 export default function CommentModal() {
   
@@ -33,6 +35,8 @@ export default function CommentModal() {
   const [loading, setLoading] = useState(false);
   const [emoji, setEmoji] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const filePickerRef = useRef(null);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   const fetchUserData = async () => {
     auth.onAuthStateChanged(async (user) => {
@@ -74,7 +78,7 @@ export default function CommentModal() {
   async function sendComment() {
     if(loading) return;
     setLoading(true);
-    await addDoc(collection(db, "ward", userData.ward, postId, "comments"), {
+    const docRef = await addDoc(collection(db, "ward", userData.ward, postId, "comments"), {
       comment: input,
       name: userData.name,
       lastname: userData.lastname,
@@ -84,8 +88,19 @@ export default function CommentModal() {
       id: userDetails.uid,
     });
 
+    const RepImage = ref(storage, `wardreply/${docRef.id}/image`);
+    if (selectedFile) {
+       await uploadString(RepImage, selectedFile, "data_url").then(async () => {
+         const downloadURL = await getDownloadURL(RepImage);
+         await updateDoc(doc(db, "ward", userData.ward, postId, "comments", docRef.id), {
+           image: downloadURL,
+         });
+       });
+     }
+
     setLoading(false);
     setOpen(false);
+    setSelectedFile(null);
     setInput("");
   }
 
@@ -94,6 +109,17 @@ const closeMode = () => {
   setShowEmojiPicker(false);
   setInput("");
 }
+
+ //  images
+ const addImageReply = (e) => {
+  const reader = new FileReader();
+  if (e.target.files[0]) {
+    reader.readAsDataURL(e.target.files[0]);
+  }
+  reader.onload = (readerEvent) => {
+    setSelectedFile(readerEvent.target.result);
+  };
+};
 
   return (
     <div>
@@ -156,16 +182,17 @@ const closeMode = () => {
                   <div className="flex">
                     <div
                       className=""
-                      // onClick={() => filePickerRef.current.click()}
+                       onClick={() => filePickerRef.current.click()}
                     >
           <Tooltip content='image' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
                       <PhotographIcon className="h-10 w-10 rounded-full cursor-pointer p-2 text-sky-500 hover:bg-sky-100 dark:hover:bg-gray-950" />
-                      {/* <input
+                      <input
                         type="file"
                         hidden
+                        accept="image/*"
                         ref={filePickerRef}
-                        onChange={addImageToPost}
-                      /> */}
+                        onChange={addImageReply}
+                      />
                       </Tooltip>
                     </div>
                     <Popover
@@ -187,6 +214,19 @@ const closeMode = () => {
                       />
                    
                     </Popover>
+                    {selectedFile && (
+                    <div className="relative">
+                      <XIcon
+                        onClick={() => setSelectedFile(null)}
+                        className="border h-7 text-black absolute cursor-pointer shadow-md border-white m-1 rounded-full"
+                      />
+                      <img
+                        src={selectedFile}
+                        controls
+                        className={`${loading && "animate-pulse"} h-[200px] w-[300px] object-cover` }
+                      />
+                    </div>
+                  )}
                   </div>
                   <button
                     onClick={sendComment}

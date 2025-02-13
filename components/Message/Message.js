@@ -43,7 +43,6 @@ function Message({ post, id }) {
       if (userDetails) {
         const q = query(collection(db, 'userPosts'), where('id', '==', userDetails.uid));
         const querySnapshot = await getDocs(q);
-        console.log(userDetails.uid)
         if (!querySnapshot.empty) {
           setUserData(querySnapshot.docs[0].data());
         }

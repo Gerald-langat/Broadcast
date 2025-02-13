@@ -159,6 +159,9 @@ export default function Input() {
     };
   };
 
+  const removeSelectedFile = (index) => {
+    setSelectedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+  };
 
   return (
     <>

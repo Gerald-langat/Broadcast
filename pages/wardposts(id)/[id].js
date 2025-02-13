@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { collection, doc, getDocs, onSnapshot, query, where } from 'firebase/firestore';
+import { collection, doc, getDocs, onSnapshot, orderBy, query, where } from 'firebase/firestore';
 import { auth, db } from '../../firebase';
 import { ArrowLeftIcon, HomeIcon, MenuAlt1Icon, SearchIcon } from '@heroicons/react/outline';
 import Sidebar from '../../components/National/Sidebar';
@@ -71,7 +71,7 @@ useEffect(
       return;
     }
     onSnapshot(
-      query(collection(db, "ward", userData.ward, id, "comments")),
+      query(collection(db, "ward", userData.ward, id, "comments"), orderBy("timestamp", "desc")),
       (snapshot) => {
         setComments(snapshot.docs);
 
@@ -82,10 +82,12 @@ useEffect(
 
 const toggleSidebar = () => {
   setIsSidebarVisible(!isSidebarVisible);
+  setIsWidgetsVisible(false);
 };
 
 const toggleWidgets = () => {
   setIsWidgetsVisible(!isWidgetsVisible);
+  setIsSidebarVisible(false);
 }
 
 const toggleHome = () => {
@@ -101,7 +103,7 @@ const toggleHome = () => {
       <Head>
         <title>{post?.data()?.text ? post?.data()?.text : 'loading...'}</title>
         <meta name="description" content="Generated and created by redAndTech" />
-        <link rel="icon" href="../../images/Brod.png" />
+        <link rel="icon" href="../../images/Brodcast.jpg" />
       </Head>
       <main className="flex min-h-screen mx-auto dark:bg-gray-950 sm:w-screen min-w-[580px] flex-1 sm:px-10 md:px-24 xl:px-0">
         {/* Sidebar */}
@@ -119,9 +121,9 @@ const toggleHome = () => {
       <Sidebar />
     </div>
         <div className="xl:ml-[370px] xl:min-w-[576px] min-w-[580px] sm:min-w-full flex-grow max-w-xl">
-          <div className="flex items-center space-x-2  py-2 px-3 sticky top-0 bg-white dark:bg-gray-950 border-[1px] rounded-md border-gray-900">
+          <div className="flex items-center space-x-2  py-2 px-3 sticky top-0 bg-white dark:bg-gray-950 border-[1px] rounded-md border-gray-300 dark:border-gray-900">
           <Tooltip content='back' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-            <div className="animate-pulse" onClick={() => router.replace("/ward")}>
+            <div className="animate-pulse" onClick={() => router.push("/ward")}>
               <ArrowLeftIcon className="h-8 animate-pulse cursor-pointer" />
             </div>
             </Tooltip>
@@ -174,8 +176,10 @@ const toggleHome = () => {
         <CommentModal />
         <StatusModal />
       </main>
-      <div className="xl:hidden justify-between bottom-0 z-40 fixed bg-slate-50 dark:bg-neutral-700 
-     sm:w-screen min-w-[580px] flex p-2 sm:px-10 md:px-24 px-4">
+      <div
+        className="xl:hidden justify-between bottom-0 z-40 fixed bg-slate-50
+        dark:bg-gray-900 w-full flex py-4 sm:px-10 md:px-24 px-4"
+      >
     <MenuAlt1Icon className="pl-4 h-8 cursor-pointer" onClick={toggleSidebar} />
     <HomeIcon className="h-8 cursor-pointer" onClick={toggleHome} />
     <SearchIcon className="pr-6 h-8 cursor-pointer" onClick={toggleWidgets} />

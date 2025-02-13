@@ -1,32 +1,50 @@
 import {
+  BookmarkIcon,
   DotsHorizontalIcon,
+  EyeOffIcon,
+  FlagIcon,
   HeartIcon,
   ReplyIcon,
   ShareIcon,
   TrashIcon,
+  UserAddIcon,
+  UserRemoveIcon,
 } from "@heroicons/react/outline";
 import { HeartIcon as HeartIconFilled } from "@heroicons/react/solid";
 import Moment from "react-moment";
 import {
+  addDoc,
   collection,
   deleteDoc,
   doc,
+  getDoc,
+  getDocs,
   onSnapshot,
+  query,
+  serverTimestamp,
   setDoc,
+  where,
 } from "firebase/firestore";
 import { auth, db } from "../../firebase";
-import { signIn } from "next-auth/react";
 import { useState, useEffect } from "react";
-import { useRecoilState } from "recoil";
-import { modalState, postIdState } from "../../atoms/modalAtom";
+import { Popover, Tooltip } from "flowbite-react";
 import { useRouter } from "next/router";
-import { Tooltip } from "flowbite-react";
+import { useFollow } from "../FollowContext";
 
 export default function Comment({ comment, commentId, originalPostId }) {
   const [likes, setLikes] = useState([]);
   const [hasLiked, setHasLiked] = useState(false);
   const [userDetails, setUserDetails] = useState(null);
-  
+  const [userData, setUserData] = useState(null);
+  const router = useRouter();
+  const { hasFollowed, followMember } = useFollow();
+  const [isHidden, setIsHidden] = useState(false);
+  const [showUndo, setShowUndo] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [reportReason, setReportReason] = useState("");
+  const [isReported, setIsReported] = useState({});
+  const [isBookmarked, setIsBookmarked] = useState({});
+
 
   const fetchUserData = async () => {
     auth.onAuthStateChanged(async (user) => {
@@ -38,6 +56,20 @@ export default function Comment({ comment, commentId, originalPostId }) {
   useEffect(() => {
     fetchUserData();
   }, []);
+
+    useEffect(() => {
+      const fetchUserData = async () => {
+        if (userDetails) {
+          const q = query(collection(db, 'userPosts'), where('id', '==', userDetails.uid));
+          const querySnapshot = await getDocs(q);
+          console.log(userDetails.uid)
+          if (!querySnapshot.empty) {
+            setUserData(querySnapshot.docs[0].data());
+          }
+        }
+      };
+      fetchUserData();
+    }, [userDetails]);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
@@ -63,7 +95,7 @@ export default function Comment({ comment, commentId, originalPostId }) {
             "comments",
             commentId,
             "likes",
-            userDetails.uid
+            userDetails?.uid
           )
         );
       } else {
@@ -75,7 +107,7 @@ export default function Comment({ comment, commentId, originalPostId }) {
             "comments",
             commentId,
             "likes",
-            userDetails.uid
+            userDetails?.uid
           ),
           {
             email: userDetails.email,
@@ -83,13 +115,7 @@ export default function Comment({ comment, commentId, originalPostId }) {
         );
       }
     } else {
-      signIn();
-    }
-  }
-
-  async function deleteComment() {
-    if (window.confirm("Are you sure you want to delete this comment?")) {
-      deleteDoc(doc(db, "posts", originalPostId, "comments", commentId));
+      router.replace('/');
     }
   }
 
@@ -121,8 +147,208 @@ export default function Comment({ comment, commentId, originalPostId }) {
     }
   };
 
+  async function deleteComment() {
+    if (window.confirm("Are you sure you want to delete this comment?")) {
+      if (originalPostId || commentId) {
+        try {
+          const likesCollectionRef = collection(db, "posts", originalPostId, "comments", commentId, "likes");
+          const likesSnapshot = await getDocs(likesCollectionRef);
+    
+          const deleteLikesPromises = likesSnapshot.docs.map((likeDoc) =>
+            deleteDoc(likeDoc.ref)
+          );
+          await Promise.all(deleteLikesPromises);
+    
+      deleteDoc(doc(db, "posts", originalPostId, "comments", commentId));
+        } catch (err) {
+          console.error('Error deleting the post:', err);
+        }
+      } else {
+      console.log('No post document reference available to delete.');
+      }
+    }
+  }
+
+  // repost
+   const repost = async () => {
+      if(!userDetails?.uid) {
+        router.replace('/');
+      }
+      if (comment) {
+        const postData = comment;
+        console.log('Post data:', postData);
+        try {
+          // Construct the new post data object
+          const newPostData = {
+            id: userDetails.uid,
+            comment: postData.comment,
+            userImg: userData.userImg,
+            timestamp: serverTimestamp(),
+            lastname: userData.lastname,
+            name: userData.name,
+            nickname: userData.nickname,
+            from: postData.name,
+            fromNickname: postData.nickname,
+            citeUserImg: postData.userImg,
+            // Include image  only if they are defined
+           
+            ...(postData.category && { fromCategory: postData.category }),
+            ...(postData.image && { image: postData.image }),
+          };
+    
+         await addDoc(collection( db, "posts", originalPostId, "comments",
+          ), newPostData);
+          console.log('Post reposted successfully!');
+        } catch (error) {
+          console.error('Error reposting the post:', error);
+        }
+      } else {
+        console.log('No post data available to repost.');
+      }
+    };
+
+    
+  // delete Repost
+  const deleteRepost = async () => {
+    if (window.confirm("Are you sure you want to delete this post?")) {
+      if (originalPostId || commentId) {
+        try {
+          const likesCollectionRef = collection(db, "posts", originalPostId, "comments", commentId, "likes");
+          const likesSnapshot = await getDocs(likesCollectionRef);
+    
+          const deleteLikesPromises = likesSnapshot.docs.map((likeDoc) =>
+            deleteDoc(likeDoc.ref)
+          );
+          await Promise.all(deleteLikesPromises);
+          await deleteDoc(doc(db, "posts", originalPostId, "comments", commentId));
+          console.log('Post deleted successfully');
+        } catch (error) {
+          console.error('Error deleting the post:', error);
+        }
+      } else {
+        console.log('No post document reference available to delete.');
+      }
+    }
+  };
+
+    // Check if the post is already bookmarked
+    const userId = userDetails?.uid;
+    const pstId = commentId;
+    // Toggle bookmark
+    const checkBookmark = async () => {
+      if (!userId || !pstId) return;
+      try {
+        const docRef = doc(db, `bookmarks/${userId}/bookmarks`, pstId);
+        const docSnap = await getDoc(docRef);
+        setIsBookmarked((prev) => ({
+          ...prev,
+          [pstId]: docSnap.exists(),
+        }));
+      } catch (error) {
+        console.error("Error checking bookmark status:", error);
+      }
+    };
+  
+    // Toggle bookmark
+    const toggleBookmark = async () => {
+      if (!userId || !pstId) return;
+      try {
+        const collectionRef = collection(db, `bookmarks/${userId}/bookmarks`);
+        const docRef = doc(collectionRef, pstId);
+  
+        if (isBookmarked[pstId]) {
+          // Remove bookmark
+          await deleteDoc(docRef);
+          setIsBookmarked((prev) => ({
+            ...prev,
+            [pstId]: false,
+          }));
+        } else {
+          // Add bookmark
+          const image = comment?.image || null;
+          
+          // Add new document to the collection
+          const bookmarkData = { pstId, timestamp: Date.now() };
+          if (image) bookmarkData.image = image;
+        
+          await setDoc(docRef, bookmarkData); // Use setDoc to ensure consistent doc IDs
+          setIsBookmarked((prev) => ({
+            ...prev,
+            [pstId]: true,
+          }));
+        }
+      } catch (error) {
+        console.error("Error toggling bookmark:", error);
+      }
+    };
+  
+    useEffect(() => {
+      checkBookmark();
+    }, [pstId, userId]);
+
+     // report post
+  const submitReport = async () => {
+    if (!userId || !pstId) return;
+    try {
+      const collectionRef = collection(db, `reports/${userId}/reports`); // Path specific to the user
+      const docRef = doc(collectionRef, pstId);
+  
+      if (isReported[pstId]) {
+        // Remove report
+        await deleteDoc(docRef);
+        setIsReported((prev) => ({
+          ...prev,
+          [pstId]: false,
+        }));
+        alert("Report removed.");
+      } else {
+        // Validate the report reason
+        if (!reportReason) {
+          alert("Please select a reason for reporting.");
+          return;
+        }
+  
+        // Add report
+        const reportData = {
+          pstId,
+          userId,
+          reportReason,
+          timestamp: Date.now(),
+        };
+  
+        await setDoc(docRef, reportData); // Use setDoc for consistent doc IDs
+        setIsReported((prev) => ({
+          ...prev,
+          [pstId]: true,
+        }));
+        alert("Your report has been submitted. Thank you!");
+      }
+    } catch (error) {
+      console.error("Error toggling report:", error);
+      alert("Failed to toggle report. Please try again later.");
+    }
+    setShowModal(false)
+  };
+
+    const handleNotInterested = () => {
+      setIsHidden(true);
+      setShowUndo(true);
+      // Optionally, save this preference to local storage or backend if needed
+    };
+  
+    const handleUndo = () => {
+      setIsHidden(false);
+      setShowUndo(false);
+    };
+  
+    const handleCancel = () => {
+      setShowModal(false);
+    };
+
   return (
-    <div className="flex p-3 cursor-pointer pl-20">
+    <div>
+    <div className={`w-full ${isHidden ? 'inline text-2xl sm:text-xl cursor-pointer dark:hover:bg-gray-900 hover:bg-gray-200 rounded-md p-1' : 'hidden'}`} onClick={handleUndo}>{showUndo && 'undo'}</div>
+    <div className={`${isHidden ? 'hidden' : "flex p-3 cursor-pointer pl-20"}`}>
       {/* user image */}
       <img
         className="h-11 w-11 rounded-full mr-4"
@@ -136,30 +362,130 @@ export default function Comment({ comment, commentId, originalPostId }) {
         <div className="flex items-center justify-between">
           {/* post user info */}
           <div className="flex items-center space-x-1 whitespace-nowrap">
-            <h4 className="font-bold text-[15px] sm:text-[16px] hover:underline">
+            <h4 className="font-bold text-[20px] sm:text-[16px] hover:underline">
               {comment?.name}
             </h4>
-            <span className="text-sm sm:text-[15px]">
+            <span className="text-[20px] sm:text-[15px]">
               @{comment?.nickname} -{" "}
             </span>
-            <span className="text-sm sm:text-[15px] hover:underline">
+            <span className="text-[20px] sm:text-[15px] hover:underline">
               <Moment fromNow>{comment?.timestamp?.toDate()}</Moment>
             </span>
           </div>
-
+         
           {/* dot icon */}
-          <DotsHorizontalIcon className="h-10 text-gray-600 dark:text-gray-200 rounded-full cursor-pointer w-10 hover:bg-sky-100 hover:text-sky-500 p-2 dark:hover:bg-neutral-700" />
+          <Popover
+                aria-labelledby="profile-popover"
+                className="md:-ml-28 -ml-8 z-20 shadow-md rounded-lg dark:shadow-gray-400 shadow-gray-500"
+                content={
+                  <div className="w-64 text-xl sm:text-sm text-gray-500 dark:text-gray-300 bg-gray-300 dark:bg-gray-900 
+                     py-2 space-y-3 border-none">
+                     
+                     { comment?.id !== userDetails?.uid ? 
+                        (
+                          <>
+                          <div className="flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900" onClick={handleNotInterested}>
+                    <EyeOffIcon className="h-6"/>
+                      <p>Not interested</p>
+                    </div>
+                    
+
+                    <div className={`${userData?.name == comment?.name ? 'hidden' : 'flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900 '}`} >
+                    {hasFollowed[comment?.id] ? (
+                      <UserRemoveIcon className="h-6" />
+
+                    ) : (
+                      <UserAddIcon className="h-6" />
+
+                    )}
+                   
+                      <p onClick={() => followMember(comment?.id, userDetails)}>{hasFollowed[comment?.id] ? 'Unfollow' : 'Follow'} @{comment?.nickname}</p>
+                    
+                    </div>
+                   
+                    <div className="flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900"  onClick={() => setShowModal(true)}>
+                     
+                     {isReported[pstId] ? (
+                              <FlagIcon className="h-6 w-6 text-blue-700" />
+                            ) : (
+                              <FlagIcon className="h-6 w-6 text-gray-500" />
+                            )}
+                    
+                      <p> {isReported[pstId]  ? "Reported" : "Report Post"}</p>
+                    </div>
+                    {showModal && (
+                      <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+                          <div className="bg-white dark:bg-gray-900 p-6 rounded shadow-md w-80">
+                            <h2 className="text-lg font-semibold mb-4">Report Post</h2>
+                            <p className="text-sm mb-4">Why are you reporting this post?</p>
+
+                            {/* Dropdown for report reasons */}
+                            <select
+                              value={reportReason}
+                              onChange={(e) => setReportReason(e.target.value)}
+                              className="w-full p-2 rounded mb-4 dark:bg-gray-900 border-none"
+                            >
+                              <option>Select a reason</option>
+                              <option value="Spam">Spam</option>
+                              <option value="Inappropriate Content">Inappropriate Content</option>
+                              <option value="Hate Speech">Hate Speech</option>
+                              <option value="Other">Other</option>
+                            </select>
+
+                            {/* Buttons */}
+                            <div className="flex justify-between w-full">
+                            <button
+                                onClick={handleCancel}
+                                className="px-4 py-2 bg-gray-300 rounded dark:bg-gray-800 dark:hover:bg-gray-700 hover:bg-gray-400"
+                              >
+                                Cancel
+                              </button>
+                              
+                              <button
+                                onClick={submitReport}
+                                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded"
+                              >
+                               {isReported[pstId]  ? "unSubmit" : "Submit"} 
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                    )}
+               
+                      </>
+                        ):(
+                          <div className="flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900" onClick={toggleBookmark}>
+                          {isBookmarked[pstId] ? (
+                              <BookmarkIcon fill="blue" className="h-6 w-6 text-blue-700" />
+                            ) : (
+                              <BookmarkIcon className="h-6 w-6 text-gray-500" />
+                            )}
+                      <p>{isBookmarked[pstId] ? "Remove Bookmark" : "Add Bookmark"}</p>
+                      </div>
+      )}                  
+                  </div>
+                }
+                arrow={false}
+              >
+                <DotsHorizontalIcon className="dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-gray-900 rounded-full h-10 hover:text-sky-500 p-1 sm:p-2"/>
+              
+             </Popover>
         </div>
 
-        {/* post text */}
-
-        <p className="text-gray-800 text-[15px sm:text-[16px] mb-2 dark:text-gray-300">
-          {comment?.comment}
-        </p>
-
-        {/* icons */}
-
-        <div className="flex justify-between text-gray-400 dark:text-gray-300 p-2">
+              {/* image */}
+        <div>
+        <p className="text-gray-800 text-[20px] sm:text-[16px] mb-2 dark:text-gray-300">
+          {comment?.comment} 
+         </p>
+        {comment?.image && (
+         
+          <img src={comment?.image} alt="" className="h-32 w-full object-cover rounded-sm"/>
+        
+        )}
+        
+        </div>
+        {comment?.from && <p>Recast from <span className="font-bold">{comment?.from}</span>{" "}<span className="text-gray-400 font-bold">@{comment?.fromNickname}</span></p>}
+        <div className="flex justify-between text-gray-500 dark:text-gray-300 p-2">
           
           
           <div className="flex items-center">
@@ -168,7 +494,7 @@ export default function Comment({ comment, commentId, originalPostId }) {
 
               <HeartIconFilled
                 onClick={likeComment}
-                className="h-9 w-9 rounded-full cursor-pointer p-2 text-red-700 hover:bg-red-100 dark:hover:bg-neutral-700"
+                className="sm:h-9 sm:w-9 h-12 w-12 rounded-full cursor-pointer p-2 text-red-700 hover:bg-red-100 dark:hover:bg-neutral-700"
               />
               </Tooltip>
             ) : (
@@ -176,7 +502,7 @@ export default function Comment({ comment, commentId, originalPostId }) {
 
               <HeartIcon
                 onClick={likeComment}
-                className="h-9 w-9 rounded-full cursor-pointer p-2 hover:text-red-600 hover:bg-red-100 dark:hover:bg-neutral-700"
+                className="sm:h-9 sm:w-9 h-12 w-12 rounded-full cursor-pointer p-2 hover:text-red-600 hover:bg-red-100 dark:hover:bg-neutral-700"
               />
               </Tooltip>
             )}
@@ -189,21 +515,23 @@ export default function Comment({ comment, commentId, originalPostId }) {
               </span>
             )}
           </div>
-          {userDetails?.uid === comment?.userId && (
-            <Tooltip content='delete' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-
-            <TrashIcon
-              onClick={deleteComment}
-              className="h-9 w-9 rounded-full cursor-pointer p-2 hover:text-red-600 hover:bg-red-100 dark:hover:bg-neutral-700"
-            />
-            </Tooltip>
-          )}
+ 
+          {userDetails?.uid === comment?.id && (
+           
+           <TrashIcon
+              onClick={userDetails?.uid === comment?.id ? deleteRepost : deleteComment}
+             className="h-12 w-12 md:h-10 md:w-10 p-2 hover:text-red-600 hover:bg-red-100 rounded-full dark:hover:bg-gray-800"
+           />
+                     
+         )}
           <Tooltip content='share' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-          <ShareIcon className="h-9 w-9 rounded-full cursor-pointer p-2 hover:text-sky-500 hover:bg-sky-100 dark:hover:bg-neutral-700" onClick={handleShare}/>
+           <ShareIcon className="sm:h-9 sm:w-9 h-12 w-12 rounded-full cursor-pointer p-2 hover:text-sky-500 hover:bg-sky-100 dark:hover:bg-neutral-700" onClick={handleShare}/>
           </Tooltip>
-          <ReplyIcon className="h-9 w-9 rounded-full cursor-pointer p-2 hover:text-sky-500 hover:bg-sky-100 dark:hover:bg-neutral-700" />
+          <ReplyIcon className="sm:h-9 sm:w-9 h-12 w-12 rounded-full cursor-pointer p-2 hover:text-sky-500 hover:bg-sky-100 dark:hover:bg-neutral-700" onClick={repost}/>
         </div>
       </div>
+
     </div>
+  </div>
   );
 }

@@ -1,5 +1,3 @@
-
-import { Carousel } from "flowbite-react";
 import { auth } from "../firebase";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -28,20 +26,20 @@ function Story({ post, id }) {
   };
 
   return (
-    <div onClick={handleClick}>
-    
-     
+    <div className='flex flex-col' onClick={handleClick} >
+       {post.statusImg && (
            <img
-                 className={`${!post.statusImage ? 'hidden' : "h-14 w-14 rounded-full p-[1.5px] border-2 border-blue-500 object-contain cursor-pointer hover:scale-110 transition transform duration-200 ease-out"}`}
-                 src={post.statusImage}
+                 className="h-14 w-14 rounded-full p-[1.5px] border-2 border-blue-500 object-contain cursor-pointer hover:scale-110 transition transform duration-200 ease-out"
+                 src={post.statusImg}
                  alt=''
                />
-         
-         {post.statusVideo && (
+       )}
+
+         {post.video && (
         <video
           className="h-14 w-14 rounded-full p-[1.5px] border-2 border-blue-500 object-contain cursor-pointer hover:scale-110 transition transform duration-200 ease-out"
           autoPlay
-          src={post.statusVideo}
+          src={post.video}
         />
          )}
       

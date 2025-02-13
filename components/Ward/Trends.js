@@ -48,7 +48,7 @@ export default function Trends({ topic, postCount }) {
 
   return (
     <div className="dark:bg-gray-950 xl:w-[600px] ml-2 space-y-5  py-2">      
-    <div className='cursor-pointer bg-slate-50 dark:bg-gray-950'>       
+    <div className='cursor-pointer dark:bg-gray-950'>       
       <div className="w-[310px] items-center py-2 px-4 hover:bg-slate-200 dark:text-gray-100 dark:hover:bg-gray-900 hover:scale-105 transition transform duration-500">
           <div className='flex flex-col' onClick={() => router.push(`/wardtrend/${topic.topic}`)}>
           <h6 className='text-sm'>Trending in {userData && userData.ward}</h6>

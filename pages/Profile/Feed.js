@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ArrowCircleRightIcon, ArrowLeftIcon, CameraIcon, PencilIcon, PhotographIcon, SunIcon } from '@heroicons/react/outline';
+import { ArrowCircleRightIcon, ArrowLeftIcon, BookmarkIcon, PencilIcon, PhotographIcon } from '@heroicons/react/outline';
 import { auth, db, storage } from '../../firebase';
 import { collection,  doc, getDocs, onSnapshot, query, updateDoc, where } from 'firebase/firestore';
 import { Button, Dropdown, Popover, Spinner } from 'flowbite-react';
@@ -8,11 +8,17 @@ import { useRouter } from 'next/router';
 import Head from 'next/head'; // Adjust the path to your script.js
 import axios from 'axios';
 import ModeButton from '../../components/ModeButton';
+import Post from './post';
+import Book from './Book';
+import { useRecoilState } from 'recoil';
+import { postIdState } from '../../atoms/modalAtom';
+import Reply from './Reply';
 
 
 function Feed() {
   const [post, setPost] = useState(null);
   const [userPosts, setUserPosts] = useState([]);
+  const [markPosts, setMarkPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const categories = ['citizen', 'leadership', 'business','company', 'organization'];
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -26,32 +32,32 @@ function Feed() {
   const [userImg, setUserImg] = useState(null);
   const [followingCount, setFollowingCount] = useState(0);
   const [followerCount, setFollowerCount] = useState(0);
-  const [followers, setFollowers] = useState([]);
-  const [postId, setPostId] = useState(null);
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [organization, setOrganization] = useState('');
   const [status, setStatus] = useState('');
+  const [isReplyVisible, setIsReplyVisible] = useState(false);
+  const [isBookVisible, setIsBookVisible] = useState(false);
+  const [isPostVisible, setIsPostVisible] = useState(false);
+  const [postId] = useRecoilState(postIdState);
+  const [replies, setReplies] = useState([])
 
   // following
   const getFollowingCount = () => {
     if (!userDetails?.uid) return;
   
-    try {
+  
       const q = query(collection(db, "following"), where('followingId', '==', userDetails.uid));
   
       // Set up real-time listener
       const unsubscribe = onSnapshot(q, (snapshot) => {
         const followingCount = snapshot.size; // Get the number of documents (i.e., following count)
         setFollowingCount(followingCount); // Update the state with the real-time following count
-        console.log(`User is following ${followingCount} users.`);
       });
   
       return unsubscribe; // Return unsubscribe to clean up listener later
-    } catch (error) {
-      console.log("Error fetching following count:", error);
-    }
+    
   };
   
   // Set up useEffect to listen for changes in userDetails.uid and update in real-time
@@ -71,20 +77,17 @@ function Feed() {
 const getFollowerCount = () => {
   if (!userDetails?.uid) return;
 
-  try {
+
     const q = query(collection(db, "following"), where('followerId', '==', userDetails.uid));
 
     // Set up real-time listener
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const followerCount = snapshot.size; // Get number of documents in the collection
       setFollowerCount(followerCount); // Update the state with the real-time count
-      console.log(`User is following ${followerCount} users.`);
     });
 
     return unsubscribe; // Return unsubscribe to clean up listener later
-  } catch (error) {
-    console.log("Error fetching following count:", error);
-  }
+ 
 };
 
 // Set up useEffect to listen for changes in postId and set up real-time updates
@@ -140,10 +143,47 @@ useEffect(() => {
   useEffect(() => {
     const fetchPost = async () => {
       if (userDetails) {
+        const q = query(collection(db, "posts", postId, "comments"), where("userId", "==", userDetails.uid));
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+          const posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data()}));
+          setReplies(posts);
+          setLoading(false);
+        });
+        return () => unsubscribe();
+      }
+    };
+
+    fetchPost();
+  }, [userDetails]);
+
+
+
+// fetching replies
+  useEffect(() => {
+    const fetchPost = async () => {
+      if (userDetails) {
         const q = query(collection(db, "posts"), where("id", "==", userDetails.uid));
         const unsubscribe = onSnapshot(q, (snapshot) => {
           const posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data()}));
           setUserPosts(posts);
+          setLoading(false);
+        });
+        return () => unsubscribe();
+      }
+    };
+
+    fetchPost();
+  }, [userDetails]);
+
+  // fetching bookmarks
+  const userId = userDetails?.uid;
+  useEffect(() => {
+    const fetchPost = async () => {
+      if (userDetails) {
+        const q = query(collection(db, `bookmarks/${userId}/bookmarks`));
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+          const posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data()}));
+          setMarkPosts(posts);
           setLoading(false);
         });
         return () => unsubscribe();
@@ -244,6 +284,8 @@ useEffect(() => {
 
   };
 
+
+
   const sendImage = () => {
     filePickerRef.current.click();
   };
@@ -304,13 +346,30 @@ useEffect(() => {
     }
   };
 
+  const toggleReply = () => {
+    setIsReplyVisible(!isReplyVisible);
+    setIsBookVisible(false);
+    setIsPostVisible(false);
+  }
+
+  const togglePost = () => {
+    setIsPostVisible(!isPostVisible);
+    setIsBookVisible(false);
+    setIsReplyVisible(false);
+  }
+
+  const toggleBookmark = () => {
+    setIsBookVisible(!isBookVisible);
+    setIsReplyVisible(false);
+    setIsPostVisible(false);
+  }
 
   return (
     <div>
     <Head>
       <title>Profile</title>
       <meta name="description" content="Generated and created by redAntTech" />
-      <link rel="icon" href="../../images/Brod.png" />
+      <link rel="icon" href="../../images/Brodcast.jpg" />
     </Head>
   
     <div className='flex flex-col h-screen w-screen dark:bg-gray-950'>
@@ -425,7 +484,7 @@ useEffect(() => {
           </div>
           <div className="cursor-pointer text-nowrap border-[1px] dark:border-gray-900 p-2 rounded-md border-gray-200">
             <p className="">
-              View this Catalogue
+              View Catalogue
             </p>
           </div>
         </div>
@@ -447,32 +506,60 @@ useEffect(() => {
 
 
         <div className="border-b-[1px] my-2 dark:border-gray-700 -mt-20 sm:-mt-0 w-full"></div>  
-          <div className="flex justify-between items-center">
-            <div className="dark:text-gray-200 sm:text-lg text-2xl flex items-center cursor-pointer text-gray-600 hover:scale-105 transition transform duration-400 hover:text-gray-900">
+          <div className="flex justify-between items-center w-full">
+            <div className="dark:text-gray-200 sm:text-lg text-xl flex items-center cursor-pointer text-gray-600 hover:scale-105 transition transform duration-400 hover:text-gray-900" onClick={togglePost}>
               <PhotographIcon className="h-6" />
               <h2>Posts</h2>
             </div>
-            <div className="dark:text-gray-200 flex sm:text-lg text-2xl items-center cursor-pointer text-gray-600 hover:scale-105 transition transform duration-400 hover:text-gray-900">
+            <div className="dark:text-gray-200 flex sm:text-lg text-xl items-center cursor-pointer text-gray-600 hover:scale-105 transition transform duration-400 hover:text-gray-900"  onClick={toggleReply}>
               <ArrowCircleRightIcon className="h-6" />
               <h2>Replies</h2>
             </div>
-            <div className="dark:text-gray-200 flex sm:text-lg text-2xl items-center cursor-pointer text-gray-600 hover:scale-105 transition transform duration-400 hover:text-gray-900">
-              <CameraIcon className="h-6" />
-              <h2>Media</h2>
+            <div className="dark:text-gray-200 flex sm:text-lg text-xl items-center cursor-pointer text-gray-600 hover:scale-105 transition transform duration-400 hover:text-gray-900" onClick={toggleBookmark} >
+              <BookmarkIcon className="h-6" />
+              <h2>bookmarked</h2>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
-            {userPosts.map((post) => (
-              <>
-              {(post.image || post.video) && (
-                <div key={post.id}>
-                {post.image && <img src={post.image} alt="" className="sm:h-[150px] sm:w-[200px] h-[200px] w-[400px] rounded-md object-cover" />}
-                {post.video && <video autoPlay controls src={post.video} className="sm:h-[150px] sm:w-[200px] h-[200px] w-[400px] rounded-md object-cover" />}
-              </div>
-              )}
-              </>
-            ))}
+          <div>
+            {loading ? (
+                    <Spinner className='h-10' />
+                  ) : (
+                    <div>
+                    <div className={`${isBookVisible || isReplyVisible || isPostVisible ? 'hidden' : 'grid grid-cols-2 lg:grid-cols-4 gap-2'}`}>
+                      {userPosts.map((post) => (
+                        <div key={post.id}>
+                        <Post key={post.id} id={post.id} post={post}/>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className={`${isPostVisible ? 'grid grid-cols-2 lg:grid-cols-4 gap-2' : 'hidden'}`}>
+                      {userPosts.map((post) => (
+                        <div key={post.id}>
+                        <Post key={post.id} id={post.id} post={post}/>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className={`${isReplyVisible ? 'grid grid-cols-2 lg:grid-cols-4 gap-2' : 'hidden'}`}>
+                      {replies.map((post) => (
+                        <div key={post.id}>
+                          <Reply key={post.id} id={post.id} post={post}/>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className={`${isBookVisible ? 'grid grid-cols-2 lg:grid-cols-4 gap-2' : 'hidden'}`}>
+                    {markPosts.map((post) => (
+                      <div key={post.id}>
+                      <Book key={post.id} id={post.id} post={post}/>
+                      </div>
+                    ))}
+                    </div>
+                    </div>
+                  )}  
+
           </div>
 
         </div>

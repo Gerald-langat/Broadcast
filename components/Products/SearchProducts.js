@@ -4,29 +4,10 @@ import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { Card, Carousel } from 'flowbite-react';
 
-function SearchProducts({ data, product, id }) {
-  const [searchResults, setPost] = useState(null);
+function SearchProducts({ data, id }) {
+
   const router = useRouter();
   
-  useEffect(() => {
-    const fetchPostsByName = async () => {
-      try {
-        const q = query(collection(db, 'marketplace'), where('product', '==', product));
-        const querySnapshot = await getDocs(q);
-        
-        const postsData = [];
-        querySnapshot.forEach((doc) => {
-          postsData.push(doc.data());
-        });
-        
-        setPost(postsData);
-      } catch (error) {
-        console.error('Error fetching posts:', error);
-      }
-    };
-  
-    fetchPostsByName();
-  }, [product]);
   
 
 

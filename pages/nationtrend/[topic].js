@@ -43,10 +43,12 @@ export default function TopicPostsPage() {
 
   const toggleSidebar = () => {
     setIsSidebarVisible(!isSidebarVisible);
+    setIsWidgetsVisible(false);
   };
 
   const toggleWidgets = () => {
     setIsWidgetsVisible(!isWidgetsVisible);
+    setIsSidebarVisible(false);
   }
 
   const toggleHome = () => {
@@ -61,7 +63,7 @@ export default function TopicPostsPage() {
       <Head>
         <title>{topic ? topic : 'loading...'}</title>
         <meta name="description" content="Generated and created by redAndtech" />
-        <link rel="icon" href="../../images/Brod.png" />
+        <link rel="icon" href="../../images/Brodcast.jpg" />
       </Head>
       <main className="flex min-h-screen mx-auto dark:bg-gray-950 sm:w-screen min-w-[580px] flex-grow sm:px-10 md:px-24 xl:px-0 flex-1">
         {/* Sidebar */}
@@ -86,11 +88,13 @@ export default function TopicPostsPage() {
      border-gray-200">
           <Tooltip content='back' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
             <div className="animate-pulse" onClick={() => router.replace("/home")}>
-              <ArrowLeftIcon className="h-8 cursor-pointer animate-pulse" />
+              <ArrowLeftIcon className="h-10 sm:h-8 cursor-pointer animate-pulse" />
             </div>
           </Tooltip>
             <h2 className="text-lg sm:text-xl font-bold cursor-pointer">
-            {topic ? (topic):(loading && <Spinner size="sm" />)}
+            {topic && (
+              <span className='text-2xl sm:text-lg'>{topic}</span>
+              )}
             </h2>
           </div>
           
@@ -111,8 +115,9 @@ export default function TopicPostsPage() {
          
         </div>
         {isWidgetsVisible && (
-          <div className="fixed inset-0 z-30  bg-black bg-opacity-50 xl:hidden" onClick={() => setIsWidgetsVisible(false)}>
-          <div
+          <div className="fixed inset-0 z-30 ml-4 dark:bg-gray-950 min-h-screen bg-opacity-50 xl:hidden" 
+          onClick={() => setIsWidgetsVisible(false)}>
+          <div className="ml-10"
                   onClick={(e) => e.stopPropagation()} // Prevents the click event from closing the sidebar when clicked inside it
                 >
             <Widgets />
@@ -125,8 +130,10 @@ export default function TopicPostsPage() {
         <CommentModal />
         <StatusModal />
       </main>
-      <div className='xl:hidden justify-between bottom-0 z-40 fixed bg-slate-50
-       dark:bg-gray-900 sm:w-screen min-w-[580px] flex p-2  sm:px-10 md:px-24 px-4 flex-grow'>
+      <div
+        className="xl:hidden justify-between bottom-0 z-40 fixed bg-slate-50
+        dark:bg-gray-900 w-full flex py-4 sm:px-10 md:px-24 px-4"
+      >
           <MenuAlt1Icon className='pl-4 h-10 cursor-pointer' onClick={toggleSidebar} />
           <HomeIcon className='h-10 cursor-pointer' onClick={toggleHome}/>
           <SearchIcon className='pr-6 h-10 cursor-pointer' onClick={toggleWidgets}/>

@@ -8,8 +8,6 @@ import StatusModal from "../components/National/StatusModal"
 import Feed from "../components/News/NewsFeed";
 
 
-
-
 function News() {
   
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
@@ -35,7 +33,7 @@ function News() {
       <Head>
         <title>home</title>
         <meta name="description" content="Generated and created by redAnttech" />
-        <link rel="icon" href="../../images/Brod.png" />
+        <link rel="icon" href="../../images/Brodcast.jpg" />
       </Head>
      
       <div className="flex min-h-screen w-full  ">  
@@ -78,8 +76,10 @@ function News() {
         <StatusModal />
       </div>
 {/*bottom menu */}
-      <div className='xl:hidden justify-between bottom-0 z-40 sticky bg-slate-50
-       dark:bg-gray-900 sm:w-screen w-[580px] flex py-6 px-4 sm:px-10 md:px-24 '>
+  <div
+        className="xl:hidden justify-between bottom-0 z-40 fixed bg-slate-50
+        dark:bg-gray-900 w-full flex py-4 sm:px-10 md:px-24 px-4"
+      >
           <MenuAlt1Icon className='pl-4 h-10 cursor-pointer' onClick={toggleSidebar} />
           <HomeIcon className='h-10 cursor-pointer' onClick={toggleHome}/>
           <SearchIcon className='pr-6 h-10 cursor-pointer' onClick={toggleWidgets}/>

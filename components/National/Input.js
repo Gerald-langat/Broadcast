@@ -40,7 +40,6 @@ export default function Input() {
 
   const fetchUserData = async () => {
     auth.onAuthStateChanged(async (user) => {
-      console.log(user)
       setUserDetails(user)
     })
   }
@@ -53,7 +52,6 @@ export default function Input() {
       if (userDetails) {
         const q = query(collection(db, 'userPosts'), where('id', '==', userDetails.uid));
         const querySnapshot = await getDocs(q);
-        console.log(userDetails.uid)
         if (!querySnapshot.empty) {
           setUserData(querySnapshot.docs[0].data());
         }
@@ -87,14 +85,13 @@ export default function Input() {
         const imageUrls = [];
         if (selectedFiles.length > 0) {
           selectedFiles.forEach((file, index) => {
-            const imageRef = ref(storage, `posts/${userDetails.uid}/image-${index}`);
-  
+            const imageRef = ref(storage, `posts/${docRef.id}/image-${index}`);
             // Upload each image and store the URL
             const uploadTask = uploadString(imageRef, file, "data_url").then(async () => {
               const downloadURL = await getDownloadURL(imageRef);
               imageUrls.push(downloadURL);
             });
-  
+          
             imageUploadPromises.push(uploadTask);
           });
   
@@ -106,8 +103,8 @@ export default function Input() {
             images: imageUrls,
           });
         }
-
-        const vidRef = ref(storage, `posts/${userDetails.uid}/video`);
+        
+        const vidRef = ref(storage, `posts/${docRef.id}/video`);
        if (selectedVidFile) {
           await uploadString(vidRef, selectedVidFile, "data_url").then(async () => {
             const downloadURL = await getDownloadURL(vidRef);
@@ -251,16 +248,18 @@ export default function Input() {
           />
         </Tooltip>
       )}
+    
           <div className="w-full border-none">
           
               <textarea
                   className="dark:bg-gray-950 border-b-[1px] border-x-0 border-t-0 dark:border-gray-900 dark:placeholder:text-gray-100
-                   dark:text-gray-300 w-full ring-0 focus:ring-0 text-xl sm:text-lg placeholder-gray-700 border-gray-300
+                   dark:text-gray-300 w-full outline-none  focus:ring-0 text-xl sm:text-lg placeholder-gray-700 border-gray-300
                    placeholder:text-2xl sm:placeholder:text-xl tracking-wide min-h-[50px] text-gray-700"
                 rows="2"
                 placeholder="type here...."
                 value={input} 
-                onChange={(e) => setInput(e.target.value)} onClick={() => setShowEmojiPicker(false)}>
+                onChange={(e) => setInput(e.target.value)} 
+                onClick={() => setShowEmojiPicker(false)}>
               </textarea>
 
 
@@ -306,7 +305,7 @@ export default function Input() {
 
             <div className="flex items-center justify-between pt-2.5 border-none">
               {!loading && (
-                <div className='flex w-full justify-between'>
+                <div className='flex w-full justify-between px-2'>
                   <div className="flex">
                     <div onClick={() => filePickerRef.current.click()}>
                     <Tooltip content='image' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
@@ -356,7 +355,7 @@ export default function Input() {
                     
                 
                   </div>
-                  <div className="flex space-x-1 ml-[60px] md:ml-[70px]">
+                  <div className="flex space-x-1 ml-[50px] md:ml-[70px]">
                     <button className="dark:bg-gray-950 dark:border-gray-900 dark:text-gray-300 border-gray-200 border-[1px]
                     dark:hover:bg-neutral-700 text-lg sm:text-sm bg-slate-200 rounded-full p-2 md:p-1 cursor-pointer" onClick={countyPost}>county</button>
                     <button className="dark:bg-gray-950 dark:border-gray-900 dark:text-gray-300 border-gray-200 border-[1px]
@@ -367,7 +366,7 @@ export default function Input() {
                   <button
                     onClick={sendPost}
                     disabled={!input.trim()}
-                    className="bg-blue-400 text-white  text-lg sm:text-sm p-2 md:py-1.5 rounded-full font-bold shadow-md hover:brightness-95
+                    className="bg-blue-400 text-white  text-lg sm:text-sm px-2 md:py-1.5 rounded-full font-bold shadow-md hover:brightness-95
                      disabled:opacity-50"
                   >
                     Cast

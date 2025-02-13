@@ -65,10 +65,12 @@ const WardPost = () => {
 
 const toggleSidebar = () => {
   setIsSidebarVisible(!isSidebarVisible);
+  setIsWidgetsVisible(false);
 };
 
 const toggleWidgets = () => {
   setIsWidgetsVisible(!isWidgetsVisible);
+  setIsSidebarVisible(false);
 }
 
 const toggleHome = () => {
@@ -83,7 +85,7 @@ const toggleHome = () => {
       <Head>
         <title>{name ? name : 'loading..'}</title>
         <meta name="description" content="Generated and created by redAnttech" />
-        <link rel="icon" href="../../images/Brod.png" />
+        <link rel="icon" href="../../images/Brodcast.jpg" />
       </Head>
       <main className="flex min-h-screen mx-auto dark:bg-gray-950 sm:w-screen min-w-[580px]
      flex-grow sm:px-10 md:px-24 xl:px-0">
@@ -140,8 +142,10 @@ const toggleHome = () => {
         </div>
         <CommentModal />
       </main>
-      <div className='xl:hidden justify-between bottom-0 z-40 sticky bg-slate-50
-       dark:bg-neutral-700 sm:w-screen min-w-[580px] flex p-2  sm:px-10 md:px-24 px-4 flex-grow'>
+      <div
+        className="xl:hidden justify-between bottom-0 z-40 fixed bg-slate-50
+        dark:bg-gray-900 w-full flex py-4 sm:px-10 md:px-24 px-4"
+      >
           <MenuAlt1Icon className='pl-4 h-8 cursor-pointer' onClick={toggleSidebar} />
           <HomeIcon className='h-8 cursor-pointer' onClick={toggleHome}/>
           <SearchIcon className='pr-6 h-8 cursor-pointer' onClick={toggleWidgets}/>

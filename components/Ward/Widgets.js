@@ -8,6 +8,7 @@ import { SearchIcon, XIcon } from '@heroicons/react/outline';
 import { useRouter } from 'next/router';
 import { Button, Spinner } from 'flowbite-react';
 import SearchComponent from './Search';
+import Link from 'next/link';
 
 
 export default function Widgets() {
@@ -144,112 +145,106 @@ export default function Widgets() {
     
   }, [querySearch]);
 
-  const handleHomeClick = () => {
-    router.push('/home');
-  };
-  
-  const handleCountyClick = () => {
-    router.push('/county');
-  };
 
-  const handleConstituencyClick = () => {
-    router.push('/constituency');
-  };
-
-  const handleWardClick = () => {
-    router.push('/ward');
-  };
  
   const clearQuery = () => {
     setQuery("");
   }
 
   return (
-    <div className="dark:bg-gray-950 bg-white w-[800px] xl:inline h-full space-y-5">
+    <div className="dark:bg-gray-950 -z-50 xl:inline h-screen space-y-5">
      {loading ? (
         <Button color="gray" className="border-0 items-center flex mt-4 sm:mt-0">
           <Spinner aria-label="Loading spinner" size="md" />
           <span className="pl-3 animate-pulse sm:text-[16px] text-[28px]">Loading...</span>
         </Button>
-     ) : (
-       <>
-     <div className=" dark:bg-gray-950 sticky -mt-2 bg-white  w-full ">
-     <div className='flex xl:ml-1 ml-24 dark:bg-gray-950 bg-gray-200 items-center dark:border-gray-900 xl:w-[335px] sm:w-[88%] w-[383px] border-b-[1px] rounded-md top-2 fixed z-50'>
-       <SearchIcon className='sm:h-6 h-8 text-gray-500 z-40 dark:text-gray-300 '/>
-     <input
-       className="border-0 dark:bg-gray-950 bg-gray-200 w-full text-lg 
-       dark:placeholder:text-gray-100 dark:text-gray-100 focus:ring-0 focus:outline-none 
-         border-gray-50 py-2 z-50"
-       type="text"
-       value={querySearch}
-       onChange={e => setQuery(e.target.value)}
-       placeholder="search name/nickname..."
-     />
-     <div className={`p-1 bg-sky-500 sm:mr-6 rounded-full cursor-pointer hover:bg-sky-400 ${!querySearch ? 'hidden' : 'inline'}`}>
-       <XIcon className='h-4 text-sm ' onClick={clearQuery}/>
-     </div>
-     </div>
-          
-     <div className='dark:bg-gray-950 dark:shadow-gray-400 shadow-md ml-24 shadow-gray-400 overflow-y-auto container bg-slate-50 mt-1 md:mt-2 xl:w-[335px] sm:w-[88%] w-[383px]
-      xl:ml-1 fixed top-12 z-50 fit max-h-80 rounded-lg flex flex-grow'>
-     <div className=" dark:bg-gray-950 w-full ">
-       {posts.map((post) => (
-         <>
-         <div key={post.id}>  
-       <SearchComponent key={post.id}
-        post={post} 
-       name={querySearch} 
-       nickname={querySearch} 
-      />
-       </div>
-       </>
-   ))}
-     </div>
-    
-     </div>
+      ) : (
+      <div className=" dark:bg-gray-950  bg-white w-full xl:ml-16">
+        <form className='flex justify-between px-3 dark:bg-gray-950 bg-gray-200 items-center -ml-12 dark:border-gray-900 xl:w-[335px] sm:w-[88%] w-[570px] border-b-[1px] rounded-md top-2 fixed flex-grow'>
+          <SearchIcon className='sm:h-6 h-8 w-8 text-gray-500 z-40 dark:text-gray-300' />
+        <input
+          className="border-0 dark:bg-gray-950 bg-gray-200 w-full text-2xl sm:text-lg placeholder:text-2xl  sm:placeholder:text-lg 
+          dark:placeholder:text-gray-400 dark:text-gray-100 focus:ring-0 focus:outline-none 
+            border-gray-50 sm:py-2 py-6 z-50"
+          type="text"
+          value={querySearch}
+          onChange={e => setQuery(e.target.value)}
+          placeholder="Search name/nickname..."
+        />
+        <div className={`p-1 bg-sky-500  rounded-full cursor-pointer hover:bg-sky-400 ${!querySearch ? 'hidden' : 'inline'}`}>
+          <XIcon className='sm:h-4 h-8' onClick={clearQuery}/>
+        </div>
+      </form>
+           
+      <div className='dark:bg-gray-950 dark:shadow-gray-400 -ml-12 shadow-md shadow-gray-400 overflow-y-auto container
+       bg-slate-50 md:mt-2 xl:w-[335px] sm:w-[88%] w-[570px]  fixed top-24 sm:top-[46px] z-50 fit max-h-80 rounded-lg flex flex-grow'>
+      <div className=" dark:bg-gray-950 w-full ">
+        {posts.map((post) => (
+          <>
+          <div key={post.id}>  
+        <SearchComponent 
+          key={post.id} 
+          post={post} 
+          name={querySearch} 
+          nickname={querySearch} 
+           />
+        </div>
+        </>
+    ))}
+      </div>
      
-     <div className='w-[400px] sm:w-[600px]'>
-     <div className='dark:bg-gray-950 bg-white space-x-2 mt-2 top-12 fixed xl:ml-1 ml-24 p-2 w-full rounded-t-md'>
-         <button className='border-gray-200 bg-green-700 p-2 rounded-full hover:bg-gray-400 text-white font-semibold hover:text-white text-sm'
-         onClick={handleHomeClick}>All</button>
-         <button className='dark:hover:bg-gray-900 dark:border-gray-900 dark:bg-gray-950 border-[1px] dark:text-gray-200 border-gray-200 bg-gray-200 text-sm
-          p-2 rounded-full hover:bg-gray-400 text-gray-500 font-semibold hover:text-white'
-         onClick={handleCountyClick}>myCounty</button>
-         <button className='dark:hover:bg-gray-900 dark:border-gray-900 dark:bg-gray-950 dark:text-gray-200 border-[1px] border-gray-200 bg-gray-200 text-sm
-          p-2 rounded-full hover:bg-gray-400 text-gray-500 font-semibold hover:text-white'
-         onClick={handleConstituencyClick}>myConstituency</button>
-         <button className='dark:hover:bg-gray-900 dark:border-gray-900 dark:bg-gray-950 border-[1px] border-gray-200 bg-gray-200 text-sm
-         p-2 rounded-full hover:bg-gray-400 text-gray-500
-          dark:text-gray-200 font-semibold hover:text-white'
-         onClick={handleWardClick}>myWard</button>
-     </div>
-     <br></br>
-     <div className="dark:bg-gray-950 xl:ml-1 ml-24 text-gray-700  bg-slate-50 rounded-xl pt-2 mt-24 fixed w-[90%] xl:w-[75%]">
-     <h4 className="font-bold text-xl px-4 text-black dark:text-gray-300">Trends for you</h4>
-     {loading ? (
-           <Button color="gray" className="border-0">
-             <Spinner aria-label="Loading spinner" size="sm" />
-             <span className="pl-3 animate-pulse">Loading...</span>
-           </Button>
-         ): (
-           <div>
-           <div className="items-center justify-center -space-y-6 -mt-2 ">
-           
-           {trendingTopics.map((topic) => (
-             <>
-               <div key={topic.topic}>
-                 <Trends topic={topic} postCount={topic.postCount}/> 
-               </div>
-             </>
-       ))}          
-           </div>
-           
-         </div>
-         )}  
-   </div>
-   </div>
-   </div>
-   </>
-     )}
-   </div>
+      </div>
+      
+      <div>
+      <div className='dark:bg-gray-950 bg-white space-x-2 mt-2 top-24 sm:top-12 fixed  -ml-12 p-2 w-full rounded-t-md'>
+      <Link href='/home'>
+          <button className='border-gray-200 bg-green-700 p-2 rounded-full hover:bg-gray-400 text-white font-semibold hover:text-white text-xl sm:text-sm'>All
+          </button>
+          </Link>
+          <Link href='/county'>
+          <button className='dark:hover:bg-gray-900 dark:border-gray-900 dark:bg-gray-950 border-[1px] dark:text-gray-200 border-gray-200 bg-gray-200 text-xl sm:text-sm
+           p-2 rounded-full hover:bg-gray-400 text-gray-500 font-semibold hover:text-white'
+          >myCounty</button>
+          </Link>
+          <Link href='/constituency'>
+          <button className='dark:hover:bg-gray-900 dark:border-gray-900 dark:bg-gray-950 dark:text-gray-200 border-[1px] border-gray-200 bg-gray-200 text-xl sm:text-sm
+           p-2 rounded-full hover:bg-gray-400 text-gray-500 font-semibold hover:text-white'
+          >myConstituency</button>
+          </Link>
+          <Link href='/ward'>
+          <button className='dark:hover:bg-gray-900 dark:border-gray-900 dark:bg-gray-950 border-[1px] border-gray-200 bg-gray-200 text-xl sm:text-sm
+          p-2 rounded-full hover:bg-gray-400 text-gray-500
+           dark:text-gray-200 font-semibold hover:text-white'
+          >myWard</button>
+          </Link>
+      </div>
+      <br></br>
+      <div className="dark:bg-gray-950  text-gray-700  bg-slate-50 rounded-xl pt-2 mt-36 sm:mt-20 fixed -ml-12 w-full xl:w-[75%] min-h-full">
+      <h4 className="font-bold text-3xl sm:text-xl px-4 text-black dark:text-gray-300">Trends for you</h4>
+      {loading ? (
+            <Button color="gray" className="border-0">
+              <Spinner aria-label="Loading spinner" size="sm" />
+              <span className="pl-3 animate-pulse">Loading...</span>
+            </Button>
+          ): (
+            <div>
+            <div className="items-center justify-center  -mt-2 ">
+            
+            {trendingTopics.map((topic) => (
+              <>
+                <div key={topic.topic}>
+                  <Trends topic={topic} postCount={topic.postCount}/> 
+                </div>
+              </>
+        ))}          
+            </div>
+            
+          </div>
+          )}  
+    </div>
+    </div>
+    </div>
+ 
+      )}
+    </div>
 )}

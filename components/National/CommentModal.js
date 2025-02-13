@@ -6,8 +6,8 @@ import {
   PhotographIcon,
   XIcon,
 } from "@heroicons/react/outline";
-import { useEffect, useState } from "react";
-import { auth, db } from "../../firebase";
+import { useEffect, useRef, useState } from "react";
+import { auth, db, storage } from "../../firebase";
 import {
   addDoc,
   collection,
@@ -16,11 +16,13 @@ import {
   onSnapshot,
   query,
   serverTimestamp,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import Moment from "react-moment";
 import Picker from 'emoji-picker-react'
 import { Tooltip } from "flowbite-react";
+import { getDownloadURL, ref, uploadString } from "firebase/storage";
 
 export default function CommentModal() {
   
@@ -33,6 +35,8 @@ export default function CommentModal() {
   const [emoji, setEmoji] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [loading, setLoading] = useState(false);
+  const filePickerRef = useRef(null);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   const fetchUserData = async () => {
     auth.onAuthStateChanged(async (user) => {
@@ -73,18 +77,32 @@ export default function CommentModal() {
     if (!loading) {
       setLoading(true);
     }
-    await addDoc(collection(db, "posts", postId, "comments"), {
+    const docRef = await addDoc(collection(db, "posts", postId, "comments"), {
       comment: input,
       userImg: userData.userImg,
       name: userData.name,
       nickname:userData.nickname,
       timestamp: serverTimestamp(),
-      userId: userDetails.uid,
+      id: userDetails.uid,
     });
+
+      // adding reply images to storage
+  const RepImage = ref(storage, `reply/${docRef.id}/image`);
+  if (selectedFile) {
+     await uploadString(RepImage, selectedFile, "data_url").then(async () => {
+       const downloadURL = await getDownloadURL(RepImage);
+       await updateDoc(doc(db, "posts", postId, "comments", docRef.id), {
+         image: downloadURL,
+       });
+     });
+   }
 
     setLoading(false);
     setOpen(false);
     setInput("");
+    setSelectedFile(null);
+
+
   }
 
   const closeMode = () => {
@@ -93,55 +111,68 @@ export default function CommentModal() {
     setInput("");
   }
 
+  //  images
+  const addImageReply = (e) => {
+    const reader = new FileReader();
+    if (e.target.files[0]) {
+      reader.readAsDataURL(e.target.files[0]);
+    }
+    reader.onload = (readerEvent) => {
+      setSelectedFile(readerEvent.target.result);
+    };
+  };
+
+
+
   return (
     <div>
       {open && (
         <Modal
           isOpen={open}
           onRequestClose={() => setOpen(false)}
-          className="max-w-lg w-[90%]  absolute top-24 left-[50%] translate-x-[-50%] bg-white rounded-md shadow-md"
+          className="max-w-lg w-[90%]  absolute top-24 left-[50%] translate-x-[-50%] bg-white rounded-md shadow-md border-none"
         >
           <div className="p-1 dark:bg-gray-950 rounded-md">
-            <div className="border-b border-gray-900 py-2 px-1.5">
+            <div className="border-b dark:border-gray-900 py-2 px-1.5">
               <div
                 onClick={closeMode}
                 className="hover:bg-blue-100 w-10 h-10 rounded-full dark:hover:bg-gray-900 flex items-center justify-center"
               >
               <Tooltip content='close' arrow={false} placement="right" className="p-1 text-xs bg-gray-500 ml-1">
-                <XIcon className="h-[23px] text-gray-700 p-0 cursor-pointer dark:text-gray-100" />
+                <XIcon className="h-14 sm:h-8 text-gray-700 p-0 cursor-pointer dark:text-gray-100" />
               </Tooltip>
               </div>
             </div>
             <div className="p-2 flex items-center space-x-1 relative">
-              <span className="w-0.5 h-full z-[-1] absolute left-8 top-11 bg-gray-300" />
+            
               <img
-                className="h-11 w-11 rounded-full mr-4"
+                className="sm:h-10 h-16 sm:w-10 w-16 rounded-md mr-4"
                 src={post?.data()?.userImg}
                 alt="user-img"
               />
-              <h4 className="font-bold text-[15px] sm:text-[16px] hover:underline">
+              <h4 className="font-bold text-[20px] sm:text-[16px] hover:underline">
                 {post?.data()?.name}
               </h4>
               <h4 className="font-bold">
                 {post?.data()?.lastname}
               </h4>
-              <span className="text-sm sm:text-[15px] font-bold">
+              <span className="text-[20px] sm:text-[16px] font-bold">
                 @{post?.data()?.nickname} -{" "}
               </span>
-              <span className="text-sm sm:text-[15px] hover:underline">
+              <span className="text-[20px] sm:text-[16px] hover:underline">
                 <Moment fromNow>{post?.data()?.timestamp?.toDate()}</Moment>
               </span>
             </div>
-            <p className="text-gray-500 text-[15px] sm:text-[16px] ml-16 mb-2 dark:text-gray-100 ">
+            <p className="text-gray-500 text-[20px] sm:text-[16px] ml-16 mb-2 dark:text-gray-100 ">
               {post?.data()?.text}
             </p>
 
             <div className="flex  p-3 space-x-3">
               
-              <div className="w-full divide-y divide-gray-900">
+              <div className="w-full divide-y dark:divide-gray-900">
                 <div className="">
                   <textarea
-                    className="w-full dark:bg-gray-950 dark:placeholder:text-gray-200 dark:text-gray-100 border-none focus:ring-0 text-lg placeholder-gray-700 tracking-wide min-h-[50px] text-gray-700"
+                    className="w-full dark:bg-gray-950 dark:placeholder:text-gray-200 dark:text-gray-100 border-none focus:ring-0 text-xl sm:text-lg dark:placeholder-gray-500 placeholder-gray-700 tracking-wide min-h-[50px] text-gray-700"
                     rows="2"
                     placeholder="Post your reply..."
                     value={input}
@@ -154,28 +185,42 @@ export default function CommentModal() {
                   <div className="flex">
                     <div
                       className=""
-                      // onClick={() => filePickerRef.current.click()}
+                      onClick={() => filePickerRef.current.click()}
                     >
                     <Tooltip content='image' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-                      <PhotographIcon className="h-10 w-10 rounded-full cursor-pointer p-2 text-sky-500 hover:bg-sky-100 dark:hover:bg-neutral-700" />
-                      {/* <input
+                      <PhotographIcon className="sm:h-10 sm:w-10 h-16 w-16 rounded-full cursor-pointer p-2 text-sky-500 hover:bg-sky-100 dark:hover:bg-neutral-700" />
+                      <input
                         type="file"
                         hidden
+                        accept="image/*"
                         ref={filePickerRef}
-                        onChange={addImageToPost}
-                      /> */}
+                        onChange={addImageReply}
+                      />
                       </Tooltip>
                     </div>
                     <Tooltip content='emoji' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
                     <EmojiHappyIcon className="hidden md:inline h-10 w-10 rounded-full p-2 cursor-pointer text-sky-500 hover:bg-sky-100 dark:hover:bg-neutral-700" onClick={() => setShowEmojiPicker(!showEmojiPicker)}/>
                   </Tooltip>
+                  {selectedFile && (
+                    <div className="relative">
+                      <XIcon
+                        onClick={() => setSelectedFile(null)}
+                        className="border h-7 text-black absolute cursor-pointer shadow-md border-white m-1 rounded-full"
+                      />
+                      <img
+                        src={selectedFile}
+                        controls
+                        className={`${loading && "animate-pulse"} h-[200px] w-[300px] object-cover` }
+                      />
+                    </div>
+                  )}
                   </div>
                   <button
                     onClick={sendComment}
                     disabled={!input.trim()}
                     className="bg-blue-400 text-white px-4 py-1.5 rounded-full font-bold shadow-md hover:brightness-95 disabled:opacity-50"
                   >
-                   {loading ? <p>Replying...</p> : <p>Reply</p>}
+                   {loading ? <p>Replying...</p> : <p className="text-lg sm:text-sm">Reply</p>}
                   </button>
                 </div>
               </div>

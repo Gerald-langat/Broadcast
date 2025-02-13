@@ -29,9 +29,6 @@ export default function Feed() {
     fetchPost();
   }, []);
   
-
-
-
   return (
     <div className="dark:bg-gray-950 sm:border-x-[1px] dark:border-gray-700
      border-gray-200 xl:min-w-[576px] min-w-[580px] sm:w-screen xl:max-w-[620px] sm:px-10 md:px-24 px-4 xl:px-0 h-screen">

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/outline';
-import { db } from '../firebase';
+import { auth, db } from '../firebase';
 import { collection, deleteDoc, onSnapshot, orderBy, query } from 'firebase/firestore';
 import Story from './Story';
 
@@ -8,28 +8,47 @@ function Stories() {
   const [posts, setPosts] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
 const [loading, setLoading ] = useState(false);
+const [userDetails, setUserDetails] = useState(null);
+ 
+
+const fetchUserData = async () => {
+  auth.onAuthStateChanged(async (user) => {
+    console.log(user)
+    setUserDetails(user)
+
+  })
+}
+useEffect(() => {
+  fetchUserData();
+}, []);
 
   const postsPerPage = 5;
-
+  
   useEffect(() => {
-    const q = query(collection(db, "status"), orderBy("timestamp", "desc"));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    if (!userDetails?.uid) return;
+  
+    const q = query(
+      collection(db, 'status'),
+      orderBy('timestamp', 'asc')
+    );
+  
+    const unsubscribe = onSnapshot(q, async (snapshot) => {
       const now = Date.now(); // Current timestamp in milliseconds
       const oneDay = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
   
-      snapshot.docs.forEach(async (doc) => {
-        const postTimestamp = doc.data().timestamp?.toMillis(); // Convert Firestore timestamp to milliseconds
-  
+      // Delete old posts
+      const deletionPromises = snapshot.docs.map(async (doc) => {
+        const postTimestamp = doc.data()?.timestamp?.toMillis?.();
         if (postTimestamp && now - postTimestamp >= oneDay) {
-          // Post is older than 24 hours, delete it
           await deleteDoc(doc.ref);
         }
       });
+      await Promise.all(deletionPromises);
   
-      // Fetch and set posts that are within 24 hours
+      // Filter and set posts
       const newPosts = snapshot.docs
         .filter((doc) => {
-          const postTimestamp = doc.data().timestamp?.toMillis();
+          const postTimestamp = doc.data()?.timestamp?.toMillis?.();
           return postTimestamp && now - postTimestamp < oneDay;
         })
         .map((doc) => ({
@@ -37,7 +56,6 @@ const [loading, setLoading ] = useState(false);
           ...doc.data(),
         }));
   
-      // Remove duplicates
       const uniquePosts = Array.from(
         new Map(newPosts.map((post) => [post.id, post])).values()
       );
@@ -46,15 +64,12 @@ const [loading, setLoading ] = useState(false);
       setLoading(false); // Set loading to false after data is fetched
     });
   
-    // Cleanup on unmount
     return () => {
       unsubscribe();
     };
-  }, []);
+  }, [userDetails?.uid]);
   
-
-
-
+  
   const handlePrevClick = () => {
     setCurrentIndex((prevIndex) => (prevIndex > 0 ? prevIndex - postsPerPage : 0));
   };
@@ -66,7 +81,7 @@ const [loading, setLoading ] = useState(false);
   };
 
   return (
-    <div>
+    <div className='border-[1px] border-gray-200 dark:border-gray-900 rounded-md mt-1'>
       {posts.length > 0 && (
         <>
           <div className="flex justify-between items-center absolute xl:w-[560px] w-[500px] sm:w-[600px] mt-3 dark:bg-gray-950">

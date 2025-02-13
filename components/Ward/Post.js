@@ -5,11 +5,13 @@ import { deleteObject, ref } from 'firebase/storage';
 import { useRecoilState } from 'recoil';
 import { modalWardState, postIdWard } from "../../atoms/modalAtom";
 import { useRouter } from "next/router";
-import { ChatIcon, DotsHorizontalIcon, ShareIcon, TrashIcon, BookmarkIcon, EyeOffIcon,  UserRemoveIcon, UserAddIcon, FlagIcon, HeartIcon, EyeIcon, BookmarkAltIcon, ReplyIcon, PencilAltIcon } from "@heroicons/react/outline";
+import { ChatIcon, DotsHorizontalIcon, ShareIcon, TrashIcon, EyeOffIcon,  UserAddIcon, HeartIcon, EyeIcon, ReplyIcon, PencilAltIcon, UserRemoveIcon } from "@heroicons/react/outline";
+import { FlagIcon, BookmarkIcon } from '@heroicons/react/solid'
 import Moment from "react-moment";
 import { Badge, Button, Carousel, Popover, Spinner, Tooltip } from 'flowbite-react';
 import { HiClock, HiCheck } from "react-icons/hi";
 import { useFollow } from '../FollowContext';
+
 
 export default function Post({ post, id }) {
   const router = useRouter();
@@ -23,10 +25,15 @@ export default function Post({ post, id }) {
   const [userDetails, setUserDetails] = useState(null);
   const [citeInput, setCiteInput] = useState("");
   const { hasFollowed, followMember } = useFollow();
-
+  const [showModal, setShowModal] = useState(false);
+  const [reportReason, setReportReason] = useState("");
+  const [isHidden, setIsHidden] = useState(false);
+  const [showUndo, setShowUndo] = useState(false);
+  const [isReported, setIsReported] = useState({});
+  const [isBookmarked, setIsBookmarked] = useState({});
+  
   const fetchUserData = async () => {
     auth.onAuthStateChanged(async (user) => {
-      console.log(user)
       setUserDetails(user)
 
     })
@@ -52,14 +59,14 @@ export default function Post({ post, id }) {
 
 
   useEffect(() => {
-    if(id){
+    if(db || id || userpost || userpost.ward){
     const unsubscribe = onSnapshot(
-      collection(db, "ward", id, "likes"),
+      collection(db, "ward", userpost.ward, id, "likes"),
       (snapshot) => setLikes(snapshot.docs)
     );
     return () => unsubscribe();
   }
-}, [db, id]);
+}, [db, id, userpost]);
 
 
 useEffect(
@@ -80,11 +87,18 @@ useEffect(
 
 const deleteRepost = async () => {
   if (window.confirm("Are you sure you want to delete this post?")) {
-    if (id) {
+    if (id || userpost) {
       try {
+        const likesCollectionRef = collection(db, "ward", userpost.ward, id, "likes");
+        const likesSnapshot = await getDocs(likesCollectionRef);
+  
+        const deleteLikesPromises = likesSnapshot.docs.map((likeDoc) =>
+          deleteDoc(likeDoc.ref)
+        );
+        await Promise.all(deleteLikesPromises);
+     
         await deleteDoc(doc(db, "ward", userpost.ward, id));
-        console.log('Post deleted successfully');
-        router.push("/ward");
+        
       } catch (error) {
         console.error('Error deleting the post:', error);
       }
@@ -101,11 +115,11 @@ const deleteRepost = async () => {
   }, [likes, userDetails]);
 
   async function likePost() {
-    if (userDetails) {
+    if (userDetails || userpost) {
       if (hasLiked) {
-        await deleteDoc(doc(db, "ward", id, "likes", userDetails?.uid));
+        await deleteDoc(doc(db, "ward", userpost.ward, id, "likes", userDetails?.uid));
       } else {
-        await setDoc(doc(db, "ward",  id, "likes", userDetails?.uid), {
+        await setDoc(doc(db, "ward",  userpost.ward, id, "likes", userDetails?.uid), {
           email: userDetails.email,
         });
       }
@@ -116,45 +130,44 @@ const deleteRepost = async () => {
 
   async function deletePost() {
     if (window.confirm("Are you sure you want to delete this post?")) {
-      try {
-        console.log("Starting the deletion process...");
-  
-        // Delete the Firestore document
-        console.log("Deleting Firestore document...");
+      if (id || userpost) {
+        try {
+          const likesCollectionRef = collection(db, "ward", userpost.ward, id, "likes");
+          const likesSnapshot = await getDocs(likesCollectionRef);
+    
+          const deleteLikesPromises = likesSnapshot.docs.map((likeDoc) =>
+            deleteDoc(likeDoc.ref)
+          );
+          await Promise.all(deleteLikesPromises);
+       
         await deleteDoc(doc(db, "ward", userpost.ward, id));
-        console.log("Firestore document deleted successfully.");
+       
   
         // Delete all images associated with the post
         const imageUrls = post?.data()?.images; // Assuming 'images' is an array of image URLs
         if (imageUrls && imageUrls.length > 0) {
-          console.log(`Deleting ${imageUrls.length} images...`);
-          const deleteImagePromises = imageUrls.map((url, index) => {
-            const imageRef = ref(storage, `ward/${userDetails.uid}/image-${index}`);
-            return deleteObject(imageRef).then(() => {
-              console.log(`Image ${index} deleted successfully.`);
-            });
-          });
           
+          const deleteImagePromises = imageUrls.map((url, index) => {
+            const imageRef = ref(storage, `ward/${id}/image-${index}`);
+            return deleteObject(imageRef).then(() => {
+              
+            });
+          });          
           // Wait for all the delete operations to complete
-          await Promise.all(deleteImagePromises);
-          console.log("All images deleted successfully.");
-        }
-  
+          await Promise.all(deleteImagePromises);          
+        }  
         // Delete the video if it exists
-        if (post?.data()?.video) {
-          console.log("Deleting video...");
-          await deleteObject(ref(storage, `ward/${userDetails.uid}/video`));
-          console.log("Video deleted successfully.");
+        if (post?.data()?.video) {          
+          await deleteObject(ref(storage, `ward/${id}/video`));          
         }
-  
-        // Redirect after deletion
-        console.log("Redirecting to home page...");
-        router.push("/ward");
       } catch (error) {
         console.error("An error occurred during deletion:", error);
       }
+    } else {
+      console.log("no data for deleting")
     }
   }
+}
 
   const handleShare = async () => {
     if (navigator.share) {
@@ -164,7 +177,7 @@ const deleteRepost = async () => {
           text: 'Sharing this amazing content.',
           url: window.location.href,
         });
-        console.log('Content shared successfully');
+        
       } catch (error) {
         console.error('Error sharing content:', error);
       }
@@ -200,10 +213,9 @@ const deleteRepost = async () => {
     if (post) {
       // Get the post data, excluding unsupported fields
       const postData = post.data();
-      console.log('Post data:', postData);
       try {
         await addDoc(collection(db, 'ward', userpost.ward), {
-         id: userDetails.uid,
+            id: userDetails.uid,
             text: postData.text,
             userImg: userpost.userImg,
             timestamp: serverTimestamp(),
@@ -212,13 +224,12 @@ const deleteRepost = async () => {
             nickname:userpost.nickname,
             from: postData.name,
             fromNickname: postData.nickname,
-            views: postData.views,
 
             ...(postData.category && {category:postData.category,}),
             ...(postData.images && {images:postData.images,}),
             ...(postData.video && {video:postData.video,})
         });
-        console.log('Post reposted successfully!');
+        
       } catch (error) {
         console.error('Error reposting the post:', error);
       }
@@ -237,11 +248,7 @@ const cite = async () => {
 
   if (post) {
     const postData = post.data();
-    
-    // Debugging: Log postData and its properties
-    console.log('postData:', postData);
-    console.log('postData.text:', postData.text);
-    console.log('citeInput:', citeInput);
+   
 
     // Check if postData and properties are defined and of correct type
      if (postData && typeof postData.text === 'string' && typeof citeInput === 'string' ) {
@@ -259,7 +266,6 @@ const cite = async () => {
           nickname: userpost.nickname,
           fromNickname: postData.nickname,
           fromlastname: postData.lastname,
-          views: postData.views,
           citeUserImg: postData.userImg,
           // Include image and video only if they are defined
         
@@ -292,10 +298,141 @@ const formatNumber = (number) => {
   }
 };
 
+const handleNotInterested = () => {
+  setIsHidden(true);
+  setShowUndo(true);
+  // Optionally, save this preference to local storage or backend if needed
+};
+
+const handleUndo = () => {
+  setIsHidden(false);
+  setShowUndo(false);
+};
+
+ // Check if the post is already bookmarked
+ const userId = userDetails?.uid;
+ const pstId = post?.id;
+ // Toggle bookmark
+ const checkBookmark = async () => {
+   if (!userId || !pstId) return;
+   try {
+     const docRef = doc(db, `bookmarks/${userId}/bookmarks`, pstId);
+     const docSnap = await getDoc(docRef);
+     setIsBookmarked((prev) => ({
+       ...prev,
+       [pstId]: docSnap.exists(),
+     }));
+   } catch (error) {
+     console.error("Error checking bookmark status:", error);
+   }
+ };
+
+ // Toggle bookmark
+ const toggleBookmark = async () => {
+   if (!userId || !pstId) return;
+   try {
+     const collectionRef = collection(db, `bookmarks/${userId}/bookmarks`);
+     const docRef = doc(collectionRef, pstId);
+
+     if (isBookmarked[pstId]) {
+       // Remove bookmark
+       await deleteDoc(docRef);
+       setIsBookmarked((prev) => ({
+         ...prev,
+         [pstId]: false,
+       }));
+     } else {
+       // Add bookmark
+       const images = post?.data()?.images || [];
+       const video = post?.data()?.video || null;
+
+       // Add new document to the collection
+       const bookmarkData = { pstId, timestamp: Date.now() };
+       if (images.length) bookmarkData.images = images;
+       if (video) bookmarkData.video = video;
+
+       await setDoc(docRef, bookmarkData); // Use setDoc to ensure consistent doc IDs
+       setIsBookmarked((prev) => ({
+         ...prev,
+         [pstId]: true,
+       }));
+     }
+   } catch (error) {
+     console.error("Error toggling bookmark:", error);
+   }
+ };
+
+ useEffect(() => {
+   checkBookmark();
+ }, [pstId, userId]);
+
+ const checkSubmitReport = async () => {
+  if (!userId || !pstId) return;
+  try {
+    const docRef = doc(db, `reports/${userId}/reports`, pstId);
+    const docSnap = await getDoc(docRef);
+    setIsReported((prev) => ({
+      ...prev,
+      [pstId]: docSnap.exists(),
+    }));
+  } catch (error) {
+    console.error("Error checking bookmark status:", error);
+  }
+};
+
+useEffect(() => {
+  checkSubmitReport();
+}, [pstId, userId]);
+ 
+ // report post
+ const submitReport = async () => {
+   if (!userId || !pstId) return;
+   try {
+     const collectionRef = collection(db, `reports/${userId}/reports`); // Path specific to the user
+     const docRef = doc(collectionRef, pstId);
+ 
+     if (isReported[pstId]) {
+       // Remove report
+       await deleteDoc(docRef);
+       setIsReported((prev) => ({
+         ...prev,
+         [pstId]: false,
+       }));
+       alert("Report removed.");
+     } else {
+       // Validate the report reason
+       if (!reportReason) {
+         alert("Please select a reason for reporting.");
+         return;
+       }
+ 
+       // Add report
+       const reportData = {
+         pstId,
+         userId,
+         reportReason,
+         timestamp: Date.now(),
+       };
+ 
+       await setDoc(docRef, reportData); // Use setDoc for consistent doc IDs
+       setIsReported((prev) => ({
+         ...prev,
+         [pstId]: true,
+       }));
+       alert("Your report has been submitted. Thank you!");
+     }
+   } catch (error) {
+     console.error("Error toggling report:", error);
+     alert("Failed to toggle report. Please try again later.");
+   }
+   setShowModal(false)
+ };
+
 
   return (
-    <div className="flex p-3 cursor-pointer border-[1px] border-gray-200 dark:border-gray-900
-    dark:text-gray-300 z-40 flex-grow min-w-full h-full flex-1 py-2 rounded-md mt-1">
+    <div className='w-full'>
+    <div className={`w-full ${isHidden ? 'inline text-2xl sm:text-xl cursor-pointer dark:hover:bg-gray-900 hover:bg-gray-200 rounded-md p-1' : 'hidden'}`} onClick={handleUndo}>{showUndo && 'undo'}</div>
+        <div className={`${isHidden ? 'hidden' : "flex cursor-pointer border-[1px] border-gray-200 dark:border-gray-900 dark:text-gray-300 z-40 flex-grow h-full flex-1 p-2 rounded-md mt-1 w-full"}`}>
   {loading ? (
        <Button color="gray" className="border-0 ">
          <Spinner aria-label="Loading spinner" size="sm" />
@@ -344,44 +481,107 @@ const formatNumber = (number) => {
          </Tooltip>
          {/* dot icon */}
          <Popover
-               aria-labelledby="profile-popover"
-               className="-ml-28 z-20 shadow-md rounded-lg dark:shadow-gray-400 shadow-gray-500 "
-               content={
-                 <div className="w-64 text-sm text-gray-500 dark:text-gray-300 bg-gray-300 dark:bg-neutral-800 
-                    py-2 space-y-3 border-none">
-                   <div className="flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900 rounded-md">
-                   <EyeOffIcon className="h-6"/>
-                     <p>Not interested</p>
-                   </div>
-                   <div className="flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900 rounded-md">
-                   <BookmarkIcon className="h-6" />
-                     <p>save</p>
-                   </div>
+                aria-labelledby="profile-popover"
+                className="md:-ml-28 -ml-8 z-20 shadow-md rounded-lg dark:shadow-gray-400 shadow-gray-500"
+                content={
+                  <div className="w-64 text-xl sm:text-sm text-gray-500 dark:text-gray-300 bg-gray-300 dark:bg-neutral-800 
+                     py-2 space-y-3 border-none">
+                     { post?.data()?.id !== userDetails?.uid ? 
+                        (
+                          <>
+                          <div className="flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900" onClick={handleNotInterested}>
+                    <EyeOffIcon className="h-6"/>
+                      <p>Not interested</p>
+                    </div>
+                    
 
-                   <div className={`${userpost?.name == post?.data()?.name ? 'hidden' : 'flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900 rounded-md'}`} >
-                   <UserAddIcon className="h-6" />
-                  
-                     <p onClick={() => followMember(post?.data()?.id, userDetails)}>{hasFollowed[post?.data()?.id] ? 'Unfollow' : 'Follow'} @{post?.data()?.nickname}</p>
+                    <div className={`${userpost?.name == post?.data()?.name ? 'hidden' : 'flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900 '}`} >
+                    {hasFollowed[post?.data()?.id] ? (
+                      <UserRemoveIcon className="h-6" />
+
+                    ) : (
+                      <UserAddIcon className="h-6" />
+
+                    )}
                    
-                   </div>
+                      <p onClick={() => followMember(post?.data()?.id, userDetails)}>{hasFollowed[post?.data()?.id] ? 'Unfollow' : 'Follow'} @{post?.data()?.nickname}</p>
+                    
+                    </div>
+                   
+                    <div className="flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900"  onClick={() => setShowModal(!showModal)}
+                     disabled={isReported}>
+                     
+                     {isReported[pstId] ? (
+                              <FlagIcon className="h-6 w-6 text-blue-700" />
+                            ) : (
+                              <FlagIcon className="h-6 w-6 text-gray-500" />
+                            )}
+                    
+                      <p> {isReported[pstId]  ? "Reported" : "Report Post"}</p>
+                      </div>
+                      {showModal && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white dark:bg-gray-900 p-6 rounded shadow-md w-80">
+            <h2 className="text-lg font-semibold mb-4">Report Post</h2>
+            <p className="text-sm mb-4">Why are you reporting this post?</p>
+
+            {/* Dropdown for report reasons */}
+            <select
+              value={reportReason}
+              onChange={(e) => setReportReason(e.target.value)}
+              className="w-full p-2 dark:bg-gray-900 rounded mb-4"
+            >
+              <option value="">Select a reason</option>
+              <option value="Spam">Spam</option>
+              <option value="Inappropriate Content">Inappropriate Content</option>
+              <option value="Hate Speech">Hate Speech</option>
+              <option value="Other">Other</option>
+            </select>
+
+            {/* Buttons */}
+            <div className="flex justify-end space-x-2 z-20">
+              <button
+                onClick={() => setShowModal(false)}
+                className="px-4 py-2 bg-gray-300 dark:bg-gray-800 rounded"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={submitReport}
+                className="px-4 py-2 bg-red-500 text-white rounded"
+              >
+                 {isReported[pstId]  ? "unSubmit" : "Submit"} 
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
                   
-                   <div className="flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900 rounded-md">
-                   <FlagIcon className="h-6" />
-                     <p>Report post</p>
-                   </div>
-                 </div>
-               }
-               arrow={false}
-             >
-               <DotsHorizontalIcon className="dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-gray-900 rounded-full h-10 hover:text-sky-500 p-1 sm:p-2"/>
-             
-            </Popover>
+                      </>
+                        ):(
+                          <div className="flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900" onClick={toggleBookmark}>
+                          {isBookmarked[pstId] ? (
+                              <BookmarkIcon className="h-6 w-6 text-blue-700" />
+                            ) : (
+                              <BookmarkIcon className="h-6 w-6 text-gray-500" />
+                            )}
+                      <p>{isBookmarked[pstId] ? "Remove Bookmark" : "Add Bookmark"}</p>
+                      </div>
+      )}
+                    
+                  </div>
+                }
+                arrow={false}
+              >
+                <DotsHorizontalIcon className="dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-gray-900 rounded-full h-10 hover:text-sky-500 p-1 sm:p-2"/>
+              
+             </Popover>
             </div>
        </div>
        
        {/* display cite */}
-       {post?.data()?.citeInput ? (<div><p onClick={() => router.push(`/constituencyposts(id)/${id}`)}>{post?.data()?.citeInput}</p>
-       <div className="border-[1px] rounded-md dark:border-gray-700 dark:hover:bg-neutral-700 border-gray-200 hover:bg-neutral-300"  onClick={() => router.push(`/constituencyposts(id)/${id}`)}>
+       {post?.data()?.citeInput ? (<div><p onClick={() => router.push(`/wardposts(id)/${id}`)}>{post?.data()?.citeInput}</p>
+       <div className="border-[1px] rounded-md dark:border-gray-900 dark:hover:bg-gray-900 border-gray-200 hover:bg-neutral-300"  onClick={() => router.push(`/wardposts(id)/${id}`)}>
        <div className="flex p-1 space-x-2 items-center">
        {post?.data()?.citeUserImg && (
          <>
@@ -405,7 +605,7 @@ const formatNumber = (number) => {
      </>
      )}
        </div>
-       <p className="ml-14" onClick={() => router.push(`/constituencyposts(id)/${id}`)}>{post?.data()?.text}</p>
+       <p className="ml-14" onClick={() => router.push(`/wardposts(id)/${id}`)}>{post?.data()?.text}</p>
 
        {post?.data()?.images?.length > 1 ? (
          <Carousel className={`${!post?.data()?.images ? 'hidden' : "rounded-2xl mr-2 h-[300px] w-[500px] sm:w-full xl:h-[250px] sm:h-[600px] "}`}>
@@ -444,7 +644,7 @@ const formatNumber = (number) => {
        ):(
          <>
          <p
-           onClick={() => router.push(`/constituencyposts(id)/${id}`)}
+           onClick={() => router.push(`/wardposts(id)/${id}`)}
            className="text-gray-800 w-96 sm:w-[490px] text-[20px] sm:text-[16px] mb-2 dark:text-gray-300 line-clamp-3 break-words cursor-pointer"
          >
            {post?.data()?.text}
@@ -585,6 +785,7 @@ const formatNumber = (number) => {
      </div>
      </>
      )}
+   </div>
    </div>
   );
 }

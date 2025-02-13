@@ -3,18 +3,18 @@
     "short_name": "CAST",
     "icons": [
       {
-        "src": "/images/Brod.png",
+        "src": "/images/Brodcast.jpg",
         "sizes": "192x192",
         "type": "image/png",
         "purpose": "any maskable"
       },
       {
-        "src": "/images/Brod.png",
+        "src": "/images/Brodcast.jpg",
         "sizes": "384x384",
         "type": "image/png"
       },
       {
-        "src": "/images/Brod.png",
+        "src": "/images/Brodcast.jpg",
         "sizes": "512x512",
         "type": "image/png"
       }
