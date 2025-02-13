@@ -1,4 +1,3 @@
-
 import { Carousel } from "flowbite-react";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -21,7 +20,7 @@ import { useRouter } from "next/router";
   <>
     {/* Display Carousel for Multiple Images */}
     {post?.data()?.images?.length > 1 ? (
-      <Carousel className="top-0 sm:h-[100px] md:h-[200px] w-full cursor-pointer">
+      <Carousel className="top-0 h-[200px] w-full cursor-pointer">
         {post?.data()?.images.map((imageUrl, index) => (
           <img
             key={index}

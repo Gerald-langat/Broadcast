@@ -170,18 +170,18 @@ function ProductsFeed() {
                 onOpenChange={setOpen}
                 trigger='click'
                 content={
-                  <div className="absolute dark:bg-gray-900 -ml-6 rounded-md shadow-lg py-2 z-20 border-0 space-y-2 w-64">
-                    <div onClick={() => handleCategorySelect("Vehicles & Trucks")} className='hover:bg-gray-800 px-2 cursor-pointer'>Vehicles & Trucks</div>
-                    <div onClick={() => handleCategorySelect("Electronics")} className='hover:bg-gray-800 px-2 cursor-pointer'>Electronics</div>
-                    <div onClick={() => handleCategorySelect("Fashion")} className='hover:bg-gray-800 px-2 cursor-pointer'>Fashion</div>
-                    <div onClick={() => handleCategorySelect("Phones & Tablets")} className='hover:bg-gray-800 px-2 cursor-pointer'>Phones & Tablets</div>
-                    <div onClick={() => handleCategorySelect("Machineries")} className='hover:bg-gray-800 px-2 cursor-pointer'>Machineries</div>
-                    <div onClick={() => handleCategorySelect("Buildings & Land")} className='hover:bg-gray-800 px-2 cursor-pointer'>Buildings & Land</div>
-                    <div onClick={() => handleCategorySelect("Agricultural")} className='hover:bg-gray-800 px-2 cursor-pointer'>Agricultural</div>
+                  <div className="absolute dark:bg-gray-900 -ml-6 rounded-md shadow-lg py-2 z-20 border-0 space-y-2 w-64 bg-gray-100">
+                    <div onClick={() => handleCategorySelect("Vehicles & Trucks")} className='dark:hover:bg-gray-800 hover:bg-gray-300 px-2 cursor-pointer'>Vehicles & Trucks</div>
+                    <div onClick={() => handleCategorySelect("Electronics")} className='dark:hover:bg-gray-800 hover:bg-gray-300 px-2 cursor-pointer'>Electronics</div>
+                    <div onClick={() => handleCategorySelect("Fashion")} className='dark:hover:bg-gray-800 hover:bg-gray-300 px-2 cursor-pointer'>Fashion</div>
+                    <div onClick={() => handleCategorySelect("Phones & Tablets")} className='dark:hover:bg-gray-800 hover:bg-gray-300 px-2 cursor-pointer'>Phones & Tablets</div>
+                    <div onClick={() => handleCategorySelect("Machineries")} className='dark:hover:bg-gray-800 hover:bg-gray-300 px-2 cursor-pointer'>Machineries</div>
+                    <div onClick={() => handleCategorySelect("Buildings & Land")} className='dark:hover:bg-gray-800 hover:bg-gray-300 px-2 cursor-pointer'>Buildings & Land</div>
+                    <div onClick={() => handleCategorySelect("Agricultural")} className='dark:hover:bg-gray-800 hover:bg-gray-300 px-2 cursor-pointer'>Agricultural</div>
                   </div>
                 } placement="bottom">
                 
-                <ArrowDownWideNarrow className='h-10 w-10 cursor-pointer p-2'  onClick={toggleDropdown}/>
+                <ArrowDownWideNarrow className='h-10 w-10 cursor-pointer p-2 text-gray-600 dark:text-gray-500'  onClick={toggleDropdown}/>
                
                   </Popover>
             

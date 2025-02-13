@@ -411,9 +411,9 @@ const formatNumber = (number) => {
         </div>
         
         {/* display cite */}
-        {post?.data()?.citeInput ? (<div><p onClick={() => router.push(`/constituencyposts(id)/${id}`)}></p>{post?.data()?.citeInput}
+        {post?.data()?.citeInput ? (<div><p onClick={() => router.push(`/constituencyposts(id)/${id}`)}>{post?.data()?.citeInput}</p>
         <div className="border-[1px] rounded-md dark:border-gray-700 dark:hover:bg-neutral-700 border-gray-200 hover:bg-neutral-300"  onClick={() => router.push(`/constituencyposts(id)/${id}`)}>
-        <div className="flex p-1">
+        <div className="flex p-1 space-x-2 items-center">
         {post?.data()?.citeUserImg && (
           <>
         <img
@@ -439,7 +439,7 @@ const formatNumber = (number) => {
         <p className="ml-14" onClick={() => router.push(`/constituencyposts(id)/${id}`)}>{post?.data()?.text}</p>
 
         {post?.data()?.images?.length > 1 ? (
-          <Carousel className="rounded-2xl mr-2 h-[300px] w-[500px] sm:w-full xl:h-[250px] sm:h-[600px] ">
+          <Carousel className={`${!post?.data()?.images ? 'hidden' : "rounded-2xl mr-2 h-[300px] w-[500px] sm:w-full xl:h-[250px] sm:h-[600px] "}`}>
               {post?.data()?.images.map((imageUrl, index) => (
                 <img
                   key={index}
@@ -451,7 +451,7 @@ const formatNumber = (number) => {
             </Carousel>
           ) : (
             <img
-                  className="rounded-md h-[300px] w-[500px] sm:w-full sm:h-[600px] xl:h-[250px] mr-2 object-cover"
+                  className={`${!post?.data()?.images ? 'hidden' : "rounded-md h-[300px] w-[500px] sm:w-full sm:h-[600px] xl:h-[250px] mr-2 object-cover"}`}
                   src={post?.data()?.images}
                   alt=''
                 />

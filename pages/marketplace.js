@@ -218,7 +218,7 @@ const removeSelectedFile = (index) => {
   {/* Category Dropdown */}
   <div className='w-72 sm:w-40 border border-gray-400 rounded-lg py-2 px-1 dark:border-gray-900 dark:text-gray-200 text-gray-700 dark:hover:bg-neutral-700'>
     <Dropdown label={selectedCategory || 'Select Category'} inline required>
-      <div className='h-36 overflow-y-scroll scrollbar-hide z-40'>
+      <div className=' overflow-y-scroll scrollbar-hide z-40'>
         {categories.map((category, index) => (
           <Dropdown.Item 
             className='text-xl md:text-sm' 
@@ -243,7 +243,7 @@ const removeSelectedFile = (index) => {
 
 
   <div className='flex-col sm:flex-row '>
-     <div onClick={() => filePickerRef.current.click()} className='flex gap-4 '>
+     <div onClick={() => filePickerRef.current.click()} className='flex gap-4 w-fit cursor-pointer'>
         <PhotographIcon className='h-11 dark:text-gray-300 text-gray-700' 
            onChange={addImageToPost}
         />

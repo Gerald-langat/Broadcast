@@ -29,7 +29,7 @@ export default function StatusModal() {
   const [post, setUserData] = useState(null);
   const [input, setInput] = useState("");
   const filePickerRef = useRef();
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedFiles, setSelectedFiles] = useState([]);
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("");
   const [selectedVidFile, setSelectedVidFile] = useState(null);
@@ -83,17 +83,31 @@ export default function StatusModal() {
           ward:post.ward
         });
 
-        const imageRef = ref(storage, `status/${docRef.id}/statusImage`);
-        const vidRef = ref(storage, `status/${docRef.id}/statusVideo`);
-
-        if (selectedFile) {
-          await uploadString(imageRef, selectedFile, "data_url").then(async () => {
-            const downloadURL = await getDownloadURL(imageRef);
-            await updateDoc(doc(db, "status", docRef.id), {
-              statusImage: downloadURL,
+        const imageUploadPromises = [];
+        const imageUrls = [];
+        if (selectedFiles.length > 0) {
+          selectedFiles.forEach((file, index) => {
+            const imageRef = ref(storage, `status/${userDetails.uid}/image-${index}`);
+  
+            // Upload each image and store the URL
+            const uploadTask = uploadString(imageRef, file, "data_url").then(async () => {
+              const downloadURL = await getDownloadURL(imageRef);
+              imageUrls.push(downloadURL);
             });
+  
+            imageUploadPromises.push(uploadTask);
           });
-        } else if (selectedVidFile) {
+  
+          // Wait for all images to upload
+          await Promise.all(imageUploadPromises);
+  
+          // Update Firestore document with all image URLs
+          await updateDoc(doc(db, "status", docRef.id), {
+            statusImage: imageUrls,
+          });
+        }
+
+     if (selectedVidFile) {
           let isVideo = false;
           if (selectedVidFile.type) {
             isVideo = selectedVidFile.type.includes("video"); 
@@ -107,7 +121,7 @@ export default function StatusModal() {
         }
         setOpen(false);
         setInput("");
-        setSelectedFile(null);
+        setSelectedFiles([]);
         setSelectedVidFile(null);
         setLoading(false);
       }
@@ -120,13 +134,18 @@ export default function StatusModal() {
   };
 
   const addImageToPost = (e) => {
-    const reader = new FileReader();
-    if (e.target.files[0]) {
-      reader.readAsDataURL(e.target.files[0]);
+    const files = e.target.files;
+    const fileReaders = [];
+  
+    for (let i = 0; i < files.length; i++) {
+      const reader = new FileReader();
+      fileReaders.push(reader);
+      reader.readAsDataURL(files[i]);
+  
+      reader.onload = (readerEvent) => {
+        setSelectedFiles((prevFiles) => [...prevFiles, readerEvent.target.result]);
+      };
     }
-    reader.onload = (readerEvent) => {
-      setSelectedFile(readerEvent.target.result);
-    };
   };
 
 
@@ -145,6 +164,12 @@ export default function StatusModal() {
     setShowEmojiPicker(false);
     setInput("");
   }
+
+  
+  const removeSelectedFile = (index) => {
+    setSelectedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+  };
+  
 
   return (
     <div>
@@ -210,27 +235,44 @@ export default function StatusModal() {
                 </div>
 
                 <div className="flex items-center justify-between pt-2.5">
-                {loading ? (<Button color="gray" className="border-0">
-                      <Spinner aria-label="Alternate spinner button example" size="sm" />
-                      <span className="pl-3">Loading...</span>
-                    </Button>) : (
-                      <div>
-                      {selectedFile && (
+                {loading ? (
+        <div  className="border-none items-center flex mt-4 sm:mt-0">
+          <Spinner aria-label="Loading spinner" size="md" />
+          <span className="pl-3 animate-pulse sm:text-[16px] text-[28px]">Loading...</span>
+        </div>
+      ) :(
+        <>
+            {selectedVidFile && (
+              <div className="relative">
+                <XIcon
+                  onClick={() => setSelectedVidFile(null)}
+                  className="border h-7 text-black absolute cursor-pointer shadow-md border-white m-1 rounded-full"
+                />
+                <video
+                  autoPlay
+                  src={selectedVidFile}
+                  controls
+                  className={`${loading && "animate-pulse"} h-[60px] w-[100px] object-cover` }
+                />
+              </div>
+            )}
+              <div className="flex gap-2 flex-wrap border-none">
+                {selectedFiles.map((file, index) => (
+                  <div key={index} className="border-none">
+                    <XIcon
+                      onClick={() => removeSelectedFile(index)}
+                      className="border h-7 text-black absolute cursor-pointer shadow-md border-white m-1 rounded-full"
+                    />
                     <img
-                        src={selectedFile}
-                        className='h-14'
-                        alt="image"
-                      />
-                    )}
-                    {selectedVidFile && (
-                    <video autoPlay
-                        src={selectedVidFile}
-                        className='h-14'
-                        alt="image"
-                      />
-                    )}
-                    </div>
-                    )}
+                      src={file}
+                      className={`${loading && "animate-pulse"} h-[60px] w-[100px] object-cover`}
+                      alt={`image-${index}`}
+                    />
+                  </div>
+                ))}
+              </div>
+              </>
+            )}
             
                      
                   <div className="flex">

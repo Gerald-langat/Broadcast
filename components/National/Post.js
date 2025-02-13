@@ -416,7 +416,7 @@ const { hasFollowed, followMember } = useFollow();
         </div>
         
         {/* display cite */}
-        {post?.data()?.citeInput ? (<div><p onClick={() => router.push(`/posts(id)/${id}`)}></p>{post?.data()?.citeInput}
+        {post?.data()?.citeInput ? (<div><p onClick={() => router.push(`/posts(id)/${id}`)}>{post?.data()?.citeInput}</p>
         <div className="border-[1px] rounded-md dark:border-gray-700 dark:hover:bg-gray-900 border-gray-200 hover:bg-neutral-300"  onClick={() => router.push(`/posts(id)/${id}`)}>
         <div className="flex p-1">
         {post?.data()?.citeUserImg && (
@@ -431,13 +431,15 @@ const { hasFollowed, followMember } = useFollow();
           <Moment fromNow>{post?.data()?.citetimestamp?.toDate().toLocaleString()}</Moment>
         </Badge>
       </p>
+     
+
       </>
       )}
         </div>
         <p className="ml-14" onClick={() => router.push(`/posts(id)/${id}`)}>{post?.data()?.text}</p>
 
         {post?.data()?.images?.length > 1 ? (
-          <Carousel className="top-0 h-[130px] w-full">
+          <Carousel className={`${!post?.data()?.images ? 'hidden' : "top-0  h-[300px] w-full"}`}>
             {post?.data()?.images.map((imageUrl, index) => {
               return (
                 <img
@@ -451,7 +453,7 @@ const { hasFollowed, followMember } = useFollow();
           </Carousel>
         ) : (
           <img
-            className="w-full h-[130px] object-cover rounded-t-md"
+            className={`${!post?.data()?.images ? 'hidden' : "w-full  h-[300px] object-cover rounded-t-md"}`}
             src={post?.data()?.images} // Ensure this is a single image
             alt=""
           />
@@ -513,7 +515,7 @@ const { hasFollowed, followMember } = useFollow();
             e.currentTarget.pause();
          
           }}
-          className="rounded-2xl h-[300px] w-[500px] sm:w-full xl:h-[250px] sm:h-[600px] mr-2 object-cover"
+          className="rounded-2xl h-[300px] w-[450px] sm:w-full xl:h-[250px] sm:h-[600px] mr-2 object-cover"
           src={post?.data()?.video}
           alt=""
           controls
@@ -546,7 +548,7 @@ const { hasFollowed, followMember } = useFollow();
           <Tooltip content='recast' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
           <ReplyIcon className="h-12 w-12 sm:h-10 sm:w-10 p-2 hover:text-sky-500 hover:bg-blue-100 rounded-full dark:hover:bg-gray-900" onClick={repost} />
         </Tooltip>
-        <Tooltip content='cite' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
+        <Tooltip content='cite' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1 shadow-sm shadow-gray-500 dark:shadow-gray-400">
         <Popover
         aria-labelledby="profile-popover"
           trigger="click"

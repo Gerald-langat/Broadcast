@@ -215,7 +215,7 @@ const deleteRepost = async () => {
             views: postData.views,
 
             ...(postData.category && {category:postData.category,}),
-            ...(postData.images && {image:postData.images,}),
+            ...(postData.images && {images:postData.images,}),
             ...(postData.video && {video:postData.video,})
         });
         console.log('Post reposted successfully!');
@@ -294,9 +294,8 @@ const formatNumber = (number) => {
 
 
   return (
-    
     <div className="flex p-3 cursor-pointer border-[1px] border-gray-200 dark:border-gray-900
-    dark:text-gray-300 z-40 flex-grow min-w-full h-full flex-1 py-2 mt-1 rounded-md">
+    dark:text-gray-300 z-40 flex-grow min-w-full h-full flex-1 py-2 rounded-md mt-1">
   {loading ? (
        <Button color="gray" className="border-0 ">
          <Spinner aria-label="Loading spinner" size="sm" />
@@ -318,12 +317,11 @@ const formatNumber = (number) => {
          <div className="sm:flex sm:space-x-8">
          <div className="flex items-center space-x-2 whitespace-nowrap dark:text-gray-300 ">
            <HiCheck className="sm:h-4 h-6 sm:w-4 w-6 bg-green-800 rounded-full text-white"/>
-           <h4 className=" dark:text-gray-300 max-w-20 font-bold text-xl sm:text-[15px] truncate">
-          {post?.data()?.name}
+           <h4 className=" dark:text-gray-300 font-bold text-xl sm:text-[15px] max-w-20 hover:underline truncate">
+             {post?.data()?.name}
            </h4>
            <h4 className="font-bold text-xl sm:text-[15px] max-w-20 dark:text-gray-300 truncate"> {post?.data()?.lastname}</h4>
-        <h4 className=" max-w-20 truncate flex-1 text-xl sm:text-[15px]  dark:text-gray-300 ">@{post?.data()?.nickname}</h4>
-        
+        <h4 className=" truncate flex-1 text-xl sm:text-[15px] max-w-20  dark:text-gray-300">@{post?.data()?.nickname}</h4>
           <Badge className="text-[16px] hover:underline sm:-ml-28 dark:text-gray-300 md:text-sm py-0" color="gray"  icon={HiClock}>
              <Moment fromNow>{post?.data()?.timestamp?.toDate()}</Moment>
            </Badge>
@@ -346,80 +344,88 @@ const formatNumber = (number) => {
          </Tooltip>
          {/* dot icon */}
          <Popover
-                aria-labelledby="profile-popover"
-                className="-ml-28 z-20 shadow-md rounded-lg dark:shadow-gray-400 shadow-gray-500 "
-                content={
-                  <div className="w-64 text-sm text-gray-500 dark:text-gray-300 bg-gray-300 dark:bg-neutral-800 
-                     py-2 space-y-3 border-none">
-                    <div className="flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900 rounded-md">
-                    <EyeOffIcon className="h-6"/>
-                      <p>Not interested</p>
-                    </div>
-                    <div className="flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900 rounded-md">
-                    <BookmarkIcon className="h-6" />
-                      <p>save</p>
-                    </div>
+               aria-labelledby="profile-popover"
+               className="-ml-28 z-20 shadow-md rounded-lg dark:shadow-gray-400 shadow-gray-500 "
+               content={
+                 <div className="w-64 text-sm text-gray-500 dark:text-gray-300 bg-gray-300 dark:bg-neutral-800 
+                    py-2 space-y-3 border-none">
+                   <div className="flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900 rounded-md">
+                   <EyeOffIcon className="h-6"/>
+                     <p>Not interested</p>
+                   </div>
+                   <div className="flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900 rounded-md">
+                   <BookmarkIcon className="h-6" />
+                     <p>save</p>
+                   </div>
 
-                    <div className={`${userpost?.name == post?.data()?.name ? 'hidden' : 'flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900 rounded-md'}`} >
-                    <UserAddIcon className="h-6" />
+                   <div className={`${userpost?.name == post?.data()?.name ? 'hidden' : 'flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900 rounded-md'}`} >
+                   <UserAddIcon className="h-6" />
+                  
+                     <p onClick={() => followMember(post?.data()?.id, userDetails)}>{hasFollowed[post?.data()?.id] ? 'Unfollow' : 'Follow'} @{post?.data()?.nickname}</p>
                    
-                      <p onClick={() => followMember(post?.data()?.id, userDetails)}>{hasFollowed[post?.data()?.id] ? 'Unfollow' : 'Follow'} @{post?.data()?.nickname}</p>
-                    
-                    </div>
-                   
-                    <div className="flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900 rounded-md">
-                    <FlagIcon className="h-6" />
-                      <p>Report post</p>
-                    </div>
-                  </div>
-                }
-                arrow={false}
-              >
-                <DotsHorizontalIcon className="dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-gray-900 rounded-full h-10 hover:text-sky-500 p-1 sm:p-2"/>
-              
-             </Popover>
+                   </div>
+                  
+                   <div className="flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900 rounded-md">
+                   <FlagIcon className="h-6" />
+                     <p>Report post</p>
+                   </div>
+                 </div>
+               }
+               arrow={false}
+             >
+               <DotsHorizontalIcon className="dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-gray-900 rounded-full h-10 hover:text-sky-500 p-1 sm:p-2"/>
+             
+            </Popover>
             </div>
        </div>
        
        {/* display cite */}
-       {post?.data()?.citeInput ? (<div><p onClick={() => router.push(`/wardposts(id)/${id}`)}></p>{post?.data()?.citeInput}
-       <div className="border-[1px] rounded-md dark:border-gray-700 dark:hover:bg-neutral-700 border-gray-200 hover:bg-neutral-300"  onClick={() => router.push(`/wardposts(id)/${id}`)}>
-       <div className="flex p-1">
+       {post?.data()?.citeInput ? (<div><p onClick={() => router.push(`/constituencyposts(id)/${id}`)}>{post?.data()?.citeInput}</p>
+       <div className="border-[1px] rounded-md dark:border-gray-700 dark:hover:bg-neutral-700 border-gray-200 hover:bg-neutral-300"  onClick={() => router.push(`/constituencyposts(id)/${id}`)}>
+       <div className="flex p-1 space-x-2 items-center">
        {post?.data()?.citeUserImg && (
          <>
        <img
-       className="h-8 w-8 rounded-md mr-4"
+       className="h-8 w-8 rounded-md"
        src={post?.data()?.citeUserImg}
        alt="user-img"
      />
-     <p className="flex space-x-2 items-center">{post?.data()?.fromUser}{" "}{post?.data()?.fromlastname}{" "}@{post?.data()?.fromNickname}{" "} 
+
+      <h4 className=" dark:text-gray-300 max-w-20 font-bold text-xl sm:text-[15px] truncate">
+         {post?.data()?.name}
+          </h4>
+          <h4 className="font-bold text-xl sm:text-[15px] max-w-20 dark:text-gray-300 truncate"> {post?.data()?.lastname}</h4>
+       <h4 className=" max-w-20 truncate flex-1 text-xl sm:text-[15px]  dark:text-gray-300 ">@{post?.data()?.nickname}</h4>
+       
+     
      <Badge className="py-0" color="gray" icon={HiClock}>
          <Moment fromNow>{post?.data()?.citetimestamp?.toDate().toLocaleString()}</Moment>
        </Badge>
-     </p>
+     
      </>
      )}
        </div>
-       <p className="ml-14" onClick={() => router.push(`/wardposts(id)/${id}`)}>{post?.data()?.text}</p>
+       <p className="ml-14" onClick={() => router.push(`/constituencyposts(id)/${id}`)}>{post?.data()?.text}</p>
+
        {post?.data()?.images?.length > 1 ? (
-            <Carousel className="rounded-2xl mr-2 h-[300px] w-[500px] sm:w-full xl:h-[250px] sm:h-[600px]">
-              {post?.data()?.images.map((imageUrl, index) => (
-                <img
-                  key={index}
-                  className="object-cover"
-                  src={imageUrl}
-                  alt={`image-${index}`}
-                />
-              ))}
-            </Carousel>
-          ) : (
-            <img
-                  className=" rounded-md h-[300px] w-[500px] sm:w-full sm:h-[600px] xl:h-[250px] mr-2 object-cover"
-                  src={post?.data()?.images}
-                  alt=''
-                />
-          )}
-       
+         <Carousel className={`${!post?.data()?.images ? 'hidden' : "rounded-2xl mr-2 h-[300px] w-[500px] sm:w-full xl:h-[250px] sm:h-[600px] "}`}>
+             {post?.data()?.images.map((imageUrl, index) => (
+               <img
+                 key={index}
+                 className="object-cover"
+                 src={imageUrl}
+                 alt={`image-${index}`}
+               />
+             ))}
+           </Carousel>
+         ) : (
+           <img
+                 className={`${!post?.data()?.images ? 'hidden' : "rounded-md h-[300px] w-[500px] sm:w-full sm:h-[600px] xl:h-[250px] mr-2 object-cover"}`}
+                 src={post?.data()?.images}
+                 alt=''
+               />
+         )}
+      
        {post?.data()?.video && (
          <video autoPlay
          onClick={(e) => { 
@@ -438,34 +444,32 @@ const formatNumber = (number) => {
        ):(
          <>
          <p
-           onClick={() => router.push(`/wardposts(id)/${id}`)}
+           onClick={() => router.push(`/constituencyposts(id)/${id}`)}
            className="text-gray-800 w-96 sm:w-[490px] text-[20px] sm:text-[16px] mb-2 dark:text-gray-300 line-clamp-3 break-words cursor-pointer"
          >
            {post?.data()?.text}
        </p>
 
-       
        {post?.data()?.images?.length > 1 ? (
-            <Carousel className={`${!post?.data()?.images ? 'hidden' : "rounded-2xl mr-2 h-[300px] w-[500px] sm:w-full xl:h-[250px] sm:h-[600px]"}`}>
-              {post?.data()?.images.map((imageUrl, index) => {
-              console.log(imageUrl, index); // Check what images are being loaded
-                return(
-                <img
-                  key={index}
-                  className="object-cover"
-                  src={imageUrl}
-                  alt={`image-${index}`}
-                />
-              );
-              })}
-            </Carousel>
-          ) : (
-            <img
+         <Carousel className={`${!post?.data()?.images ? 'hidden' : "rounded-2xl mr-2 h-[300px] w-[500px] sm:w-full xl:h-[250px] sm:h-[600px] "}`}>
+         
+             {post?.data()?.images.map((imageUrl, index) => (
+               <img
+                 key={index}
+                 className="object-cover"
+                 src={imageUrl}
+                 alt={`image-${index}`}
+               />
+             ))}
+           </Carousel>
+         ) : (
+           <img
                   className={` ${!post?.data()?.images ? 'hidden' :"rounded-md h-[300px] w-[500px] sm:w-full sm:h-[600px] xl:h-[250px] mr-2 object-cover"}`}
-                  src={post?.data()?.images}
-                  alt=''
-                />
-          )}
+                 src={post?.data()?.images}
+                 alt=''
+               />
+         )}
+
      
         {post?.data()?.video && (
          <video autoPlay

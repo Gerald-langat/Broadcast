@@ -62,6 +62,7 @@ export default function Post({ post, id }) {
     fetchUserData();
   }, []);
 
+
   useEffect(() => {
     const fetchUserData = async () => {
       if (userDetails) {
@@ -71,7 +72,7 @@ export default function Post({ post, id }) {
         if (!querySnapshot.empty) {
           setUserData(querySnapshot.docs[0].data());
         }
-  
+   
       }
     };
 
@@ -82,28 +83,29 @@ export default function Post({ post, id }) {
   useEffect(() => {
     if(!id) return;
     const unsubscribe = onSnapshot(
-      query(collection(db, "county",  id, "likes")),
+      collection(db, "county", id, "likes"),
       (snapshot) => setLikes(snapshot.docs)
     );
-    return unsubscribe;
-  }, [id]);
+  
+  }, [db]);
 
-  useEffect(() =>{
-    if (!userpost || !userpost.county) {
-      setLoading(false);
-      return;
-    }
-    onSnapshot(
-      query(collection(db, "county", userpost.county, id, "comments")),
-      (snapshot) => {
-        setComments(snapshot.docs);
-        setLoading(false);
+  useEffect(
+    () =>{
+      if (!userpost || !userpost.county) {
+        setLoading(true);
+        return;
       }
-    ),
-  [db]
-});
-
-
+      onSnapshot(
+        query(collection(db, "county", userpost.county, id, "comments")),
+        (snapshot) => {
+          setComments(snapshot.docs);
+          setLoading(false);
+        }
+      ),
+    []
+  });
+  
+  
   useEffect(() => {
     setHasLiked(
       likes.findIndex((like) => like.id === userDetails.uid) !== -1
@@ -123,7 +125,7 @@ export default function Post({ post, id }) {
       router.replace('/');
     }
   }
-
+ 
   async function deletePost() {
     if (window.confirm("Are you sure you want to delete this post?")) {
       try {
@@ -166,46 +168,6 @@ export default function Post({ post, id }) {
     }
   }
 
-  
-  // delete Repost
-  const deleteRepost = async () => {
-    if (window.confirm("Are you sure you want to delete this post?")) {
-      if (id) {
-        try {
-          await deleteDoc(doc(db, "county", userpost.county, id));
-          console.log('Post deleted successfully');
-          router.push("/county");
-        } catch (error) {
-          console.error('Error deleting the post:', error);
-        }
-      } else {
-        console.log('No post document reference available to delete.');
-      }
-    }
-  };
-
-  useEffect(() => {
-    const fetchPost = async () => {
-      if (!userpost || !userpost.county) {
-        setLoading(false);
-        return;
-      }
-      const postRef = doc(db, "county", userpost.county, id);
-      const docSnap = await getDoc(postRef);
-
-      if (docSnap.exists()) {
-        const postData = docSnap.data();
-     
-        // Increment view count
-        await updateDoc(postRef, { views: (postData.views || 0) + 1 });
-      } else {
-        console.log('No such document!');
-      }
-    };
-    setLoading(false);
-    fetchPost();
-  }, [id]);
-
   const handleShare = async () => {
     if (navigator.share) {
       try {
@@ -226,36 +188,34 @@ export default function Post({ post, id }) {
 
 
   useEffect(() => {
-    const fetchPost = async () =>{
+    const fetchPost = async () => {
       if (!userpost || !userpost.county || !id) {
         setLoading(true);
         return;
       }
       const postRef = doc(db, "county", userpost.county, id);
-      const docSnap = await getDocs(postRef);
+      const docSnap = await getDoc(postRef);
 
-      if(docSnap.exists()){
+      if (docSnap.exists()) {
         const postData = docSnap.data();
-       
-        await updateDoc(postRef, {views: (postData.views || 0) + 1})
-    } else {
-      console.log('No such document!');
-    }
+          // Increment view count
+        await updateDoc(postRef, { views: (postData.views || 0) + 1 });
+      } else {
+        console.log('No such document!');
+      }
     };
     setLoading(false);
     fetchPost();
-  },[id, userpost])
+  }, [id, userpost]);
 
-
-   // Repost the posts
-   const repost = async () => {
+  const repost = async () => {
     if (post) {
       // Get the post data, excluding unsupported fields
       const postData = post.data();
       console.log('Post data:', postData);
       try {
         await addDoc(collection(db, 'county', userpost.county), {
-            id: userDetails.uid,
+          id: postData.id,
             text: postData.text,
             userImg: userpost.userImg,
             timestamp: serverTimestamp(),
@@ -266,9 +226,10 @@ export default function Post({ post, id }) {
             fromNickname: postData.nickname,
             views: postData.views,
 
-            ...(postData.category && {category:postData.category,}),
-            ...(postData.images && {images:postData.images,}),
-            ...(postData.video && {video:postData.video,})
+            ...(postData.category && {category:postData.category}),
+            ...(postData.images && {images:postData.images}),
+            ...(postData.video && {video:postData.video}),
+
           // Add any other fields from postData you need, excluding unsupported fields
         });
         console.log('Post reposted successfully!');
@@ -280,6 +241,22 @@ export default function Post({ post, id }) {
     }
   };
 
+  const deleteRepost = async () => {
+    if (window.confirm("Are you sure you want to delete this post?")) {
+      if (id) {
+        try {
+          await deleteDoc(doc(db, "county", userpost.county, id));
+          console.log('Post deleted successfully');
+          router.push("/county");
+        } catch (error) {
+          console.error('Error deleting the post:', error);
+        }
+      } else {
+        console.log('No post document reference available to delete.');
+      }
+    }
+  };
+  
 // recite post
 
 const cite = async () => {
@@ -334,6 +311,7 @@ const cite = async () => {
     console.log('No post data available to repost.');
   }
 };
+
 
 const formatNumber = (number) => {
   if (number >= 1000000) {
@@ -433,8 +411,8 @@ const formatNumber = (number) => {
        
        {/* display cite */}
        {post?.data()?.citeInput ? (<div><p onClick={() => router.push(`/countyposts(id)/${id}`)}></p>{post?.data()?.citeInput}
-       <div className="border-[1px] rounded-md dark:border-gray-700 dark:hover:bg-neutral-700 border-gray-200 hover:bg-neutral-300"  onClick={() => router.push(`/countyposts(id)/${id}`)}>
-       <div className="flex p-1">
+       <div className="border-[1px] rounded-md dark:border-gray-700 dark:hover:bg-neutral-700 border-gray-200 "  onClick={() => router.push(`/countyposts(id)/${id}`)}>
+       <div className="flex p-1 hover:bg-neutral-300 dark:hover:bg-neutral-700">
        {post?.data()?.citeUserImg && (
          <>
        <img
@@ -465,7 +443,7 @@ const formatNumber = (number) => {
             </Carousel>
           ) : (
             <img
-                  className=" rounded-md h-[300px] w-[500px] sm:w-full sm:h-[600px] xl:h-[250px] mr-2 object-cover"
+                  className={` ${!post?.data()?.images ? 'hidden' : "rounded-md h-[300px] w-[500px] sm:w-full sm:h-[600px] xl:h-[250px] mr-2 object-cover"}`}
                   src={post?.data()?.images}
                   alt=''
                 />

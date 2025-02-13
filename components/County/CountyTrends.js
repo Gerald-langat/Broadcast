@@ -332,7 +332,7 @@ const deleteRepost = async () => {
         </div>
         <p className="ml-14" onClick={() => router.push(`/countyposts(id)/${id}`)}>{post?.data()?.text}</p>
         {post?.data()?.images?.length  > 1 ? (
-            <Carousel className="rounded-2xl mr-2 h-[300px] w-[500px] sm:w-full xl:h-[250px] sm:h-[600px]">
+            <Carousel className={`${!post?.data()?.images ? 'hidden' : "rounded-2xl mr-2 h-[300px] w-[500px] sm:w-full xl:h-[250px] sm:h-[600px]"}`}>
               {post?.data()?.images.map((imageUrl, index) => (
                 <img
                   key={index}
@@ -344,7 +344,7 @@ const deleteRepost = async () => {
             </Carousel>
           ) : (
             <img
-                  className=" rounded-md h-[300px] w-[500px] sm:w-full sm:h-[600px] xl:h-[250px] mr-2 object-cover"
+                  className={`${!post?.data()?.images ? 'hidden' : "rounded-md h-[300px] w-[500px] sm:w-full sm:h-[600px] xl:h-[250px] mr-2 object-cover"}`}
                   src={post?.data()?.images}
                   alt=''
                 />
@@ -407,7 +407,7 @@ const deleteRepost = async () => {
             e.currentTarget.pause();
          
           }}
-          className="rounded-2xl h-[600px] w-[500px] sm:h-[300px] mr-2 object-cover"
+          className={`${!post?.data()?.video ? 'hidden' : "rounded-2xl h-[600px] w-[500px] sm:h-[300px] mr-2 object-cover"}`}
           src={post?.data()?.video}
           alt=""
           controls

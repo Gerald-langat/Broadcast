@@ -176,8 +176,8 @@ function Message({ post, id }) {
     {loading ? <Spinner className='h-6'/> : (
 
     <div className="flex-1 overflow-y-auto scrollbar-hide" onClick={() => setShowEmojiPicker(false)}>
- 
-      {messages.map((messageDoc) => (
+  {messages.map((messageDoc) => (
+        
         <motion.div
           key={messageDoc.id}
           initial={{ opacity: 0 }}
@@ -185,9 +185,12 @@ function Message({ post, id }) {
           exit={{ opacity: 0 }}
           transition={{ duration: 1 }}
         >
-          <MessageContainer key={messageDoc.id} message={messageDoc} />
+          <MessageContainer key={messageDoc.id} id={messageDoc.id} message={messageDoc} />
         </motion.div>
       ))}
+
+      
+      
   <div ref={endOfMessagesRef} />
        
     </div>

@@ -425,7 +425,7 @@ useEffect(() => {
           </div>
           <div className="cursor-pointer text-nowrap border-[1px] dark:border-gray-900 p-2 rounded-md border-gray-200">
             <p className="">
-              View Catalogue
+              View this Catalogue
             </p>
           </div>
         </div>

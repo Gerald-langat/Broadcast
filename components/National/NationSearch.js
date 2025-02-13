@@ -344,7 +344,7 @@ async function likePost() {
         </div>
         <p onClick={() => router.push(`/posts(id)/${id}`)}>{post?.data()?.text}</p>
         {post?.data()?.images?.length > 1 ? (
-            <Carousel className="rounded-2xl mr-2 h-[300px] w-[500px] sm:w-full xl:h-[250px] sm:h-[600px]">
+            <Carousel className={`${!post?.data()?.images ? 'hidden' : "rounded-2xl mr-2 h-[300px] w-[500px] sm:w-full xl:h-[250px] sm:h-[600px]"}`}>
               {post?.data()?.images.map((imageUrl, index) => (
                 <img
                   key={index}
@@ -356,7 +356,7 @@ async function likePost() {
             </Carousel>
           ) : (
             <img
-                  className=" rounded-md h-[300px] w-[500px] sm:w-full sm:h-[600px] xl:h-[250px] mr-2 object-cover"
+                  className={`${!post?.data()?.images ? 'hidden' : "rounded-md h-[300px] w-[500px] sm:w-full sm:h-[600px] xl:h-[250px] mr-2 object-cover"}`}
                   src={post?.data()?.images}
                   alt=''
                 />

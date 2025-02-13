@@ -15,7 +15,7 @@ const emojiMap = {
   surprise: "😮",
 };
 
-function MessageContainer({ message }) {
+function MessageContainer({ message, id }) {
   const [userDetails, setUserDetails] = useState(null);
 
   const handleReactionSelect = async (reaction) => {
@@ -32,6 +32,7 @@ function MessageContainer({ message }) {
         
         // Update the document with the selected emoji
         await updateDoc(docRef, {
+          emojiID: userDetails.uid,
           emoji: emojiMap[reaction] || reaction // Set the emoji
         });
       });
@@ -92,11 +93,15 @@ function MessageContainer({ message }) {
       <Moment fromNow>{message.timestamp?.toDate()}</Moment>
     </p>
 
-    {message?.emoji && (
           <div className="absolute left-0 w-full flex justify-end p-1">
+          {message?.emojiID === userDetails?.uid && (
             <span className="text-lg">{message?.emoji}</span>
+          )}
+          {message?.emojiID !== userDetails?.uid && (
+            <span className="text-lg">{message?.emoji}</span>
+          )}
           </div>
-        )}
+        
 
     {/* Other user's avatar */}
     <img
@@ -156,11 +161,16 @@ function MessageContainer({ message }) {
       alt="User avatar"
       className="h-6 w-6 rounded-full absolute right-0"
     />
-     {message?.emoji && (
+    
           <div className="absolute  left-0 w-full flex  p-1">
+          {message?.emojiID === userDetails?.uid && (
             <span className="text-lg">{message?.emoji}</span>
+          )}
+          {message?.emojiID !== userDetails?.uid && (
+            <span className="text-lg">{message?.emoji}</span>
+          )}
           </div>
-        )}
+        
   </div>
 </div>
 )}

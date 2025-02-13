@@ -4,7 +4,7 @@ import { db } from '../../firebase';
 import { collection, onSnapshot, orderBy, query, where } from 'firebase/firestore';
 import { Button, Spinner } from 'flowbite-react';
 import { AnimatePresence, motion } from 'framer-motion'; 
-import { SearchIcon } from '@heroicons/react/outline';
+import { SearchIcon, ShoppingCartIcon } from '@heroicons/react/outline';
 import {  XIcon } from 'lucide-react';
 import { HomeIcon,  OfficeBuildingIcon, PauseIcon, UserIcon } from '@heroicons/react/outline'
 import { useRouter } from 'next/router';
@@ -100,13 +100,17 @@ function MediaFeed() {
           <span className="hidden md:inline font-bold text-xl" onClick={() => router.push('/media')}>Media</span>
         </div>
         <div className="flex sm:items-center space-x-2 cursor-pointer dark:hover:bg-gray-900 hover:bg-gray-300 p-1 w-fit rounded-full">
+          <ShoppingCartIcon className="h-10 sm:h-8" />
+          <span className="hidden md:inline font-bold text-xl" onClick={() => router.push('/products')}>Products</span>
+        </div>
+        <div className="flex sm:items-center space-x-2 cursor-pointer dark:hover:bg-gray-900 hover:bg-gray-300 p-1 w-fit rounded-full">
           <UserIcon className="h-10 sm:h-8" />
           <span className="hidden md:inline font-bold text-xl" onClick={() => router.push('/profile')}>Profile</span>
         </div>
       </div>
         {/* Center the search bar */}
       <div className='flex flex-col justify-center w-full  '>  
-        <div className="flex py-1 justify-center items-center space-x-4  w-full top-0 z-10 bg-white sticky">
+        <div className="flex py-1 justify-center items-center space-x-4  w-full top-0 z-10 dark:bg-gray-950 bg-white sticky">
           <form className="flex items-center px-4 w-full py-2 sm:w-[400px]  space-x-4 rounded-full">
             <div className="flex items-center border-[1px] w-full rounded-full dark:border-gray-500">
               <SearchIcon className="h-10 sm:h-8 ml-2 text-gray-600 dark:text-gray-500" />

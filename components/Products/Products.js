@@ -1,10 +1,31 @@
 import { Carousel } from 'flowbite-react';
 import { useRouter } from 'next/router';
+import { db } from '../../firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import { useEffect, useState } from 'react';
 
 function Products({data, id}) {
-
-   
     const router = useRouter();
+    const [post, setPost] = useState(null);
+  
+    useEffect(() => {
+      const fetchPost = async () => {
+        try {
+          const docRef = doc(db, "marketplace", id);
+          const docSnap = await getDoc(docRef);
+          
+          if (docSnap.exists()) {
+            setPost(docSnap.data());
+          } else {
+            console.log("No such document!");
+          }
+        } catch (error) {
+          console.error("Error fetching post:", error);
+        }
+      };
+      
+      fetchPost();
+    }, [id]);
 
 
   return (
@@ -12,10 +33,9 @@ function Products({data, id}) {
         <div
         key={data?.data()?.id}
         className="max-w-sm hover:scale-105 transition transform duration-300 dark:bg-gray-950 border-[1px] 
-        dark:border-gray-800 rounded-md border-gray-300"
-      
+        dark:border-gray-800 rounded-md border-gray-300 relative"
         >
-       {data?.data()?.reserved}
+   <p className='absolute bg-yellow-500 text-white px-1'>{post?.reserved && 'Reserved'}</p>
            {data?.data()?.images?.length > 1 ? (
             <Carousel className="top-0 h-[130px] w-full">
               {data?.data()?.images.map((imageUrl, index) => (
@@ -47,7 +67,7 @@ function Products({data, id}) {
             Price: KES {Number(data?.data()?.cost).toLocaleString('en-KE')}
                     </p>
         </div>
-
+          
         </div>
           
   )

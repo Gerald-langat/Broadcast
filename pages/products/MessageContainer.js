@@ -4,7 +4,7 @@ import { auth, db } from '../../firebase';
 import { DotsHorizontalIcon, EmojiHappyIcon, TrashIcon } from '@heroicons/react/outline';
 import { Popover } from 'flowbite-react';
 import EmojiPicker from 'emoji-picker-react';
-import { collection, deleteDoc, doc, getDocs, Query, query, updateDoc, where } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, getDocs, Query, query, updateDoc, where } from 'firebase/firestore';
 import { ReactionBarSelector } from '@charkour/react-reactions';
 
 const emojiMap = {
@@ -45,8 +45,7 @@ function MessageContainer({ message, originalId }) {
         
         // Update the document with the selected emoji
         await updateDoc(docRef, {
-          
-          emoji: emojiMap[reaction] || reaction // Set the emoji
+          buyerEmoji: emojiMap[reaction] || reaction // Set the emoji
         });
       });
 
@@ -91,13 +90,13 @@ function MessageContainer({ message, originalId }) {
     // Message from the user (aligned to the right)
     <div className='flex justify-end items-center w-full'>
       {/* Dots Icon */}
+      <TrashIcon className='h-5 cursor-pointer hover:text-red-600' onClick={deleteMessage} />
       <Popover
             aria-labelledby="default-popover"
-            className="rounded-full z-50"
+            className="rounded-full z-50 border-none"
             placement='left'
             content={
-              <div className="w-62 flex items-center">
-              <TrashIcon className='h-5 cursor-pointer hover:text-red-600' onClick={deleteMessage} />
+              <div className="w-62 border-none">
                  <ReactionBarSelector iconSize={16}  onSelect={(reaction) => handleReactionSelect(reaction)} />
              </div>
             }>
@@ -110,11 +109,16 @@ function MessageContainer({ message, originalId }) {
         <p className="text-xs">
           <Moment fromNow>{message.timestamp?.toDate()}</Moment>
         </p>
-        {message.emoji && (
+       
           <div className="absolute left-0 w-full flex  p-1">
-            <span className="text-lg">{message.emoji}</span>
+          {message.buyerEmoji && (
+            <span className="text-lg">{message.buyerEmoji} </span>
+          )}
+          {message.emoji && (
+            <span className="text-lg">{message.emoji} </span>
+          )}
           </div>
-        )}
+      
 
         {/* User avatar */}
         <img
@@ -136,11 +140,16 @@ function MessageContainer({ message, originalId }) {
         <p className="text-xs">
           <Moment fromNow>{message.timestamp?.toDate()}</Moment>
         </p>
-        {message.emoji && (
+        
           <div className="absolute right-0 w-full flex justify-end p-1">
-            <span className="text-lg">{message.emoji}</span>
+          {message.buyerEmoji && (
+            <span className="text-lg">{message.buyerEmoji} </span>
+          )}
+          {message.emoji && (
+            <span className="text-lg">{message.emoji} </span>
+          )}
           </div>
-        )}
+        
 
         {/* Other user's avatar */}
         <img

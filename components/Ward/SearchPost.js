@@ -253,205 +253,266 @@ const formatNumber = (number) => {
 };
 
   return (
-    <div className=' border-[1px] dark:border-gray-900
-     border-gray-200 py-2 px-4 min-w-full rounded-md mt-1'>
-     {loading ? (
-        <Button color="gray" className="border-0">
-          <Spinner aria-label="Loading spinner" size="sm" />
-          <span className="pl-3 animate-pulse">Loading...</span>
-        </Button>
-      ) : (
-        <>
-      <div className='flex items-center'>
-      <div className='flex items-center flex-1 space-x-2'>
-      <div className='flex space-x-2 items-center'>
-      <img
-        className="h-11 w-11 rounded-full "
-        src={post?.data()?.userImg}
-        alt="user-img"
-      />
-       <h4 className=" dark:text-gray-300 max-w-20 font-bold text-xl sm:text-[15px] truncate">
-          {post?.data()?.name}
-           </h4>
-           <h4 className="font-bold text-xl sm:text-[15px] max-w-20 ml-2 mr-3 dark:text-gray-300 truncate"> {post?.data()?.lastname}</h4>
-        <h4 className=" max-w-20 truncate flex-1 text-xl sm:text-[15px]  dark:text-gray-300 ">@{post?.data()?.nickname}</h4>
-        
-      </div>
-      <Badge className="text-sm sm:text-[15px] -ml-28 dark:text-gray-300" color="gray"  icon={HiClock}>
-              <Moment fromNow>{post?.data()?.timestamp?.toDate()}</Moment>
-            </Badge>
-      </div>
-<div className='flex text-gray-600 dark:text-gray-300'>
-      {userDetails?.uid === post?.data()?.id && (
-          <Tooltip content='delete' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-            <TrashIcon
-              onClick={deletePost}
-              className="h-9 w-9 md:h-10 md:w-10 p-2 hover:text-red-600 hover:bg-red-100 dark:hover:bg-neutral-700 rounded-full cursor-pointer"
-            />
-            </Tooltip>
-          )}
-          <DotsHorizontalIcon className="h-10 w-10 hover:bg-sky-100 dark:hover:bg-neutral-700 hover:text-sky-500 p-2 rounded-full cursor-pointer" />
+    <div className='m-2 border-[1px] border-gray-300 dark:border-gray-900 rounded-md mt-1 p-2'>
+    <div className='flex items-center'>
+    <div className='flex items-center space-x-1 flex-1'>
+    <div className='flex space-x-2 items-center '>
+    <img
+      className="h-11 w-11 rounded-full "
+      src={post?.data()?.userImg}
+      alt="user-img"
+    />
+     <h4 className=" dark:text-gray-300 max-w-20 font-bold text-xl sm:text-[15px] truncate">
+        {post?.data()?.name}
+         </h4>
+         <h4 className="font-bold text-xl sm:text-[15px] max-w-20 dark:text-gray-300 truncate"> {post?.data()?.lastname}</h4>
+      <h4 className=" max-w-20 truncate flex-1 text-xl sm:text-[15px]  dark:text-gray-300 ">@{post?.data()?.nickname}</h4>
+      
+            
           </div>
-      </div>
-      <p className="text-gray-800 w-96 ml-14 sm:w-[490px] text-[20px] sm:text-[16px] mb-2 dark:text-gray-300 line-clamp-3 break-words cursor-pointer">
-{post?.data()?.text}</p>
+          <Badge className="text-sm sm:text-[15px] hover:underline -ml-28 dark:text-gray-300" color="gray"  icon={HiClock}>
+            <Moment fromNow>{post?.data()?.timestamp?.toDate()}</Moment>
+          </Badge>
+          </div>
+        {/* dot icon */}
+      <div className='flex text-gray-600 dark:text-gray-300'>
+        {userDetails?.uid === post?.data()?.id && (
+        <Tooltip content='delete' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
 
-
-{post?.data()?.images?.length > 1 ? (
-            <Carousel className={`${!post?.data()?.images ? 'hidden' : "rounded-2xl mr-2 h-[300px] w-[500px] sm:w-full xl:h-[250px] sm:h-[600px]"}`}>
-              {post?.data()?.images.map((imageUrl, index) => {
-              console.log(imageUrl, index); // Check what images are being loaded
-                return(
-                <img
-                  key={index}
-                  className="object-cover"
-                  src={imageUrl}
-                  alt={`image-${index}`}
-                />
-              );
-              })}
-            </Carousel>
-          ) : (
-            <img
-                  className={` ${!post?.data()?.images ? 'hidden' :"rounded-md h-[300px] w-[500px] sm:w-full sm:h-[600px] xl:h-[250px] mr-2 object-cover"}`}
-                  src={post?.data()?.images}
-                  alt=''
-                />
-          )}
-
-
-        {post?.data()?.video && (
-          <video
-            autoPlay
-            onClick={(e) => {
-              e.stopPropagation(); // Prevent the click event from bubbling up
-              e.preventDefault(); // Prevent the default action (navigation)
-              e.currentTarget.pause();
-              router.push(`/wardposts(id)/${id}`);
-            }}
-            className="rounded-2xl mr-2 h-[400px] w-[500px] ml-16 m-1"
-            src={post?.data()?.video}
-            alt=""
-            controls
+          <TrashIcon
+            onClick={deletePost}
+            className="h-9 w-9 md:h-10 md:w-10 p-2 hover:text-red-600 cursor-pointer hover:bg-red-100 rounded-full dark:hover:bg-neutral-700"
           />
+          </Tooltip>
+        )}
+        <DotsHorizontalIcon className="h-10 rounded-full cursor-pointer w-10 hover:bg-sky-100 hover:text-sky-500 p-2 dark:hover:bg-neutral-700 dark:text-gray-300" />
+        </div>
+    </div>
+      <div className='ml-14'>
+    {post?.data()?.citeInput ? (<div><p onClick={() => router.push(`/constituencyposts(id)/${id}`)}></p>{post?.data()?.citeInput}
+      <div className="border rounded-md border-gray-300 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-neutral-700"  onClick={() => router.push(`/constituencyposts(id)/${id}`)}>
+      <div className="flex p-1">
+      {post?.data()?.citeUserImg && (
+        <>
+      <img
+      className="h-8 w-8 rounded-md mr-4"
+      src={post?.data()?.citeUserImg}
+      alt="user-img"
+    />
+    <p className="flex space-x-2">{post?.data()?.fromUser}{" "}{post?.data()?.fromlastname}{" "}@{post?.data()?.fromNickname}{" "} 
+    <Badge color="gray" icon={HiClock}>
+        <Moment fromNow>{post?.data()?.citetimestamp?.toDate().toLocaleString()}</Moment>
+      </Badge>
+    </p>
+    </>
+    )}
+      </div>
+      <p className="ml-14" onClick={() => router.push(`/constituencyposts(id)/${id}`)}>{post?.data()?.text}</p>
+      {post?.data()?.images?.length  > 1 ? (
+          <Carousel className="rounded-2xl mr-2 h-[300px] w-[500px] sm:w-full xl:h-[250px] sm:h-[600px]">
+            {post?.data()?.images.map((imageUrl, index) => (
+              <img
+                key={index}
+                className="object-cover"
+                src={imageUrl}
+                alt={`image-${index}`}
+              />
+            ))}
+          </Carousel>
+        ) : (
+          <img
+                className=" rounded-md h-[300px] w-[500px] sm:w-full sm:h-[600px] xl:h-[250px] mr-2 object-cover"
+                src={post?.data()?.images}
+                alt=''
+              />
         )}
 
-        <div className="flex justify-between text-gray-500 p-2 dark:text-gray-300 ml-16">
-          <div className="flex items-center select-none">
-          <Tooltip content='reply' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-            <ChatIcon
-              onClick={() => {
-                if (!userDetails) {
-                  signIn();
-                } else {
-                  setPostId(id);
-                  setOpen(!open);
-                }
-              }}
-              className="h-9 w-9 md:h-10 md:w-10 p-2 hover:text-sky-500 hover:bg-sky-100 rounded-full cursor-pointer dark:hover:bg-neutral-700"
-            />
-           </Tooltip>
-            {comments.length > 0 && (
-              <span className="text-sm">{formatNumber(comments.length)}</span>
-            )}
-          </div>
-        
-          
-          <Tooltip content='recast' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-          <ReplyIcon className="h-9 w-9 md:h-10 md:w-10 p-2 hover:text-sky-500 hover:bg-sky-100 cursor-pointer rounded-full dark:hover:bg-neutral-700"  onClick={repost}/>
-          </Tooltip>
 
-          <Tooltip content='cite' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-        <Popover
-        aria-labelledby="profile-popover"
-          trigger="click"
-        content={
-          <div className="w-96 p-3 shadow-md dark:shadow-white">
-            <div className="flex flex-col gap-1">
-              <input type='text' 
-              value={citeInput}
-              placeholder="cite this post....."
-              onChange={(e) => setCiteInput(e.target.value)}
-              className='border-x-0 border-t-0 focus:outline-none focus:ring-0 text-black bg-transparent
-               dark:placeholder:text-gray-300 dark:text-white'/>
-            </div>
-            <div className="flex justify-end">
-            <button
-              type="button"
-              disabled={!citeInput}
-              className="rounded-lg bg-blue-700 px-3 py-1.5 mt-3 text-xs font-medium text-white hover:bg-blue-800 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            onClick={cite}
-            >
-              {loading ? 'citing...' : 'cite'}
-            </button>
-            </div>
-          </div>
-        }
-      >
-       <PencilAltIcon className="h-9 w-9 md:h-10 md:w-10 p-2 cursor-pointer"/>
-      </Popover>
-        
-        </Tooltip>
-          
-          <div className="flex items-center ">
-            {hasLiked ? (
-          <Tooltip content='unlike' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-              <HeartIcon fill='red'
-                onClick={likePost}
-                className="h-9 w-9 md:h-10 md:w-10 p-2 text-red-700 hover:bg-blue-200 dark:hover:bg-neutral-700 rounded-full cursor-pointer"
+      
+      {post?.data()?.video && (
+        <video autoPlay
+        onClick={(e) => { 
+          e.stopPropagation(); // Prevent the click event from bubbling up
+          e.preventDefault(); // Prevent the default action (navigation)
+          e.currentTarget.pause();
+        }}
+        className="rounded-md h-[600px] w-[500px] sm:h-[300px] mr-2 object-cover"
+        src={post?.data()?.video}
+        alt=""
+        controls
+      />
+      )}
+      </div>
+      </div>
+      ):(
+        <>
+        <p
+          onClick={() => router.push(`/constituencyposts(id)/${id}`)}
+          className="text-gray-800 w-96 sm:w-[490px] text-[20px] sm:text-[16px] mb-2 dark:text-gray-300 line-clamp-3 break-words cursor-pointer"
+        >
+          {post?.data()?.text}
+      </p>
+
+    
+      {post?.data()?.images?.length > 1 ? (
+          <Carousel className={`${!post?.data()?.images ? 'hidden' : "rounded-2xl mr-2 h-[300px] w-[500px] sm:w-full xl:h-[250px] sm:h-[600px]"}`}>
+            {post?.data()?.images.map((imageUrl, index) => {
+            console.log(imageUrl, index); // Check what images are being loaded
+              return(
+              <img
+                key={index}
+                className="object-cover"
+                src={imageUrl}
+                alt={`image-${index}`}
               />
-          </Tooltip>
-            ) : (
-          <Tooltip content='like' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-              <HeartIcon
-                onClick={likePost}
-                className="h-9 w-9 md:h-10 md:w-10 p-2 hover:bg-blue-200 dark:hover:bg-neutral-700 rounded-full cursor-pointer"
+            );
+            })}
+          </Carousel>
+        ) : (
+          <img
+                className={` ${!post?.data()?.images ? 'hidden' :"rounded-md h-[300px] w-[500px] sm:w-full sm:h-[600px] xl:h-[250px] mr-2 object-cover"}`}
+                src={post?.data()?.images}
+                alt=''
               />
-          </Tooltip>
-            )}
-            {likes.length > 0 && (
-              <span
-                className='text-[20px] sm:text-sm select-none'
-              >
-                {formatNumber(likes.length)}
-              </span>
-            )}
-          </div>
-          <Tooltip content='view' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-            <div className="flex items-center">
-                <EyeIcon className="h-9 w-9 md:h-10 md:w-10 p-2 hover:text-sky-500 hover:bg-blue-100 rounded-full dark:hover:bg-neutral-700"/>
-                <span className='text-[20px] sm:text-sm select-none'>{formatNumber(post?.data()?.views)}</span> 
-            </div>
-            </Tooltip>
-          <Tooltip content='share' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-          <ShareIcon className="h-9 w-9 md:h-10 md:w-10 p-2 hover:text-sky-500 hover:bg-sky-100 cursor-pointer rounded-full dark:hover:bg-neutral-700" onClick={handleShare}/>
-          </Tooltip>
-        </div>
-          {comments.length > 0 && (
-        <div className="">
-          <AnimatePresence>
-            {comments.map((comment) => (
-              <motion.div
-                key={comment.id}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 1 }}
-              >
-                <Comment
-                  key={comment.id}
-                  commentId={comment.id}
-                  originalPostId={id}
-                  comment={comment.data()}
-                />
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
+        )}
+
+
+
+    
+       {post?.data()?.video && (
+        <video autoPlay
+        onClick={(e) => { 
+          e.stopPropagation(); // Prevent the click event from bubbling up
+          e.preventDefault(); // Prevent the default action (navigation)
+          e.currentTarget.pause();
+       
+        }}
+        className="rounded-2xl h-[600px] w-[500px] sm:h-[300px] mr-2 object-cover"
+        src={post?.data()?.video}
+        alt=""
+        controls
+      />
       )}
       </>
-      )}
-    </div>
+    )}
+
+      {post?.data()?.from && <p>from {post?.data()?.from}{" "}<span className="text-gray-400">@{post?.data()?.fromNickname}</span></p>}
+</div>
+
+      <div className="flex justify-between text-gray-500 p-2 dark:text-gray-300 ml-16">
+        <div className="flex items-center select-none">
+        <Tooltip content='reply' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
+
+          <ChatIcon
+            onClick={() => {
+              if (!userDetails) {
+                router.replace('/');
+              } else {
+                setPostId(id);
+                setOpen(!open);
+              }
+            }}
+            className="h-9 w-9 md:h-10 md:w-10 p-2 hover:text-sky-500 hover:bg-sky-100 dark:hover:bg-neutral-700 rounded-full cursor-pointer"
+          />
+          </Tooltip>
+          {comments.length > 0 && (
+            <span className="text-[20px] sm:text-sm select-none">{formatNumber(comments.length)}</span>
+          )}
+        </div>
+        <Tooltip content='repost' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
+        <ReplyIcon className="h-9 w-9 md:h-10 md:w-10 p-2 hover:text-sky-500 cursor-pointer hover:bg-sky-100 rounded-full dark:hover:bg-neutral-700 " onClick={repost}/>
+      </Tooltip>
+
+      <Tooltip content='cite' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
+      <Popover
+      aria-labelledby="profile-popover"
+        trigger="click"
+      content={
+        <div className="w-96 p-3 shadow-md dark:shadow-white">
+          <div className="flex flex-col gap-1">
+            <input type='text' 
+            value={citeInput}
+            placeholder="cite this post....."
+            onChange={(e) => setCiteInput(e.target.value)}
+            className='border-x-0 border-t-0 focus:outline-none focus:ring-0 text-black bg-transparent
+             dark:placeholder:text-gray-300 dark:text-white'/>
+          </div>
+          <div className="flex justify-end">
+          <button
+            type="button"
+            disabled={!citeInput}
+            className="rounded-lg bg-blue-700 px-3 py-1.5 mt-3 text-xs font-medium text-white hover:bg-blue-800 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          onClick={cite}
+          >
+            {loading ? 'citing...' : 'cite'}
+          </button>
+          </div>
+        </div>
+      }
+    >
+     <PencilAltIcon className="h-9 w-9 md:h-10 md:w-10 p-2 cursor-pointer"/>
+    </Popover>
+    </Tooltip>
+
+        <div className="flex items-center ">
+        {hasLiked ? (
+          <Tooltip content='unlike' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
+            <HeartIcon fill="red"
+              onClick={likePost}
+              className="h-9 w-9 md:h-10 md:w-10 cursor-pointer p-2 text-red-700 dark:hover:bg-red-900 hover:bg-red-300 rounded-full"
+            />
+            </Tooltip>
+          ) : (
+        <Tooltip content='like' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
+            <HeartIcon
+              onClick={likePost}
+              className="h-9 w-9 md:h-10 md:w-10 p-2  cursor-pointer hover:text-red-600 hover:bg-red-300 rounded-full dark:hover:bg-red-900"
+            />
+            </Tooltip>
+          )}
+          {likes.length > 0 && (
+            <span
+              className='text-[20px] sm:text-sm select-none'
+            >
+              {formatNumber(likes.length)}
+            </span>
+          )}
+        </div>
+        <Tooltip content='view' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
+          <div className="flex items-center">
+              <EyeIcon className="h-9 w-9 md:h-10 md:w-10 p-2 hover:text-sky-500 hover:bg-blue-100 rounded-full dark:hover:bg-neutral-700"/>
+              <span className='text-[20px] sm:text-sm select-none'>{formatNumber(post?.data()?.views)}</span> 
+          </div>
+          </Tooltip>
+        <Tooltip content='share' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
+
+        <ShareIcon className="h-9 w-9 md:h-10 md:w-10 p-2 hover:text-sky-500 cursor-pointer hover:bg-sky-100 rounded-full dark:hover:bg-neutral-700 " onClick={handleShare}/>
+        </Tooltip>
+       
+      </div>
+      {comments.length > 0 && (
+          <div className="">
+            <AnimatePresence>
+              {comments.map((comment) => (
+                <motion.div
+                  key={comment.id}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 1 }}
+                >
+                  <Comment
+                    key={comment.id}
+                    commentId={comment.id}
+                    originalPostId={id}
+                    comment={comment.data()}
+                  />
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+        )}
+  </div>
     
   )
 }

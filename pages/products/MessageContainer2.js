@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Moment from 'react-moment';
 import { auth, db } from '../../firebase';
-import { DotsHorizontalIcon, EmojiHappyIcon, TrashIcon } from '@heroicons/react/outline';
+import { DotsHorizontalIcon, TrashIcon } from '@heroicons/react/outline';
 import { Popover } from 'flowbite-react';
 import { ReactionBarSelector } from '@charkour/react-reactions';
 import { collection, deleteDoc, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
@@ -96,11 +96,16 @@ const userId = userDetails?.uid;
           alt="User avatar"
           className="h-6 w-6 rounded-full absolute left-0"
         />
-         {message.emoji && (
+        
           <div className="absolute right-0 w-full flex justify-end  p-1">
-            <span className="text-lg">{message.emoji}</span>
+          {message.buyerEmoji && (
+            <span className="text-lg">{message.buyerEmoji} </span>
+          )}
+          {message.emoji && (
+            <span className="text-lg">{message.emoji} </span>
+          )}
           </div>
-        )}
+        
       </div>
       <Popover
             aria-labelledby="default-popover"
@@ -120,13 +125,13 @@ const userId = userDetails?.uid;
 // Message from the user (aligned to the right)
 <div className='flex justify-end items-center w-full'>
       {/* Dots Icon */}
+      <TrashIcon className='h-5 cursor-pointer hover:text-red-600' onClick={deleteMessage} />
       <Popover
             aria-labelledby="default-popover"
             className="rounded-full z-50"
             placement='left'
             content={
-              <div className="w-62 flex items-center">
-              <TrashIcon className='h-5 cursor-pointer hover:text-red-600' onClick={deleteMessage} />
+              <div className="w-62 flex flex-col items-center">
                  <ReactionBarSelector iconSize={16}  onSelect={(reaction) => handleReactionSelect(reaction)} />
              </div>
             }>
@@ -140,11 +145,16 @@ const userId = userDetails?.uid;
           <Moment fromNow>{message.timestamp?.toDate()}</Moment>
         </p>
 
-        {message.emoji && (
+        
           <div className="absolute  left-0 w-full flex justify-start p-1">
-            <span className="text-lg">{message.emoji}</span>
+          {message.buyerEmoji && (
+            <span className="text-lg">{message.buyerEmoji} </span>
+          )}
+          {message.emoji && (
+            <span className="text-lg">{message.emoji} </span>
+          )}
           </div>
-        )}
+      
         {/* User avatar */}
         <img
           src={message.userImg}

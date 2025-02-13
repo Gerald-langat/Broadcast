@@ -136,12 +136,12 @@ useEffect(() => {
   }
 
   async function likeProduct() {
-    if (userDetails || id) {
+    if (userDetails || id || userData) {
       if (hasLiked) {
         await deleteDoc(doc(db, "marketplace", id, "likes", userDetails.uid));
       } else {
         await setDoc(doc(db, "marketplace", id, "likes", userDetails.uid), {
-          username: userDetails.displayName,
+          username: userData.name,
         });
       }
     } else {
@@ -171,28 +171,31 @@ useEffect(() => {
   
   const reserve = async () => {
     if (!userDetails?.uid) return;
-
+  
     try {
-      const docRef = doc(db, "marketplace", id, "reserve", userDetails.uid);
+      const docRef = doc(db, "marketplace", id);
       const docSnap = await getDoc(docRef);
-
+  
       if (docSnap.exists()) {
-        // Unreserve the item (delete the document)
-        await deleteDoc(docRef);
-        setIsReserved(false);
-        console.log("Reservation cancelled");
-      } else {
-        // Reserve the item (create the document)
-        await setDoc(docRef, {
-          username: userDetails.displayName,
-        });
-        setIsReserved(true);
-        console.log("Item reserved");
+        const currentReservedStatus = docSnap.data().reserved;
+  
+        if (currentReservedStatus) {
+          // Unreserve the item (update the document)
+          await setDoc(docRef, { reserved: false }, { merge: true });
+          setIsReserved(false);
+          console.log("Reservation cancelled");
+        } else {
+          // Reserve the item (update the document)
+          await setDoc(docRef, { reserved: true, username: userData.name }, { merge: true });
+          setIsReserved(true);
+          console.log("Item reserved");
+        }
       }
     } catch (error) {
       console.error("Error reserving item:", error);
     }
   };
+  
   
 
   useEffect(() => {
@@ -299,7 +302,15 @@ useEffect(() => {
     fetchPost();
   }, [id, userDetails]);
   
-  
+  const formatNumber = (number) => {
+    if (number >= 1000000) {
+      return (number / 1000000).toFixed(1) + 'M'; // 1 million and above
+    } else if (number >= 1000) {
+      return (number / 1000).toFixed(1) + 'k'; // 1 thousand and above
+    } else {
+      return number; // below 1 thousand
+    }
+  };
 
   return (
     <div>
@@ -320,7 +331,8 @@ useEffect(() => {
         </div>
       </div>
 
-      <div className='grid grid-cols-1 sm:grid-cols-2  lg:grid-cols-4 justify-center w-full p-4 gap-4'>
+<div className='w-full flex justify-center'>
+      <div className='grid grid-cols-1 sm:grid-cols-2  lg:grid-cols-4 justify-items-center p-4 gap-4'>
 
 {/* Product Image */}
 {Array.isArray(posts?.data()?.images) && posts?.data()?.images.length > 1 ? (
@@ -384,7 +396,7 @@ useEffect(() => {
       )}
       {likes.length > 0 && (
         <span className={`${hasLiked && "text-red-600"} text-sm select-none`}>
-          {likes.length}
+          {formatNumber(likes.length)}
         </span>
       )}
     </div>
@@ -458,8 +470,8 @@ useEffect(() => {
     </form>
   </div>
 )}
+      </div>
 </div>
-
      
 <div>
   

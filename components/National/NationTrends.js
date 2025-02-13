@@ -318,7 +318,7 @@ async function deletePost() {
           </div>
       </div>
       <div className='ml-14'>
-      {post?.data()?.citeInput ? (<div><p onClick={() => router.push(`/posts(id)/${id}`)}></p>{post?.data()?.citeInput}
+      {post?.data()?.citeInput ? (<div><p onClick={() => router.push(`/posts(id)/${id}`)}>{post?.data()?.citeInput}</p>
         <div className="border rounded-md dark:border-gray-700
      border-gray-200 hover:bg-neutral-300"  onClick={() => router.push(`/posts(id)/${id}`)}>
         <div className="flex p-1">
@@ -337,10 +337,10 @@ async function deletePost() {
       </>
       )}
         </div>
-        <p onClick={() => router.push(`/posts(id)/${id}`)}>{post?.data()?.text}</p>
+        <p className='ml-14' onClick={() => router.push(`/posts(id)/${id}`)}>{post?.data()?.text}</p>
 
           {post?.data()?.images?.length > 1 ? (
-          <Carousel className="top-0 h-[130px] w-full">
+          <Carousel className={`${!post?.data()?.images ? 'hidden' : "top-0 h-[130px] w-full"}`}>
             {post?.data()?.images.map((imageUrl, index) => {
               console.log("the images to be displayed",imageUrl, index); // Check what images are being loaded
               return (
@@ -355,7 +355,7 @@ async function deletePost() {
           </Carousel>
         ) : (
           <img
-            className="w-full h-[130px] object-cover rounded-t-md"
+            className={`${!post?.data()?.images ? 'hidden' : "w-full h-[130px] object-cover rounded-t-md"}`}
             src={post?.data()?.images} // Ensure this is a single image
             alt=""
           />
@@ -369,7 +369,7 @@ async function deletePost() {
             e.preventDefault(); // Prevent the default action (navigation)
             e.currentTarget.pause();
           }}
-          className="rounded-md h-[600px] w-[500px] sm:h-[300px] mr-2 object-cover"
+          className={`${!post?.data()?.video ? 'hidden' : "rounded-md h-[600px] w-[500px] sm:h-[300px] mr-2 object-cover"}`}
           src={post?.data()?.video}
           alt=""
           controls
@@ -416,7 +416,7 @@ async function deletePost() {
             e.currentTarget.pause();
          
           }}
-          className="rounded-2xl h-[600px] w-[500px] sm:h-[300px] mr-2 object-cover"
+          className={`${!post?.data()?.video ? 'hidden' : "rounded-2xl h-[600px] w-[500px] sm:h-[300px] mr-2 object-cover"}`}
           src={post?.data()?.video}
           alt=""
           controls
