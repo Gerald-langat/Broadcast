@@ -41,13 +41,12 @@ export default function Feed() {
         </Button>
       ) : (
         <>
-      <div className="flex items-center dark:bg-gray-950 md:py-2 xl:px-3 sticky top-0 border-[1px] rounded-md
+      <div className="flex items-center justify-between dark:bg-gray-950 md:py-2 xl:px-3 sticky top-0 border-[1px] rounded-md
        border-gray-200 bg-white  dark:border-gray-900">
         <h2 className="text-2xl md:text-xl font-bold cursor-pointer top-0 fixed dark:text-gray-300 xl:p-0 ">National</h2>
-        <div className="flex items-center justify-center px-0 ml-auto w-9 h-9 ">
-          <SparklesIcon className="text-2xl sm:text-sm h-6 md:h-5 dark:text-gray-300" />
-        </div>
+      
       </div>
+     
       
       <div className=" z-50">
         <Stories />

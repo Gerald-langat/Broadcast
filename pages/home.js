@@ -7,6 +7,8 @@ import CommentModal from "../components/National/CommentModal";
 import StatusModal from "../components/National/StatusModal";
 import Feed from "../components/National/Feed";
 
+
+
 function Home() {
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [isWidgetsVisible, setIsWidgetsVisible] = useState(false);
@@ -33,7 +35,7 @@ function Home() {
         <meta name="description" content="Generated and created by redAnttech" />
         <link rel="icon" href="../../images/Brodcast.jpg" />
       </Head>
-
+  
       {/* Main Content */}
       <div className="flex min-h-screen min-w-[560px] flex-1 ">
         {/* Sidebar */}

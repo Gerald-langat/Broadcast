@@ -8,6 +8,7 @@ import { SearchIcon, XIcon } from '@heroicons/react/outline';
 import { useRouter } from 'next/router';
 import { Button, Spinner } from 'flowbite-react';
 import Link from 'next/link';
+// import LiveStream from '../../pages/liveStream/livestream';
 
 
 export default function Widgets() {
@@ -121,6 +122,8 @@ const clearQuery = () => {
   setQuery('');
 }
 
+
+
   return (
     <div className="dark:bg-gray-950 -z-50 xl:inline h-screen space-y-5">
      {loading ? (
@@ -217,5 +220,9 @@ const clearQuery = () => {
     </div>
  
       )}
+          
+      {/* <div className=" z-50 right-0 bottom-6 fixed">
+        <LiveStream />
+      </div> */}
     </div>
 )}

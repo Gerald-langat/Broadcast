@@ -24,7 +24,7 @@ export default function StatusPage() {
       console.log(user)
       setUserDetails(user)
     })
-  }
+  } 
   useEffect(() => {
     fetchUserData();
   }, []);

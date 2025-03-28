@@ -120,6 +120,7 @@ useEffect(() => {
     setSelectedCategory(category);
   };
 
+  // user image and back image
   useEffect(() => {
     const fetchUserData = async () => {
       if (userDetails) {
@@ -130,7 +131,6 @@ useEffect(() => {
           setPost(userData);  // Set the post data to state
           setBackImg(userData.backImg || null);
           setUserImg(userData.userImg || null);
-         
         }
       }
     };

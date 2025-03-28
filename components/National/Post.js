@@ -48,7 +48,6 @@ export default function Post({ post, id }) {
   const [hasLiked, setHasLiked] = useState(false);
   const [comments, setComments] = useState([]);
   const [userDetails, setUserDetails] = useState(null);
-  const [userData, setUserData] = useState(null);
   const [citeInput, setCiteInput] = useState(""); 
   const [loading, setLoading] = useState(false);
   const { hasFollowed, followMember } = useFollow();
@@ -58,6 +57,7 @@ export default function Post({ post, id }) {
   const [reportReason, setReportReason] = useState("");
   const [isReported, setIsReported] = useState({});
   const [isBookmarked, setIsBookmarked] = useState({});
+  const [userData, setUserData] = useState(null);
 
 
   const fetchUserData = async () => {
@@ -215,13 +215,12 @@ const handleShare = async () => {
       await navigator.share({
         title: 'Check this out!',
         text: 'Sharing this amazing content.',
-        url: window.location.href,
+        url: `/posts(id)/${id}`
       });
     } catch (error) {
       console.error('Error sharing content:', error);
     }
   } else {
-    // Fallback for browsers that do not support the Web Share API
     alert('Web Share API is not supported in your browser.');
   }
 };
