@@ -3,14 +3,14 @@ import { useRouter } from 'next/router';
 
 function SearchComponent({ post }) {
   const router = useRouter();
-  
+  const uid = post?.data()?.uid;
  
 
   return (
     <div>
       {post && (
         <div className="flex cursor-pointer items-center dark:hover:bg-gray-900 py-5 sm:py-2 hover:bg-slate-100 w-full"
-         onClick={() =>  router.push(`/posts/${ post.data().name}`)}>
+         onClick={() =>  router.push(`/posts/${uid}`)}>
           
           <div className="flex items-center">
             <img

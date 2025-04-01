@@ -8,6 +8,8 @@ import { Button, Spinner, Tooltip } from 'flowbite-react';
 import { HomeIcon, InboxInIcon, NewspaperIcon, OfficeBuildingIcon, PauseIcon, PlusIcon, UserIcon } from '@heroicons/react/outline';
 import { useFollow } from '../FollowContext';
 import Link from 'next/link';
+import { signOut } from 'next-auth/react';
+import { SignedIn, SignedOut, SignInButton, useUser } from '@clerk/nextjs';
 
 
 export default function Sidebar() {
@@ -15,30 +17,22 @@ export default function Sidebar() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const [open, setOpen] = useRecoilState(modalStatus);
-  const [userDetails, setUserDetails] = useState(null);
   const [posts, setPosts] = useState([]);
   const { hasFollowed, followMember, followloading } = useFollow();
   const [userPosts, setUserPosts] = useState(null);
-
-  // Fetch user details
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      setUserDetails(user);
-    });
-    return () => unsubscribe();
-  }, []);
+  const { user } = useUser();
 
   // Fetch user posts
   useEffect(() => {
     const fetchUserPosts = async () => {
-      if (!userDetails?.uid) {
+      if (!user?.id) {
         // Exit early if userDetails or userDetails.uid is missing
         return;
       }
   
       try {
         setLoading(true); // Only set loading state when query starts
-        const q = query(collection(db, 'userPosts'), where('id', '==', userDetails.uid));
+        const q = query(collection(db, 'userPosts'), where('uid', '==', user.id));
         const querySnapshot = await getDocs(q);
   
         if (!querySnapshot.empty) {
@@ -52,7 +46,7 @@ export default function Sidebar() {
     };
   
     fetchUserPosts();
-  }, [userDetails]);
+  }, [user?.id]);
   
 
   // Fetch members' posts
@@ -75,8 +69,9 @@ export default function Sidebar() {
   
 
   return (
-    <div className="dark:bg-gray-950 bg-white xl:flex flex-col px-28 md:p-2 items-start 
-      fixed h-full lg:w-1/4 w-3/4 ">
+    <div className="dark:bg-gray-950 xl:flex flex-col px-28 md:p-2 items-start 
+    fixed h-full lg:w-1/4 w-3/4 2xl:w-10 2xl:ml-48 ml-0">
+    
       {loading ? (
         <Button color="gray" className="border-0 ml-20 items-center flex mt-4 sm:mt-0">
           <Spinner aria-label="Loading spinner" size="md" />
@@ -87,11 +82,16 @@ export default function Sidebar() {
           {userPosts && (
             <div className="flex space-x-3 items-center w-[400px] sm:w-[300px] mb-1 p-2 -ml-20 md:ml-16 cursor-pointer">
               <Tooltip content="logout" arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
+                <SignedIn>
                 <img
                   src={userPosts.userImg}
                   className="sm:h-11 sm:w-11 h-20 w-20 rounded-md cursor-pointer hover:brightness-95 shadow-gray-800 shadow-sm dark:shadow-gray-600"
-                  onClick={() => router.replace('/')}
+      
                 />
+                </SignedIn>
+                <SignedOut>
+                  <SignInButton />
+                </SignedOut>
               </Tooltip>
               <div className="flex-1 flex-col">
                 <p className="font-bold text-lg sm:text-sm dark:text-gray-300">{userPosts.name}</p>
@@ -201,14 +201,7 @@ export default function Sidebar() {
 
           </div>
 
-          {!userPosts && (
-            <button
-              onClick={() => router.push('/')}
-              className="bg-blue-400 text-white rounded-full ml-16 w-36 h-12 font-bold shadow-md hover:brightness-95 text-lg hidden xl:inline"
-            >
-              Sign in
-            </button>
-          )}
+         
         </div>
       )}
     </div>

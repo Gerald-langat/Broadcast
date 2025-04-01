@@ -22,7 +22,7 @@ export default function Widgets() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const unsubscribe = onSnapshot(collection(db, 'posts'), (snapshot) => {
+        const unsubscribe = onSnapshot(collection(db, 'national'), (snapshot) => {
           setTrendPosts(snapshot.docs.map((doc) => doc.data()));
         });
 
@@ -132,8 +132,8 @@ const clearQuery = () => {
           <span className="pl-3 animate-pulse sm:text-[16px] text-[28px]">Loading...</span>
         </Button>
       ) : (
-      <div className=" dark:bg-gray-950  bg-white w-full">
-        <form className='flex justify-between px-3 dark:bg-gray-950 bg-gray-200 items-center -ml-12 dark:border-gray-900 xl:w-[335px] sm:w-[88%] w-[570px] border-b-[1px] rounded-md top-2 fixed flex-grow'>
+      <div>
+        <form className='flex justify-between px-3 dark:bg-gray-950 bg-gray-200 items-center -ml-12 2xl:-ml-40 dark:border-gray-900 lg:w-[380px] 2xl:w-[400px] sm:w-[88%] w-[570px] border-b-[1px] rounded-md top-2 fixed flex-grow'>
           <SearchIcon className='sm:h-6 h-8 w-8 text-gray-500 z-40 dark:text-gray-300' />
         <input
           className="border-0 dark:bg-gray-950 bg-gray-200 w-full text-2xl sm:text-lg placeholder:text-2xl  sm:placeholder:text-lg 
@@ -149,8 +149,8 @@ const clearQuery = () => {
         </div>
       </form>
            
-      <div className='dark:bg-gray-950 dark:shadow-gray-400 -ml-12 shadow-md shadow-gray-400 overflow-y-auto container
-       bg-slate-50 md:mt-2 xl:w-[335px] sm:w-[88%] w-[570px]  fixed top-24 sm:top-[46px] z-50 fit max-h-80 rounded-lg flex 
+      <div className='dark:bg-gray-950 dark:shadow-gray-400 -ml-12 2xl:-ml-40 shadow-md shadow-gray-400 overflow-y-auto container
+       bg-slate-50 md:mt-2 2xl:w-[400px] sm:w-[88%] w-[570px]  fixed top-24 sm:top-[46px] z-50 fit max-h-80 rounded-lg flex 
        flex-grow'>
       <div className=" dark:bg-gray-950 w-full ">
         {posts.map((post) => (
@@ -170,8 +170,8 @@ const clearQuery = () => {
       </div>
       
       <div>
-      <div className='dark:bg-gray-950 bg-white space-x-2 mt-2 top-24 sm:top-12 fixed  -ml-12 p-2 w-full rounded-t-md'>
-          <Link href='/home'>
+      <div className='dark:bg-gray-950 bg-white space-x-2 mt-2 top-24 sm:top-12 fixed 2xl:-ml-40 flex justify-between lg:w-[380px] 2xl:w-[400px] sm:w-[88%] w-[570px] -ml-12 p-2  rounded-t-md'>
+          <Link href='/national'>
           <button className='border-gray-200 bg-green-700 p-2 rounded-full hover:bg-gray-400 text-white font-semibold hover:text-white text-xl sm:text-sm'>All
           </button>
           </Link>
@@ -193,7 +193,7 @@ const clearQuery = () => {
           </Link>
       </div>
       <br></br>
-      <div className="dark:bg-gray-950  text-gray-700  bg-slate-50 rounded-xl pt-2 mt-36 sm:mt-20 fixed -ml-12 w-full xl:w-[75%] min-h-full">
+      <div className="dark:bg-gray-950 2xl:-ml-40 text-gray-700 2xl:w-[400px] sm:w-[88%] w-[570px] bg-slate-50 rounded-xl pt-2 mt-36 sm:mt-20 fixed -ml-12 min-h-full">
       <h4 className="font-bold text-3xl sm:text-xl px-4 text-black dark:text-gray-300">Trends for you</h4>
       {loading ? (
             <Button color="gray" className="border-0">

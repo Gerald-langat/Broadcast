@@ -4,11 +4,6 @@ import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import { getAuth } from "firebase/auth";
 
-
-
-
-// TODO: Add SDKs for Firebase products that you want to use
-//
 const firebaseConfig = {
   apiKey: "AIzaSyAmI3uZKu0oqJ90xsX-3BLsYNLno3rz3rI",
   authDomain: "deep-state-dce44.firebaseapp.com",

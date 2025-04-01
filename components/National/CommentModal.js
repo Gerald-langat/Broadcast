@@ -3,11 +3,10 @@ import { modalState, postIdState } from "../../atoms/modalAtom";
 import Modal from "react-modal";
 import {
   EmojiHappyIcon,
-  PhotographIcon,
   XIcon,
 } from "@heroicons/react/outline";
 import { useEffect, useRef, useState } from "react";
-import { auth, db, storage } from "../../firebase";
+import { db } from "../../firebase";
 import {
   addDoc,
   collection,
@@ -16,45 +15,31 @@ import {
   onSnapshot,
   query,
   serverTimestamp,
-  updateDoc,
   where,
 } from "firebase/firestore";
 import Moment from "react-moment";
 import Picker from 'emoji-picker-react'
 import { Tooltip } from "flowbite-react";
-import { getDownloadURL, ref, uploadString } from "firebase/storage";
+import { useUser } from "@clerk/nextjs";
 
 export default function CommentModal() {
   
   const [open, setOpen] = useRecoilState(modalState);
   const [postId] = useRecoilState(postIdState);
-  const [post, setPost] = useState(null);
   const [input, setInput] = useState("");
-  const [userDetails, setUserDetails] = useState(null);
   const [userData, setUserData] = useState(null);
   const [emoji, setEmoji] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [loading, setLoading] = useState(false);
   const filePickerRef = useRef(null);
-  const [selectedFile, setSelectedFile] = useState(null);
-
-  const fetchUserData = async () => {
-    auth.onAuthStateChanged(async (user) => {
-      console.log(user)
-      setUserDetails(user)
-
-    })
-  }
-  useEffect(() => {
-    fetchUserData();
-  }, []);
+  const [post, setPost] = useState({})
+  const { user } = useUser()
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (userDetails) {
-        const q = query(collection(db, 'userPosts'), where('id', '==', userDetails.uid));
+      if (user?.id) {
+        const q = query(collection(db, 'userPosts'), where('uid', '==', user?.id));
         const querySnapshot = await getDocs(q);
-        console.log(userDetails.uid)
         if (!querySnapshot.empty) {
           setUserData(querySnapshot.docs[0].data());
         }
@@ -62,11 +47,11 @@ export default function CommentModal() {
     };
 
     fetchUserData();
-  }, [userDetails]);
+  }, [user?.id]);
 
 
  useEffect(() => {
-  const unsubscribe = onSnapshot(doc(db, "posts", postId), (snapshot) => {
+  const unsubscribe = onSnapshot(doc(db, "national", postId), (snapshot) => {
     setPost(snapshot); // Save the snapshot object
   });
 
@@ -77,32 +62,19 @@ export default function CommentModal() {
     if (!loading) {
       setLoading(true);
     }
-    const docRef = await addDoc(collection(db, "posts", postId, "comments"), {
+   await addDoc(collection(db, "national", postId, "comments"), {
       comment: input,
       userImg: userData.userImg,
       name: userData.name,
       nickname:userData.nickname,
       timestamp: serverTimestamp(),
-      id: userDetails.uid,
+      uid: user?.id,
     });
 
-      // adding reply images to storage
-  const RepImage = ref(storage, `reply/${docRef.id}/image`);
-  if (selectedFile) {
-     await uploadString(RepImage, selectedFile, "data_url").then(async () => {
-       const downloadURL = await getDownloadURL(RepImage);
-       await updateDoc(doc(db, "posts", postId, "comments", docRef.id), {
-         image: downloadURL,
-       });
-     });
-   }
 
     setLoading(false);
     setOpen(false);
     setInput("");
-    setSelectedFile(null);
-
-
   }
 
   const closeMode = () => {
@@ -111,18 +83,6 @@ export default function CommentModal() {
     setInput("");
   }
 
-  //  images
-  const addImageReply = (e) => {
-    const reader = new FileReader();
-    if (e.target.files[0]) {
-      reader.readAsDataURL(e.target.files[0]);
-    }
-    reader.onload = (readerEvent) => {
-      setSelectedFile(readerEvent.target.result);
-    };
-  };
-
-
 
   return (
     <div>
@@ -130,7 +90,7 @@ export default function CommentModal() {
         <Modal
           isOpen={open}
           onRequestClose={() => setOpen(false)}
-          className="max-w-lg w-[90%]  absolute top-24 left-[50%] translate-x-[-50%] bg-white rounded-md shadow-md border-none"
+          className="max-w-lg w-[90%]  absolute top-62 left-[50%] translate-x-[-50%] bg-white rounded-md shadow-md border-none"
         >
           <div className="p-1 dark:bg-gray-950 rounded-md">
             <div className="border-b dark:border-gray-900 py-2 px-1.5">
@@ -187,33 +147,12 @@ export default function CommentModal() {
                       className=""
                       onClick={() => filePickerRef.current.click()}
                     >
-                    <Tooltip content='image' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-                      <PhotographIcon className="sm:h-10 sm:w-10 h-16 w-16 rounded-full cursor-pointer p-2 text-sky-500 hover:bg-sky-100 dark:hover:bg-neutral-700" />
-                      <input
-                        type="file"
-                        hidden
-                        accept="image/*"
-                        ref={filePickerRef}
-                        onChange={addImageReply}
-                      />
-                      </Tooltip>
+                    
                     </div>
                     <Tooltip content='emoji' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
                     <EmojiHappyIcon className="hidden md:inline h-10 w-10 rounded-full p-2 cursor-pointer text-sky-500 hover:bg-sky-100 dark:hover:bg-neutral-700" onClick={() => setShowEmojiPicker(!showEmojiPicker)}/>
                   </Tooltip>
-                  {selectedFile && (
-                    <div className="relative">
-                      <XIcon
-                        onClick={() => setSelectedFile(null)}
-                        className="border h-7 text-black absolute cursor-pointer shadow-md border-white m-1 rounded-full"
-                      />
-                      <img
-                        src={selectedFile}
-                        controls
-                        className={`${loading && "animate-pulse"} h-[200px] w-[300px] object-cover` }
-                      />
-                    </div>
-                  )}
+                 
                   </div>
                   <button
                     onClick={sendComment}

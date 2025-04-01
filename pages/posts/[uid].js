@@ -1,45 +1,68 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { collection, query, onSnapshot, orderBy } from 'firebase/firestore';
+import { collection, getDocs, query, where, orderBy, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase';
-import Head from "next/head";
+import { ArrowLeftIcon, HomeIcon, MenuAlt1Icon, SearchIcon } from '@heroicons/react/outline';
 import Sidebar from '../../components/National/Sidebar';
-import { ArrowLeftIcon, HomeIcon, MenuAlt1Icon, SearchIcon } from "@heroicons/react/outline";
 import Widgets from '../../components/National/Widgets';
 import CommentModal from '../../components/National/CommentModal';
+import Head from 'next/head';
 import { Button, Spinner, Tooltip } from 'flowbite-react';
-import NationTrends from '../../components/National/NationTrends';
 import StatusModal from '../../components/National/StatusModal';
+import NationTrends from '../../components/National/NationTrends';
 
-export default function TopicPostsPage() {
+const WardPost = () => {
   const router = useRouter();
-  const { topic } = router.query;
+  const { uid } = router.query;
   const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [userData, setUserData] = useState(null);
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [isWidgetsVisible, setIsWidgetsVisible] = useState(false);
-  
+
 
   useEffect(() => {
-    if (!loading) {
-      setLoading(true);
-    }
+    const fetchUserData = async () => {
+      setLoading(true); // Ensure loading is set to true at the start
+  
+      try {
+        if (uid) {
+          const q = query(collection(db, 'userPosts'), where('uid', '==', uid));
+          const querySnapshot = await getDocs(q);
+          if (!querySnapshot.empty) {
+            setUserData(querySnapshot.docs[0].data());
+          }
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false); // Ensure loading is set to false after fetching
+      }
+    };
+  
+    fetchUserData();
+  }, [uid]);
+  
 
-    const q = query(collection(db, "national"), orderBy('timestamp', 'desc'));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const filteredPosts = snapshot.docs
-        .filter(doc => {
-          const data = doc.data();
-          return data.text && data.text.includes(topic);
-        })
-        
-      setPosts(filteredPosts);
-      setLoading(false);
-    });
-  
-    return () => unsubscribe();
-  }, [topic]);
-  
+  // posts
+  useEffect(() =>{
+      if (!userData || !userData.county) {
+        setLoading(true);
+        return;
+      }
+      const unsubscribe = onSnapshot(
+        query(collection(db, "national"),
+        where("uid", "==", uid),
+        orderBy("timestamp", "desc")
+      ),
+        (snapshot) => {
+          setPosts(snapshot.docs);
+          setLoading(false);
+        }
+      );
+      return () => unsubscribe();
+},[userData]);
+
 
   const toggleSidebar = () => {
     setIsSidebarVisible(!isSidebarVisible);
@@ -49,19 +72,19 @@ export default function TopicPostsPage() {
   const toggleWidgets = () => {
     setIsWidgetsVisible(!isWidgetsVisible);
     setIsSidebarVisible(false);
-  }
+  };
 
   const toggleHome = () => {
     setIsWidgetsVisible(false);
     setIsSidebarVisible(false);
-  }
-  
-
+  };
 
   return (
     <div>
       <Head>
-        <title>{topic ? topic : 'loading...'}</title>
+        <title>{
+          loading ? 'loading...' : 
+          userData ? userData.name + " " + userData.lastname + " " + '@' + userData.nickname : 'loading...'}</title>
         <meta name="description" content="Generated and created by redAndtech" />
         <link rel="icon" href="../../images/Brodcast.jpg" />
       </Head>
@@ -83,17 +106,17 @@ export default function TopicPostsPage() {
         <Sidebar />
         </div>
         {/* Feed */}
-        <div className="xl:ml-[350px] 2xl:mr-[150px] 2xl:ml-[560px] xl:min-w-[576px] 2xl:min-w-[700px]  sm:min-w-full flex-grow max-w-xl">
+        <div className="xl:ml-[350px] 2xl:mr-[150px] 2xl:ml-[560px] xl:min-w-[576px] 2xl:min-w-[600px]  sm:min-w-full flex-grow max-w-xl">
           <div className="flex items-center space-x-2  py-2 px-3 sticky top-0 dark:bg-gray-950 bg-white border-[1px] rounded-md dark:border-gray-900
-             border-gray-200">
+     border-gray-200">
           <Tooltip content='back' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
             <div className="animate-pulse" onClick={() => router.replace("/national")}>
               <ArrowLeftIcon className="h-10 sm:h-8 cursor-pointer animate-pulse" />
             </div>
           </Tooltip>
             <h2 className="text-lg sm:text-xl font-bold cursor-pointer">
-            {topic && (
-              <span className='text-2xl sm:text-lg'>{topic}</span>
+            {userData?.name && (
+              <span className='text-2xl sm:text-lg'>{userData.name}{" "}{userData.lastname}{" "}@{userData.nickname}</span>
               )}
             </h2>
           </div>
@@ -141,3 +164,9 @@ export default function TopicPostsPage() {
     </div>
   );
 }
+
+
+
+
+
+export default WardPost;

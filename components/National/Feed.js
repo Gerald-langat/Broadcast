@@ -1,4 +1,3 @@
-import { SparklesIcon } from "@heroicons/react/outline";
 import Input from "./Input";
 import Post from "./Post";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
@@ -15,7 +14,7 @@ export default function Feed() {
 
   useEffect(() => {
     const fetchPost = async () => {
-    const q = query(collection(db, "posts"), orderBy("timestamp", "desc"));
+    const q = query(collection(db, "national"), orderBy("timestamp", "desc"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       setPosts(snapshot.docs);
       setLoading(false);
@@ -30,8 +29,8 @@ export default function Feed() {
 
   return (
     <div className="dark:bg-gray-950 dark:border-gray-700 
-    border-gray-200 w-full sm:w-screen xl:min-w-[576px] 
-    xl:max-w-[620px] sm:px-4 md:px-8 xl:px-0 min-h-screen">
+    border-gray-200 w-full sm:w-screen lg:min-w-[576px] 
+    lg:max-w-[620px] 2xl:max-w-[700px] sm:px-4 md:px-8 xl:px-0 min-h-screen 2xl:ml-20 ml-0 ">
 
      <div className=" dark:border-gray-700 border-gray-200 w-full">
     {loading ? (
@@ -42,17 +41,15 @@ export default function Feed() {
       ) : (
         <>
       <div className="flex items-center justify-between dark:bg-gray-950 md:py-2 xl:px-3 sticky top-0 border-[1px] rounded-md
-       border-gray-200 bg-white  dark:border-gray-900">
+       border-gray-200 bg-white  dark:border-gray-900 h-10">
         <h2 className="text-2xl md:text-xl font-bold cursor-pointer top-0 fixed dark:text-gray-300 xl:p-0 ">National</h2>
-      
       </div>
-     
-      
+    
       <div className=" z-50">
         <Stories />
       </div>
       
-      <div className="top-8 sticky bg-white dark:bg-gray-950">
+      <div className="top-0 sticky bg-white z-50 dark:bg-gray-950">
         <Input />
       </div>
 

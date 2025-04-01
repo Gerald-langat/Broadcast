@@ -18,8 +18,9 @@ import { getDownloadURL, ref, uploadString } from "firebase/storage";
 import { useState, useRef, useEffect } from "react";
 import { auth, db, storage } from "../../firebase";
 import Picker from 'emoji-picker-react'// Import your EmojiPicker component
-import { Button, Popover, Spinner, Tooltip } from "flowbite-react";
+import { Popover, Spinner, Tooltip } from "flowbite-react";
 import { useRouter } from "next/router";
+import { useUser } from "@clerk/nextjs";
 
 export default function Input() {
   const [input, setInput] = useState("");
@@ -37,20 +38,12 @@ export default function Input() {
   const [userDetails, setUserDetails] = useState(null);
   const router = useRouter();
   const [selectedFiles, setSelectedFiles] = useState([]);
-
-  const fetchUserData = async () => {
-    auth.onAuthStateChanged(async (user) => {
-      setUserDetails(user)
-    })
-  }
-  useEffect(() => {
-    fetchUserData();
-  }, []);
+  const { user } = useUser()
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (userDetails) {
-        const q = query(collection(db, 'userPosts'), where('id', '==', userDetails.uid));
+      if (user?.id) {
+        const q = query(collection(db, 'userPosts'), where('uid', '==', user.id));
         const querySnapshot = await getDocs(q);
         if (!querySnapshot.empty) {
           setUserData(querySnapshot.docs[0].data());
@@ -58,7 +51,7 @@ export default function Input() {
       }
     };
     fetchUserData();
-  }, [userDetails]);
+  }, [user?.id]);
 
   const sendPost = async () => {
     if (loading) return;
@@ -66,8 +59,8 @@ export default function Input() {
 
     try {
       if (userData) {
-        const docRef = await addDoc(collection(db, 'posts'), {
-          id: userDetails.uid,
+        const docRef = await addDoc(collection(db, 'national'), {
+          uid: userData.uid,
           text: input,
           userImg: userData.userImg,
           timestamp: serverTimestamp(),
@@ -85,7 +78,7 @@ export default function Input() {
         const imageUrls = [];
         if (selectedFiles.length > 0) {
           selectedFiles.forEach((file, index) => {
-            const imageRef = ref(storage, `posts/${docRef.id}/image-${index}`);
+            const imageRef = ref(storage, `national/${docRef.id}/image-${index}`);
             // Upload each image and store the URL
             const uploadTask = uploadString(imageRef, file, "data_url").then(async () => {
               const downloadURL = await getDownloadURL(imageRef);
@@ -99,25 +92,25 @@ export default function Input() {
           await Promise.all(imageUploadPromises);
   
           // Update Firestore document with all image URLs
-          await updateDoc(doc(db, "posts", docRef.id), {
+          await updateDoc(doc(db, "national", docRef.id), {
             images: imageUrls,
           });
         }
         
-        const vidRef = ref(storage, `posts/${docRef.id}/video`);
+        const vidRef = ref(storage, `national/${docRef.id}/video`);
        if (selectedVidFile) {
           await uploadString(vidRef, selectedVidFile, "data_url").then(async () => {
             const downloadURL = await getDownloadURL(vidRef);
-            await updateDoc(doc(db, "posts", docRef.id), {
+            await updateDoc(doc(db, "national", docRef.id), {
               video: downloadURL,
             });
           });
         }
 
         if (postToWard) {
-          const wardCollection = collection(db, 'ward', userData.ward);
+          const wardCollection = collection(db, "ward", userData.ward, "posts");
           await addDoc(wardCollection, {
-            id: userDetails.uid,
+            uid: userDetails.uid,
             text: input,
             userImg: userData.userImg,
             timestamp: serverTimestamp(),
@@ -128,14 +121,14 @@ export default function Input() {
             constituency: userData.constituency,
             ward: userData.ward,
             category:userData.category,
-            views: 0
+            views: [],
           });
         }
 
         if (postToConst) {
-          const ConstituencyCollection = collection(db, 'constituency', userData.constituency);
+          const ConstituencyCollection = collection(db, "constituency", userData.constituency, "posts");
           await addDoc(ConstituencyCollection, {
-            id: userDetails.uid,
+            uid: userDetails.uid,
             text: input,
             userImg: userData.userImg,
             timestamp: serverTimestamp(),
@@ -151,9 +144,9 @@ export default function Input() {
         }
 
         if (postToCounty) {
-          const countyCollection = collection(db, 'county', userData.county);
+          const countyCollection = collection(db, "county", userData.county, "posts");
           await addDoc(countyCollection, {
-            id: userDetails.uid,
+            uid: userDetails.uid,
             text: input,
             userImg: userData.userImg,
             timestamp: serverTimestamp(),

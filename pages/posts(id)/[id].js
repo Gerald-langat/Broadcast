@@ -34,7 +34,7 @@ const [isWidgetsVisible, setIsWidgetsVisible] = useState(false);
  useEffect(() => {
    if (!id) return;
    setLoading(true);
-   const unsubscribe = onSnapshot(doc(db, "posts", id), (snapshot) => {
+   const unsubscribe = onSnapshot(doc(db, "national", id), (snapshot) => {
        setPost(snapshot);
        setLoading(false);
    });
@@ -49,7 +49,7 @@ useEffect(() => {
     return;
   }
       onSnapshot(
-        query(collection(db, "posts",  id, "comments"), orderBy("timestamp", 'desc')),
+        query(collection(db, "national",  id, "comments"), orderBy("timestamp", 'desc')),
         (snapshot) => {
           setComments(snapshot.docs);
         }
@@ -76,35 +76,46 @@ const toggleHome = () => {
 }
 
   return (
-    <div>
+    <div className="flex flex-col min-h-screen w-full">
       <Head>
         <title>{post?.data()?.text ? post?.data()?.text : 'loading...'}</title>
         <meta name="description" content="Generated and created by redAnttech" />
         <link rel="icon" href="../../images/Brodcast.jpg" />
       </Head>
-      <main className="flex min-h-screen mx-auto dark:bg-gray-950 w-[500px] sm:w-screen min-w-[476px] sm:px-10 md:px-24 xl:px-0 flex-grow">
-        {/* Sidebar */}
-        <div className="hidden xl:inline">
-          <Sidebar />
-        </div>
+        <div className="flex min-h-screen min-w-[560px] flex-1 ">
+              {/* Sidebar */}
+              {isSidebarVisible && (
+                <div
+                  className="fixed inset-0 z-30 xl:hidden w-full"
+                  onClick={() => setIsSidebarVisible(false)}
+                >
+                  <div
+                    onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the sidebar
+                    className="relative"
+                  >
+                    <Sidebar />
+                  </div>
+                </div>
+              )}
+              <div className="hidden xl:block w-1/4 ">
+                <Sidebar />
+              </div>
 
         {/* Post content */}
-        <div className="xl:ml-[350px] dark:border-gray-600 border-gray-300 xl:min-w-[576px] flex-grow max-w-xl min-w-[580px] sm:min-w-full">
-          <div className="flex items-center space-x-2 py-2 px-3 sticky top-0 bg-white dark:bg-gray-950 border rounded-md dark:border-gray-900 border-gray-300">
-            <Tooltip
-              content="back"
-              arrow={false}
-              placement="bottom"
-              className="p-1 text-xs bg-gray-500 -mt-1"
-            >
-              <Link href='/home'>
-                <ArrowLeftIcon className="h-10 sm:h-8 animate-pulse cursor-pointer" />
-              </Link>
-            </Tooltip>
-            <h2 className="text-xl sm:text-lg font-bold cursor-pointer">
-              Posts
-            </h2>
-          </div>
+        <div className="xl:ml-[10px] 2xl:mr-[120px] 2xl:ml-[80px] xl:min-w-[576px] 2xl:min-w-[700px]  sm:min-w-full flex-grow max-w-xl">
+                  <div className="flex items-center space-x-2  py-2 px-3 sticky top-0 dark:bg-gray-950 bg-white border-[1px] rounded-md dark:border-gray-900
+                     border-gray-200">
+                  <Tooltip content='back' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
+                    <div className="animate-pulse" onClick={() => router.replace("/national")}>
+                      <ArrowLeftIcon className="h-10 sm:h-8 cursor-pointer animate-pulse" />
+                    </div>
+                  </Tooltip>
+                    <h2 className="text-lg sm:text-xl font-bold cursor-pointer">
+                    {post?.data()?.text && (
+                      <span className='text-2xl sm:text-lg'>{post?.data()?.text}</span>
+                      )}
+                    </h2>
+                  </div>
 
            {loading ? (<Button color="gray" className="border-0">
                       <Spinner aria-label="Alternate spinner button example" size="sm" />
@@ -129,14 +140,29 @@ const toggleHome = () => {
         </div>
 
         {/* Widgets */}
-        <div className="hidden xl:inline ml-14">
-          <Widgets />
-        </div>
-
+        {isWidgetsVisible && (
+                 <div
+                   className="fixed inset-0 z-30 bg-white dark:bg-gray-950 xl:hidden"
+                   onClick={() => setIsWidgetsVisible(false)}
+                 >
+                   <div
+                     onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the widgets
+                     className="relative"
+                   >
+                     <Widgets />
+                   </div>
+                 </div>
+               )}
+               
+ 
+              <div className="xl:ml-16">
+                 <Widgets />
+               </div>
+</div>
         {/* Modal */}
         <CommentModal />
         <StatusModal />
-      </main>
+     
 
       {/* Bottom navigation for mobile */}
       <div
