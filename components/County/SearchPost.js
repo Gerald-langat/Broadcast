@@ -13,6 +13,8 @@ import { useRecoilState } from 'recoil';
 import { deleteObject } from 'firebase/storage';
 import { useFollow } from '../FollowContext';
 import { FlagIcon } from '@heroicons/react/solid';
+import { useUser } from '@clerk/nextjs';
+import Link from 'next/link';
 
 function SearchPost({post, id}) {
 
@@ -33,31 +35,21 @@ function SearchPost({post, id}) {
   const [showUndo, setShowUndo] = useState(false);
   const [isReported, setIsReported] = useState({});
   const [isBookmarked, setIsBookmarked] = useState({});
-
-
-  const fetchUserData = async () => {
-    auth.onAuthStateChanged(async (user) => {
-      setUserDetails(user)
-
-    })
-  }
-  useEffect(() => {
-    fetchUserData();
-  }, []);
+const { user } = useUser()
 
    useEffect(() => {
-     if(!id || !userpost || !userpost.county) return;
+     if(!id) return;
      const unsubscribe = onSnapshot(
-       collection(db, "county", userpost.county, id, "likes"),
+       collection(db, "county",  id, "likes"),
        (snapshot) => setLikes(snapshot.docs)
      );
      return () => unsubscribe(); 
-   }, [db, userpost]);
+   }, [id]);
 
 useEffect(() => {
   const fetchUserData = async () => {
-    if (userDetails) {
-      const q = query(collection(db, 'userPosts'), where('id', '==', userDetails.uid));
+    if (user?.id) {
+      const q = query(collection(db, 'userPosts'), where('uid', '==', user?.id));
       const querySnapshot = await getDocs(q);
 
       if (!querySnapshot.empty) {
@@ -67,11 +59,11 @@ useEffect(() => {
     }
   };
   fetchUserData();
-}, [userDetails]);
+}, [user?.id]);
 
 useEffect(
   () =>{
-    if (!userpost || !userpost.county) {
+    if (!id) {
       setLoading(false);
       return;
     }
@@ -102,7 +94,7 @@ useEffect(
         if (imageUrls && imageUrls.length > 0) {
           console.log(`Deleting ${imageUrls.length} images...`);
           const deleteImagePromises = imageUrls.map((url, index) => {
-            const imageRef = ref(storage, `county/${userDetails.uid}/image-${index}`);
+            const imageRef = ref(storage, `county/${id}/image-${index}`);
             return deleteObject(imageRef).then(() => {
               console.log(`Image ${index} deleted successfully.`);
             });
@@ -115,7 +107,7 @@ useEffect(
         // Delete the video if it exists
         if (post?.data()?.video) {
           console.log("Deleting video...");
-          await deleteObject(ref(storage, `county/${userDetails.uid}/video`));
+          await deleteObject(ref(storage, `county/${id}/video`));
           console.log("Video deleted successfully.");
         }
   
@@ -133,9 +125,9 @@ useEffect(
 
   const deleteRepost = async () => {
     if (window.confirm("Are you sure you want to delete this post?")) {
-      if (id || userpost) {
+      if (id || userpost?.county) {
         try {
-          const likesCollectionRef = collection(db, "county", userpost.constituency, id, "likes");
+          const likesCollectionRef = collection(db, "county", id, "likes");
           const likesSnapshot = await getDocs(likesCollectionRef);
     
           const deleteLikesPromises = likesSnapshot.docs.map((likeDoc) =>
@@ -143,7 +135,7 @@ useEffect(
           );
           await Promise.all(deleteLikesPromises);
 
-          await deleteDoc(doc(db, "county", id));
+          await deleteDoc(doc(db, "county", userpost.county, "posts", id));
         } catch (error) {
           console.error('Error deleting the post:', error);
         }
@@ -155,21 +147,21 @@ useEffect(
   
   useEffect(() => {
     setHasLiked(
-      likes.some((like) => like.id === userDetails?.uid)
+      likes.some((like) => like.id === user?.id)
     );
-  }, [likes, userDetails]);
+  }, [likes, user?.id]);
 
   async function likePost() {
-    if (userDetails || userpost || id) {
+    if (user?.id || id) {
       if (hasLiked) {
-        await deleteDoc(doc(db, "county",  userpost.constituency, id, "likes", userDetails?.uid));
+        await deleteDoc(doc(db, "county",  id, "likes", user?.id));
       } else {
-        await setDoc(doc(db, "county",  userpost.constituency, id, "likes", userDetails?.uid), {
-          email: userDetails.email,
+        await setDoc(doc(db, "county",  id, "likes", user?.id), {
+          uid: user?.id,
         });
       }
     } else {
-      router.replace('/');
+      router.replace('/signup');
     }
   }
 
@@ -197,7 +189,7 @@ useEffect(
       const postData = post.data();
       try {
         await addDoc(collection(db, 'county', userpost.county), {
-            id: userDetails.uid,
+            uid: user?.id,
             text: postData.text,
             userImg: userpost.userImg,
             timestamp: serverTimestamp(),
@@ -223,8 +215,8 @@ useEffect(
 
   // cite
   const cite = async () => {
-    if (!userDetails?.uid) { 
-      router.replace('/');
+    if (!user?.id) { 
+      router.replace('/signup');
     }
     setLoading(true);
   
@@ -235,7 +227,7 @@ useEffect(
         const collectionName = userpost.county;
         try {
           await addDoc(collection(db, 'county', collectionName), {
-            id: userDetails.uid,
+            uid: user?.id,
             text: postData.text,
             citeInput: citeInput,
             userImg: userpost.userImg,
@@ -290,7 +282,7 @@ useEffect(
   };
   
    // Check if the post is already bookmarked
-   const userId = userDetails?.uid;
+   const userId = user?.id;
    const pstId = post?.id;
    // Toggle bookmark
    const checkBookmark = async () => {
@@ -407,6 +399,7 @@ useEffect(
      }
      setShowModal(false)
    };
+   const uid = post?.data()?.uid
 
   return (
     <div>
@@ -421,11 +414,14 @@ useEffect(
         <>
       <div className='flex items-center w-full'>
       <div className='flex items-center flex-1 space-x-2'>
+      <Link href={`/userProfile/${uid}`}>
       <img
         className="h-11 w-11 rounded-full"
         src={post?.data()?.userImg}
         alt="user-img"
       />
+
+      </Link>
        <h4 className=" dark:text-gray-300 font-bold text-xl sm:text-[15px] max-w-20 hover:underline truncate">
               {post?.data()?.name}
             </h4>

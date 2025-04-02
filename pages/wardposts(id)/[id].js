@@ -12,34 +12,23 @@ import Comment from '../../components/Ward/Comment';
 import Post from '../../components/Ward/Post';
 import { Button, Spinner, Tooltip } from 'flowbite-react';
 import StatusModal from '../../components/National/StatusModal';
+import { useUser } from '@clerk/nextjs';
 
 
 const WardPost = () => {
    const router = useRouter();
   const { id } = router.query;
   const [post, setPost] = useState(null);
-  const [userDetails, setUserDetails] = useState(null);
   const [userData, setUserData] = useState(null);
   const [comments, setComments] = useState([]);
 const [loading, setLoading] = useState(false);
 const [isSidebarVisible, setIsSidebarVisible] = useState(false);
 const [isWidgetsVisible, setIsWidgetsVisible] = useState(false);
-
-
-  const fetchUserData = async () => {
-    auth.onAuthStateChanged(async (user) => {
-      console.log(user)
-      setUserDetails(user)
-
-    })
-  }
-  useEffect(() => {
-    fetchUserData();
-  }, []);
+const { user } = useUser()
   useEffect(() => {
     const fetchUserData = async () => {
-      if (userDetails) {
-        const q = query(collection(db, 'userPosts'), where('id', '==', userDetails.uid));
+      if (user?.id) {
+        const q = query(collection(db, 'userPosts'), where('uid', '==', user.id));
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
@@ -49,14 +38,14 @@ const [isWidgetsVisible, setIsWidgetsVisible] = useState(false);
       }
     };
     fetchUserData();
-  }, [userDetails]);
+  }, [user?.id]);
 
 
   useEffect(() => {
     if (!userData || !userData.ward || !id) return;
 
     setLoading(true);
-    const unsubscribe = onSnapshot(doc(db, "ward", userData.ward, id), (snapshot) => {
+    const unsubscribe = onSnapshot(doc(db, "ward", userData.ward, "posts", id), (snapshot) => {
         setPost(snapshot);
         setLoading(false);
     });
@@ -67,17 +56,17 @@ const [isWidgetsVisible, setIsWidgetsVisible] = useState(false);
   
 useEffect(
   () =>{
-    if (!userData || !userData.ward) {
+    if (!id) {
       return;
     }
     onSnapshot(
-      query(collection(db, "ward", userData.ward, id, "comments"), orderBy("timestamp", "desc")),
+      query(collection(db, "ward",  id, "comments"), orderBy("timestamp", "desc")),
       (snapshot) => {
         setComments(snapshot.docs);
 
       }
     ),
-  []
+  [id]
 });
 
 const toggleSidebar = () => {
@@ -101,7 +90,7 @@ const toggleHome = () => {
   return (
     <div>
       <Head>
-        <title>{post?.data()?.text ? post?.data()?.text : 'loading...'}</title>
+        <title>{loading ? "loading..." : post?.data()?.text ? post?.data()?.text : 'loading...'}</title>
         <meta name="description" content="Generated and created by redAndTech" />
         <link rel="icon" href="../../images/Brodcast.jpg" />
       </Head>
@@ -120,7 +109,7 @@ const toggleHome = () => {
     <div className="hidden xl:inline">
       <Sidebar />
     </div>
-        <div className="xl:ml-[370px] xl:min-w-[576px] min-w-[580px] sm:min-w-full flex-grow max-w-xl">
+        <div className="xl:ml-[370px] 2xl:ml-[560px] xl:min-w-[576px]  sm:min-w-full flex-grow max-w-xl">
           <div className="flex items-center space-x-2  py-2 px-3 sticky top-0 bg-white dark:bg-gray-950 border-[1px] rounded-md border-gray-300 dark:border-gray-900">
           <Tooltip content='back' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
             <div className="animate-pulse" onClick={() => router.push("/ward")}>

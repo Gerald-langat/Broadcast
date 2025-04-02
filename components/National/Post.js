@@ -274,15 +274,15 @@ const handleShare = async () => {
 };
   // Repost the posts 
   const repost = async () => {
-    if(!userData?.uid) {
-      router.replace('/');
+    if(!user?.id) {
+      router.replace('/signup');
     }
     if (post) {
       const postData = post.data();
       try {
         // Construct the new post data object
         const newPostData = {
-          uid: userData.uid,
+          uid: user?.id,
           text: postData.text,
           userImg: userData.userImg,
           timestamp: serverTimestamp(),
@@ -312,7 +312,7 @@ const handleShare = async () => {
 
   // cite
   const cite = async () => {
-    if (!userData?.uid) { 
+    if (!user?.id) { 
       router.replace('/signup');
     }
     setLoading(true);
@@ -324,7 +324,7 @@ const handleShare = async () => {
       if (postData && typeof postData.text === 'string' && typeof citeInput === 'string') {
         try {
           await addDoc(collection(db, 'national'), {
-            uid: userData.uid,
+            uid: user?.id,
             text: postData.text,
             citeInput: citeInput,
             userImg: userData.userImg,
@@ -503,7 +503,7 @@ const handleShare = async () => {
     setShowModal(false);
   };
 
-  const uid = user?.id
+  const uid = post?.data()?.uid
 
   return (
    <div className='flex-col'>

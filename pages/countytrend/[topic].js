@@ -9,6 +9,8 @@ import Widgets from '../../components/County/Widgets';
 import CommentModal from '../../components/County/CommentModal';
 import CountyTrends from '../../components/County/CountyTrends';
 import { Button, Spinner, Tooltip } from 'flowbite-react';
+import { useUser } from '@clerk/nextjs';
+import Link from 'next/link';
 
 export default function TopicPostsPage() {
   const router = useRouter();
@@ -16,27 +18,14 @@ export default function TopicPostsPage() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
-  const [userDetails, setUserDetails] = useState(null);
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [isWidgetsVisible, setIsWidgetsVisible] = useState(false);
-  
-
-  const fetchUserData = async () => {
-    auth.onAuthStateChanged(async (user) => {
-      console.log(user)
-      setUserDetails(user)
-
-    })
-  }
-
-  useEffect(() => {
-    fetchUserData();
-  }, []);
+  const { user } = useUser()
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (userDetails) {
-        const q = query(collection(db, 'userPosts'), where('id', '==', userDetails.uid));
+      if (user?.id) {
+        const q = query(collection(db, 'userPosts'), where('uid', '==', user?.id));
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
@@ -46,15 +35,15 @@ export default function TopicPostsPage() {
     };
 
     fetchUserData();
-  }, [userDetails]);
+  }, [user?.id]);
 
   useEffect(() => {
-    if (!userData || !userData.county) {
+    if (!userData || !userData?.county) {
       setLoading(true);
       return;
     }
   
-    const q = query(collection(db, "county", userData.county), orderBy('timestamp', 'desc'));
+    const q = query(collection(db, "county", userData.county, "posts"), orderBy('timestamp', 'desc'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const filteredPosts = snapshot.docs
         .filter(doc => {
@@ -109,13 +98,14 @@ export default function TopicPostsPage() {
         <Sidebar />
         </div>
         {/* Feed */}
-        <div className="xl:ml-[370px] xl:min-w-[576px]  sm:min-w-full flex-grow max-w-xl">
+        <div className="xl:ml-[370px] 2xl:ml-[560px] xl:min-w-[576px]  sm:min-w-full flex-grow max-w-xl">
           <div className="flex items-center space-x-2  py-2 px-3 sticky top-0 bg-white dark:bg-gray-950 border-[1px] rounded-md border-gray-300 dark:border-gray-900">
           <Tooltip content='back' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-            
-            <div className="animate-pulse" onClick={() => router.replace("/county")}>
+            <Link href={`/county`}>
+            <div className="animate-pulse">
               <ArrowLeftIcon className="h-8 cursor-pointer animate-pulse" />
             </div>
+            </Link>
           </Tooltip>
             <h2 className="text-lg  font-bold cursor-pointer">
             {topic ? (topic):(loading && <Spinner size="sm" />)}
@@ -145,7 +135,7 @@ export default function TopicPostsPage() {
             </div>
           </div>
         )}
-       <div className='hidden xl:inline'>
+       <div className='hidden xl:inline 2xl:ml-16'>
        <Widgets />
        </div>
         

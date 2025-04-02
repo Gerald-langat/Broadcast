@@ -3,9 +3,10 @@ import Input from "./Input";
 import Post from "./Post";
 import { collection, getDocs, onSnapshot, orderBy, query, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { auth, db } from "../../firebase";
+import { db } from "../../firebase";
 import { AnimatePresence, motion } from "framer-motion";
 import { Button, Spinner } from "flowbite-react";
+import { useUser } from "@clerk/nextjs";
 
 
 
@@ -13,36 +14,24 @@ export default function Feed() {
   const [posts, setPosts] = useState([]);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [userDetails, setUserDetails] = useState(null);
-
-  const fetchUserData = async () => {
-    auth.onAuthStateChanged(async (user) => {
-      console.log(user)
-      setUserDetails(user)
-
-    })
-  }
-  useEffect(() => {
-    fetchUserData();
-  }, []);
+const { user } = useUser()
 
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (userDetails) {
-        const q = query(collection(db, 'userPosts'), where('id', '==', userDetails.uid));
+      if (user?.id) {
+        const q = query(collection(db, 'userPosts'), where('uid', '==', user.id));
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
           setUserData(querySnapshot.docs[0].data());
         }
-        console.log(userData)
       }
     };
 
     fetchUserData();
 
-  }, [userDetails]);
+  }, [user?.id]);
 
   useEffect(
     () =>{
@@ -51,7 +40,7 @@ export default function Feed() {
         return;
       }
       onSnapshot(
-        query(collection(db, "county", userData.county), orderBy("timestamp", "desc")),
+        query(collection(db, "county", userData.county, "posts"), orderBy("timestamp", "desc")),
         (snapshot) => {
           setPosts(snapshot.docs);
           setLoading(false);
@@ -62,8 +51,9 @@ export default function Feed() {
 
 
   return (
-    <div className="dark:bg-gray-950  dark:border-gray-700 xl:ml-[340px]
-     border-gray-200 xl:min-w-[576px] min-w-[600px] sm:w-screen xl:max-w-[620px] sm:px-10 md:px-24 px-4 xl:px-0 min-h-screen">
+    <div className="dark:bg-gray-950 dark:border-gray-700 
+    border-gray-200 w-full sm:w-screen lg:min-w-[576px] 
+    lg:max-w-[620px] 2xl:min-w-[700px] sm:px-4 md:px-8 xl:px-0 min-h-screen 2xl:ml-[560px] ml-0 2xl:mr-16">
      <div className="xl:border-0 sm:border-x-[1px] dark:border-gray-700 border-gray-200">
      {loading ? (
         <Button color="gray" className="border-0 items-center flex mt-4 sm:mt-0">
@@ -72,7 +62,8 @@ export default function Feed() {
         </Button>
       ) : (
         <>
-      <div className=" dark:bg-gray-950 xl:px-3 flex py-2 sticky dark:border-gray-900 top-0  bg-white border-[1px] border-gray-200 rounded-md">
+        <div className="flex items-center justify-between dark:bg-gray-950 md:py-2 xl:px-3 sticky top-0 border-[1px] rounded-md
+       border-gray-200 bg-white  dark:border-gray-900 h-10">
         <h2 className="text-lg sm:text-xl font-bold cursor-pointer dark:text-gray-300">{userData ? userData.county: ""}</h2>
         <div className="flex items-center justify-center px-0 ml-auto w-9 h-9 dark:text-gray-300">
           <SparklesIcon className="h-5" />

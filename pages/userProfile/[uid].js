@@ -1,11 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ArrowCircleRightIcon, ArrowLeftIcon, BookmarkIcon, PhotographIcon } from '@heroicons/react/outline';
-import { auth, db } from '../../firebase';
+import { db } from '../../firebase';
 import { collection,  getDocs, onSnapshot, query, where } from 'firebase/firestore';
 import { Button, Spinner } from 'flowbite-react';
 import { useRouter } from 'next/router';
 import Head from 'next/head'; // Adjust the path to your script.js
-import axios from 'axios';
 import ModeButton from '../../components/ModeButton';
 import Post from './post';
 import Book from './Book';
@@ -245,7 +244,7 @@ useEffect(() => {
           <>
     <div className='flex flex-col h-screen w-screen'>
     <div className='p-2 flex space-x-1 items-center justify-center dark:text-gray-100 mt-4 z-40'>
-    <ArrowLeftIcon className='sm:h-8 sm:w-8 h-10 animate-pulse cursor-pointer' onClick={() => router.push('/national')}/>
+    <ArrowLeftIcon className='sm:h-8 sm:w-8 h-10 animate-pulse cursor-pointer' onClick={()=> router.back()}/>
       <p className='sm:text-lg text-2xl'>post</p>
     </div>
 

@@ -23,16 +23,16 @@ import {
   setDoc,
   where,
 } from "firebase/firestore";
-import { auth, db } from "../../firebase";
+import { db } from "../../firebase";
 import { useState, useEffect } from "react";
 import { Popover, Tooltip } from "flowbite-react";
 import { useRouter } from "next/router";
 import { useFollow } from "../FollowContext";
+import { useUser } from "@clerk/nextjs";
 
 export default function Comment({ comment, commentId, originalPostId }) {
   const [likes, setLikes] = useState([]);
   const [hasLiked, setHasLiked] = useState(false);
-  const [userDetails, setUserDetails] = useState(null);
   const [userData, setUserData] = useState({});
   const router = useRouter();
    const { hasFollowed, followMember } = useFollow();
@@ -42,43 +42,31 @@ export default function Comment({ comment, commentId, originalPostId }) {
     const [reportReason, setReportReason] = useState("");
     const [isReported, setIsReported] = useState({});
     const [isBookmarked, setIsBookmarked] = useState({});
-
-  const fetchUserData = async () => {
-    auth.onAuthStateChanged(async (user) => {
-      console.log(user)
-      setUserDetails(user)
-
-    })
-  }
-  useEffect(() => {
-    fetchUserData();
-  }, []);
+  const { user } = useUser()
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
-      collection(db, "constituency", originalPostId, "comments", commentId, "likes"),
+      collection(db, "constituency", commentId, "likes"),
       (snapshot) => setLikes(snapshot.docs)
     );
   }, [db, originalPostId, commentId]);
 
   useEffect(() => {
     setHasLiked(
-      likes.findIndex((like) => like.id === userDetails.uid) !== -1
+      likes.findIndex((like) => like.id === user?.id) !== -1
     );
   }, [likes]);
 
   async function likeComment() {
-    if (userDetails) {
+    if (user?.id) {
       if (hasLiked) {
         await deleteDoc(
           doc(
             db,
             "constituency",
-            originalPostId,
-            "comments",
             commentId,
             "likes",
-            userDetails?.uid
+            user?.id
           )
         );
       } else {
@@ -86,26 +74,24 @@ export default function Comment({ comment, commentId, originalPostId }) {
           doc(
             db,
             "constituency",
-            originalPostId,
-            "comments",
             commentId,
             "likes",
-            userDetails?.uid
+            user?.id
           ),
           {
-            email: userDetails.email,
+            uid: user?.id,
           }
         );
       }
     } else {
-      router.replace('/');
+      router.replace('/signup');
     }
   }
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (userDetails) {
-        const q = query(collection(db, 'userPosts'), where('id', '==', userDetails.uid));
+      if (user?.id) {
+        const q = query(collection(db, 'userPosts'), where('uid', '==', user?.id));
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
@@ -114,14 +100,14 @@ export default function Comment({ comment, commentId, originalPostId }) {
       }
     };
     fetchUserData();
-  }, [userDetails])
+  }, [user?.id])
 
   async function deleteComment() {
    
     if (window.confirm("Are you sure you want to delete this post?")) {
-      deleteDoc(doc(db, "constituency", userData.constituency, originalPostId, "comments", commentId));
+      deleteDoc(doc(db, "constituency", originalPostId, "comments", commentId));
     }
-    console.log("Comment deleted successfully");
+   
   }
 
   const handleShare = async () => {
@@ -154,8 +140,8 @@ export default function Comment({ comment, commentId, originalPostId }) {
 
   // repost
      const repost = async () => {
-        if(!userDetails?.uid) {
-          router.replace('/');
+        if(!user?.id) {
+          router.replace('/signup');
         }
         if (comment) {
           const postData = comment;
@@ -163,7 +149,7 @@ export default function Comment({ comment, commentId, originalPostId }) {
           try {
             // Construct the new post data object
             const newPostData = {
-              id: userDetails.uid,
+              uid: user?.id,
               comment: postData.comment,
               userImg: userData.userImg,
               timestamp: serverTimestamp(),
@@ -179,7 +165,7 @@ export default function Comment({ comment, commentId, originalPostId }) {
               ...(postData.image && { image: postData.image }),
             };
       
-           await addDoc(collection( db, "constituency", userData.constituency, originalPostId, "comments",
+           await addDoc(collection( db, "constituency", originalPostId, "comments",
             ), newPostData);
             console.log('Comment reposted successfully!');
           } catch (error) {
@@ -197,14 +183,14 @@ export default function Comment({ comment, commentId, originalPostId }) {
         if (window.confirm("Are you sure you want to delete this post?")) {
           if (originalPostId || commentId) {
             try {
-              const likesCollectionRef = collection(db, "constituency", userData.constituency, originalPostId, "comments", commentId, "likes");
+              const likesCollectionRef = collection(db, "constituency", commentId, "likes");
               const likesSnapshot = await getDocs(likesCollectionRef);
         
               const deleteLikesPromises = likesSnapshot.docs.map((likeDoc) =>
                 deleteDoc(likeDoc.ref)
               );
               await Promise.all(deleteLikesPromises);
-              await deleteDoc(doc(db, "constituency", userData.constituency, originalPostId, "comments", commentId));
+              await deleteDoc(doc(db, "constituency",  originalPostId, "comments", commentId));
               console.log('Post deleted successfully');
             } catch (error) {
               console.error('Error deleting the post:', error);
@@ -221,14 +207,14 @@ export default function Comment({ comment, commentId, originalPostId }) {
       if (window.confirm("Are you sure you want to delete this post?")) {
         if (originalPostId || commentId) {
           try {
-            const likesCollectionRef = collection(db, "constituency", userData.constituency, originalPostId, "comments", commentId, "likes");
+            const likesCollectionRef = collection(db, "constituency",  commentId, "likes");
             const likesSnapshot = await getDocs(likesCollectionRef);
       
             const deleteLikesPromises = likesSnapshot.docs.map((likeDoc) =>
               deleteDoc(likeDoc.ref)
             );
             await Promise.all(deleteLikesPromises);
-            await deleteDoc(doc(db, "constituency", userData.constituency, originalPostId, "comments", commentId));
+            await deleteDoc(doc(db, "constituency", originalPostId, "comments", commentId));
             console.log('Post deleted successfully');
           } catch (error) {
             console.error('Error deleting the post:', error);
@@ -239,7 +225,7 @@ export default function Comment({ comment, commentId, originalPostId }) {
       }
     }
     // Check if the post is already bookmarked
-    const userId = userDetails?.uid;
+    const userId = user?.id;
     const pstId = commentId;
     // Toggle bookmark
     const checkBookmark = async () => {
@@ -352,7 +338,7 @@ export default function Comment({ comment, commentId, originalPostId }) {
       setShowModal(false);
     };
 
-    
+    const uid = comment?.uid;
 
   return (
     <div>
@@ -360,11 +346,13 @@ export default function Comment({ comment, commentId, originalPostId }) {
     <div className={`${isHidden ? 'hidden' : "flex p-3 cursor-pointer pl-20"}`}>
       {/* user image */}
     
+<Link href={`/userProfile/${uid}`}>
       <img
         className="h-11 w-11 rounded-full mr-4"
         src={comment?.userImg}
         alt="user-img"
       />
+      </Link>
       {/* right side */}
       <div className="flex-1">
         {/* Header */}
@@ -391,7 +379,7 @@ export default function Comment({ comment, commentId, originalPostId }) {
                   <div className="w-64 text-xl sm:text-sm text-gray-500 dark:text-gray-300 bg-gray-300 dark:bg-gray-900 
                      py-2 space-y-3 border-none">
                      
-                     { comment?.id !== userDetails?.uid ? 
+                     { comment?.uid !== user?.id ? 
                         (
                           <>
                           <div className="flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900" onClick={handleNotInterested}>
@@ -401,7 +389,7 @@ export default function Comment({ comment, commentId, originalPostId }) {
                     
 
                     <div className={`${userData?.name == comment?.name ? 'hidden' : 'flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900 '}`} >
-                    {hasFollowed[comment?.id] ? (
+                    {hasFollowed[comment?.uid] ? (
                       <UserRemoveIcon className="h-6" />
 
                     ) : (
@@ -409,7 +397,7 @@ export default function Comment({ comment, commentId, originalPostId }) {
 
                     )}
                    
-                      <p onClick={() => followMember(comment?.id, userDetails)}>{hasFollowed[comment?.id] ? 'Unfollow' : 'Follow'} @{comment?.nickname}</p>
+                      <p onClick={() => followMember(comment?.uid)}>{hasFollowed[comment?.uid] ? 'Unfollow' : 'Follow'} @{comment?.nickname}</p>
                     
                     </div>
                    
@@ -523,10 +511,10 @@ export default function Comment({ comment, commentId, originalPostId }) {
               </span>
             )}
           </div>
-          {userDetails?.uid === comment?.id && (
+          {user?.id === comment?.uid && (
            
            <TrashIcon
-              onClick={userDetails?.uid === comment?.id ? deleteRepost : deleteComment}
+              onClick={user?.id === comment?.uid ? deleteRepost : deleteComment}
              className="h-12 w-12 md:h-10 md:w-10 p-2 hover:text-red-600 hover:bg-red-100 rounded-full dark:hover:bg-gray-800"
            />
                      

@@ -8,6 +8,7 @@ import { SearchIcon, XIcon } from '@heroicons/react/outline';
 import { useRouter } from 'next/router';
 import { Button, Spinner } from 'flowbite-react';
 import Link from 'next/link';
+import { useUser } from '@clerk/nextjs';
 
 
 export default function Widgets() {
@@ -15,27 +16,14 @@ export default function Widgets() {
   const [querySearch, setQuery] = useState('');
   const [trendPosts, setTrendPosts] = useState([]);
   const [trendingTopics, setTrendingTopics] = useState([]);
-  const router = useRouter();
   const [userData, setUserData] = useState(null);
   const [loading, setLoading ] = useState(false)
-  const [userDetails, setUserDetails] = useState(null);
-
-  const fetchUserData = async () => {
-    auth.onAuthStateChanged(async (user) => {
-      console.log(user)
-      setUserDetails(user)
-
-    })
-  }
-  useEffect(() => {
-    fetchUserData();
-  }, []);
-
+  const { user } = useUser()
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (userDetails) {
-        const q = query(collection(db, 'userPosts'), where('id', '==', userDetails.uid));
+      if (user?.id) {
+        const q = query(collection(db, 'userPosts'), where('uid', '==', user?.id));
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
@@ -45,18 +33,18 @@ export default function Widgets() {
     };
 
     fetchUserData();
-  }, [userDetails]);
+  }, [user?.id]);
 
   // Fetch trend posts
   useEffect(() => {
-    if (!userData || !userData.county) {
+    if (!userData || !userData?.county) {
       setLoading(true);
       return;
     }
 
     const unsubscribe = onSnapshot(
       
-      query(collection(db, "county", userData.county)),
+      query(collection(db, "county", userData.county, "posts")),
       (snapshot) => {
         setTrendPosts(snapshot.docs.map(doc => doc.data()));
         setLoading(false);
@@ -161,8 +149,8 @@ export default function Widgets() {
           <span className="pl-3 animate-pulse sm:text-[16px] text-[28px]">Loading...</span>
         </Button>
       ) : (
-      <div className=" dark:bg-gray-950  bg-white w-full xl:ml-16">
-        <form className='flex justify-between px-3 dark:bg-gray-950 bg-gray-200 items-center -ml-12 dark:border-gray-900 xl:w-[335px] sm:w-[88%] w-[570px] border-b-[1px] rounded-md top-2 fixed flex-grow'>
+      <div >
+        <form className='flex justify-between px-3 dark:bg-gray-950 bg-gray-200 items-center -ml-12 dark:border-gray-900 lg:w-[380px] 2xl:w-[400px] sm:w-[88%] w-[570px] border-b-[1px] rounded-md top-2 fixed flex-grow'>
           <SearchIcon className='sm:h-6 h-8 w-8 text-gray-500 z-40 dark:text-gray-300' />
         <input
           className="border-0 dark:bg-gray-950 bg-gray-200 w-full text-2xl sm:text-lg placeholder:text-2xl  sm:placeholder:text-lg 
@@ -179,7 +167,7 @@ export default function Widgets() {
       </form>
            
       <div className='dark:bg-gray-950 dark:shadow-gray-400 -ml-12 shadow-md shadow-gray-400 overflow-y-auto container
-       bg-slate-50 md:mt-2 xl:w-[335px] sm:w-[88%] w-[570px]  fixed top-24 sm:top-[46px] z-50 fit max-h-80 rounded-lg flex flex-grow'>
+       bg-slate-50 md:mt-2 lg:w-[380px] 2xl:w-[400px] sm:w-[88%] w-[570px]  fixed top-24 sm:top-[46px] z-50 fit max-h-80 rounded-lg flex flex-grow'>
       <div className=" dark:bg-gray-950 w-full ">
         {posts.map((post) => (
           <>
@@ -198,8 +186,8 @@ export default function Widgets() {
       </div>
       
       <div>
-      <div className='dark:bg-gray-950 bg-white space-x-2 mt-2 top-24 sm:top-12 fixed  -ml-12 p-2 w-full rounded-t-md'>
-      <Link href='/home'>
+      <div className='dark:bg-gray-950 bg-white space-x-2 mt-2 top-24 sm:top-12 fixed lg:w-[380px] 2xl:w-[400px] sm:w-[88%] w-[570px] -ml-12 p-2 flex justify-between rounded-t-md'>
+      <Link href='/national'>
           <button className='border-gray-200 bg-green-700 p-2 rounded-full hover:bg-gray-400 text-white font-semibold hover:text-white text-xl sm:text-sm'>All
           </button>
           </Link>

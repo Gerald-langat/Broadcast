@@ -1,4 +1,4 @@
-import { auth, db, storage } from '../../firebase';
+import {  db, storage } from '../../firebase';
 import { BookmarkIcon, ChatIcon, DotsHorizontalIcon, EyeIcon, EyeOffIcon, HeartIcon, PencilAltIcon, ReplyIcon, ShareIcon, TrashIcon, UserAddIcon, UserRemoveIcon } from '@heroicons/react/outline';
 import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, query, serverTimestamp, setDoc, where } from 'firebase/firestore';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -13,11 +13,11 @@ import { useRecoilState } from 'recoil';
 import { deleteObject, ref } from 'firebase/storage';
 import { useFollow } from '../FollowContext';
 import { FlagIcon } from '@heroicons/react/solid';
+import { useUser } from '@clerk/nextjs';
 
 function SearchPost({post, id}) {
 
   const[loading, setLoading] = useState(false);
-  const [userDetails, setUserDetails] = useState(null);
   const [likes, setLikes] = useState([]);
   const [comments, setComments] = useState([]);
   const [hasLiked, setHasLiked] = useState(false);
@@ -33,21 +33,12 @@ function SearchPost({post, id}) {
   const [isBookmarked, setIsBookmarked] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [reportReason, setReportReason] = useState("");
-
-  const fetchUserData = async () => {
-    auth.onAuthStateChanged(async (user) => {
-      setUserDetails(user)
-
-    })
-  }
-  useEffect(() => {
-    fetchUserData();
-  }, []);
+const { user } = useUser()
 
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
-      collection(db, "posts", id, "likes"),
+      collection(db, "national", id, "likes"),
       (snapshot) => setLikes(snapshot.docs)
     );
     return () => unsubscribe();
@@ -62,7 +53,7 @@ useEffect(
       }
      
     onSnapshot(
-      query(collection(db, "posts", id, "comments")),
+      query(collection(db, "national", id, "comments")),
       (snapshot) => {
         setComments(snapshot.docs);
         setLoading(false);
@@ -72,12 +63,12 @@ useEffect(
 });
 
 async function likePost() {
-    if (userDetails) {
+    if (user?.id) {
       if (hasLiked) {
-        await deleteDoc(doc(db, "posts", id, "likes", userDetails.uid));
+        await deleteDoc(doc(db, "national", id, "likes", user?.id));
       } else {
-        await setDoc(doc(db, "posts", id, "likes", userDetails.uid), {
-          username: userDetails.displayName,
+        await setDoc(doc(db, "national", id, "likes", user?.id), {
+          uid: user?.id,
         });
       }
     } else {
@@ -86,9 +77,9 @@ async function likePost() {
   }
 
   useEffect(() => {
-    if(userDetails){
+    if(user?.id){
     setHasLiked(
-      likes.findIndex((like) => like.id === userDetails.uid) !== -1
+      likes.findIndex((like) => like.id === user.id) !== -1
     );
   }
   }, [likes]);
@@ -98,7 +89,7 @@ async function likePost() {
   if (window.confirm("Are you sure you want to delete this post?")) {
     if (id) {
       try {
-        const likesCollectionRef = collection(db, "posts", id, "likes");
+        const likesCollectionRef = collection(db, "national", id, "likes");
         const likesSnapshot = await getDocs(likesCollectionRef);
   
         const deleteLikesPromises = likesSnapshot.docs.map((likeDoc) =>
@@ -106,7 +97,7 @@ async function likePost() {
         );
         await Promise.all(deleteLikesPromises);
 
-        await deleteDoc(doc(db, "posts", id));
+        await deleteDoc(doc(db, "national", id));
       } catch (error) {
         console.error('Error deleting the post:', error);
       }
@@ -121,20 +112,20 @@ async function likePost() {
    if (window.confirm("Are you sure you want to delete this post?")) {
      if (id) {
      try {      
-       const likesCollectionRef = collection(db, "posts", id, "likes");
+       const likesCollectionRef = collection(db, "national", id, "likes");
            const likesSnapshot = await getDocs(likesCollectionRef);
      
            const deleteLikesPromises = likesSnapshot.docs.map((likeDoc) =>
              deleteDoc(likeDoc.ref)
            );
            await Promise.all(deleteLikesPromises);
-       await deleteDoc(doc(db, "posts", id));     
+       await deleteDoc(doc(db, "national", id));     
  
        // Delete all images associated with the post
        const imageUrls = post?.data()?.images; // Assuming 'images' is an array of image URLs
        if (imageUrls && imageUrls.length > 0) {
          const deleteImagePromises = imageUrls.map((url, index) => {
-           const imageRef = ref(storage, `posts/${id}/image-${index}`);
+           const imageRef = ref(storage, `national/${id}/image-${index}`);
            return deleteObject(imageRef)
          });        
          // Wait for all the delete operations to complete
@@ -143,7 +134,7 @@ async function likePost() {
  
        // Delete the video if it exists
        if (post?.data()?.video) {
-         await deleteObject(ref(storage, `posts/${id}/video`));      
+         await deleteObject(ref(storage, `national/${id}/video`));      
        }
  
      } catch (error) {
@@ -175,8 +166,8 @@ async function likePost() {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (userDetails) {
-        const q = query(collection(db, 'userPosts'), where('id', '==', userDetails.uid));
+      if (user?.id) {
+        const q = query(collection(db, 'userPosts'), where('uid', '==', user?.id));
         const querySnapshot = await getDocs(q);
         if (!querySnapshot.empty) {
           setUserData(querySnapshot.docs[0].data());
@@ -184,11 +175,11 @@ async function likePost() {
       }
     };
     fetchUserData();
-  }, [userDetails]);
+  }, [user?.id]);
 
   // recast
   const repost = async () => {
-    if(!userDetails?.uid) {
+    if(!user?.id) {
       router.replace('/');
       return;
     }
@@ -197,7 +188,7 @@ async function likePost() {
       try {
         // Construct the new post data object
         const newPostData = {
-          id: userDetails.uid,
+          uid: user?.id,
           text: postData.text,
           userImg: userData.userImg,
           timestamp: serverTimestamp(),
@@ -225,7 +216,7 @@ async function likePost() {
   };
 
   const cite = async () => {
-    if (!userDetails?.uid) { 
+    if (!user?.id) { 
       router.replace('/');
       return;
     }
@@ -238,7 +229,7 @@ async function likePost() {
       if (postData && typeof postData.text === 'string' && typeof citeInput === 'string') {
         try {
           await addDoc(collection(db, 'posts'), {
-            id: userDetails.uid,
+            uid: user?.id,
             text: postData.text,
             citeInput: citeInput,
             userImg: userData.userImg,
@@ -283,7 +274,7 @@ async function likePost() {
   };
 
   
-  const userId = userDetails?.uid;
+  const userId = user?.id;
   const pstId = post.id;
   // Toggle bookmark
   const checkBookmark = async () => {
@@ -442,11 +433,11 @@ async function likePost() {
             </Badge>
       </div>
       <div className='flex'>
-      {userDetails?.uid === post?.data()?.id && (
+      {user?.id === post?.data()?.uid && (
           <Tooltip content='delete' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
 
             <TrashIcon
-              onClick={userDetails?.uid === post?.data()?.id ? deleteRepost : deletePost}
+              onClick={user?.id === post?.data()?.id ? deleteRepost : deletePost}
               className="h-12 w-12 md:h-10 md:w-10 p-2 hover:text-red-600 hover:bg-red-100 rounded-full cursor-pointer dark:hover:bg-neutral-700"
             />
             </Tooltip>
@@ -457,7 +448,7 @@ async function likePost() {
                 content={
                   <div className="w-64 text-xl sm:text-sm text-gray-500 dark:text-gray-300 bg-gray-300 dark:bg-neutral-800 
                      py-2 space-y-3 border-none">
-                     { post?.data()?.id !== userDetails?.uid ? 
+                     { post?.data()?.uid !== user?.id ? 
                         (
                           <>
                           <div className="flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900" onClick={handleNotInterested}>
@@ -467,7 +458,7 @@ async function likePost() {
                     
 
                     <div className={`${userData?.name == post?.data()?.name ? 'hidden' : 'flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900 '}`} >
-                    {hasFollowed[post?.data()?.id] ? (
+                    {hasFollowed[post?.data()?.uid] ? (
                       <UserRemoveIcon className="h-6" />
 
                     ) : (
@@ -475,7 +466,7 @@ async function likePost() {
 
                     )}
                    
-                      <p onClick={() => followMember(post?.data()?.id, userDetails)}>{hasFollowed[post?.data()?.id] ? 'Unfollow' : 'Follow'} @{post?.data()?.nickname}</p>
+                      <p onClick={() => followMember(post?.data()?.uid, userDetails)}>{hasFollowed[post?.data()?.uid] ? 'Unfollow' : 'Follow'} @{post?.data()?.nickname}</p>
                     
                     </div>
                    
@@ -663,8 +654,8 @@ async function likePost() {
            
             <ChatIcon
               onClick={() => {
-                if (!userDetails) {
-                  router.replace('/');
+                if (!user?.id) {
+                  router.replace('/signup');
                 } else {
                   setPostId(id);
                   setOpen(!open);

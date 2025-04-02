@@ -106,9 +106,11 @@ const toggleHome = () => {
                   <div className="flex items-center space-x-2  py-2 px-3 sticky top-0 dark:bg-gray-950 bg-white border-[1px] rounded-md dark:border-gray-900
                      border-gray-200">
                   <Tooltip content='back' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-                    <div className="animate-pulse" onClick={() => router.replace("/national")}>
+                  <Link href={`/national`}>
+                    <div className="animate-pulse">
                       <ArrowLeftIcon className="h-10 sm:h-8 cursor-pointer animate-pulse" />
                     </div>
+                    </Link>
                   </Tooltip>
                     <h2 className="text-lg sm:text-xl font-bold cursor-pointer">
                     {post?.data()?.text && (

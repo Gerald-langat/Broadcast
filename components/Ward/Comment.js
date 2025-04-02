@@ -23,11 +23,13 @@ import {
   setDoc,
   where,
 } from "firebase/firestore";
-import { auth, db } from "../../firebase";
+import { db } from "../../firebase";
 import { useState, useEffect } from "react";
 import { Popover, Tooltip } from "flowbite-react";
 import { useRouter } from "next/router";
 import { useFollow } from "../FollowContext";
+import { useUser } from "@clerk/nextjs";
+import Link from "next/link";
 
 
 export default function Comment({ comment, commentId, originalPostId }) {
@@ -38,50 +40,37 @@ export default function Comment({ comment, commentId, originalPostId }) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
    const { hasFollowed, followMember } = useFollow();
-      const [isHidden, setIsHidden] = useState(false);
-      const [showUndo, setShowUndo] = useState(false);
-      const [showModal, setShowModal] = useState(false);
-      const [reportReason, setReportReason] = useState("");
-      const [isReported, setIsReported] = useState({});
-      const [isBookmarked, setIsBookmarked] = useState({});
-  
-
-  const fetchUserData = async () => {
-    auth.onAuthStateChanged(async (user) => {
-      console.log(user)
-      setUserDetails(user)
-
-    })
-  }
-  useEffect(() => {
-    fetchUserData();
-  }, []);
+  const [isHidden, setIsHidden] = useState(false);
+  const [showUndo, setShowUndo] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [reportReason, setReportReason] = useState("");
+  const [isReported, setIsReported] = useState({});
+  const [isBookmarked, setIsBookmarked] = useState({});
+  const { user } = useUser()
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
-      collection(db, "ward", originalPostId, "comments", commentId, "likes"),
+      collection(db, "ward",  commentId, "likes"),
       (snapshot) => setLikes(snapshot.docs)
     );
   }, [db, originalPostId, commentId]);
 
   useEffect(() => {
     setHasLiked(
-      likes.findIndex((like) => like.id === userDetails.uid) !== -1
+      likes.findIndex((like) => like.id === user?.id) !== -1
     );
   }, [likes]);
 
   async function likeComment() {
-    if (userDetails) {
+    if (user?.id) {
       if (hasLiked) {
         await deleteDoc(
           doc(
             db,
             "ward",
-            originalPostId,
-            "comments",
             commentId,
             "likes",
-            userDetails?.uid
+            user?.id
           )
         );
       } else {
@@ -89,26 +78,24 @@ export default function Comment({ comment, commentId, originalPostId }) {
           doc(
             db,
             "ward",
-            originalPostId,
-            "comments",
             commentId,
             "likes",
-            userDetails?.uid
+            user?.id
           ),
           {
-            email: userDetails.email,
+            uid: user?.id,
           }
         );
       }
     } else {
-      router.replace('/');
+      router.replace('/signup');
     }
   }
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (userDetails) {
-        const q = query(collection(db, 'userPosts'), where('id', '==', userDetails.uid));
+      if (user?.id) {
+        const q = query(collection(db, 'userPosts'), where('uid', '==', user?.id));
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
@@ -117,20 +104,20 @@ export default function Comment({ comment, commentId, originalPostId }) {
       }
     };
     fetchUserData();
-  }, [userDetails])
+  }, [user?.id])
 
   async function deleteComment() {
     if (window.confirm("Are you sure you want to delete this post?")) {
       if (originalPostId || commentId) {
         try {
-          const likesCollectionRef = collection(db, "ward", userData.ward, originalPostId, "comments", commentId, "likes");
+          const likesCollectionRef = collection(db, "ward", commentId, "likes");
           const likesSnapshot = await getDocs(likesCollectionRef);
     
           const deleteLikesPromises = likesSnapshot.docs.map((likeDoc) =>
             deleteDoc(likeDoc.ref)
           );
           await Promise.all(deleteLikesPromises);
-          await deleteDoc(doc(db, "ward", userData.ward, originalPostId, "comments", commentId));
+          await deleteDoc(doc(db, "ward",  originalPostId, "comments", commentId));
           console.log('Post deleted successfully');
         } catch (error) {
           console.error('Error deleting the post:', error);
@@ -172,16 +159,15 @@ export default function Comment({ comment, commentId, originalPostId }) {
   
   // repost
        const repost = async () => {
-          if(!userDetails?.uid) {
-            router.replace('/');
+          if(!user?.id) {
+            router.replace('/signup');
           }
           if (comment) {
             const postData = comment;
-            console.log('Post data:', postData);
             try {
               // Construct the new post data object
               const newPostData = {
-                 id: userDetails.uid,
+                 uid: user?.id,
                 comment: postData.comment,
                 userImg: userData.userImg,
                 timestamp: serverTimestamp(),
@@ -197,7 +183,7 @@ export default function Comment({ comment, commentId, originalPostId }) {
                 ...(postData.image && { image: postData.image }),
               };
         
-             await addDoc(collection( db, "ward", userData.ward, originalPostId, "comments",
+             await addDoc(collection( db, "ward", originalPostId, "comments",
               ), newPostData);
               console.log('Comment reposted successfully!');
             } catch (error) {
@@ -215,14 +201,14 @@ export default function Comment({ comment, commentId, originalPostId }) {
           if (window.confirm("Are you sure you want to delete this post?")) {
             if (originalPostId || commentId) {
               try {
-                const likesCollectionRef = collection(db, "ward", userData.ward, originalPostId, "comments", commentId, "likes");
+                const likesCollectionRef = collection(db, "ward",  commentId, "likes");
                 const likesSnapshot = await getDocs(likesCollectionRef);
           
                 const deleteLikesPromises = likesSnapshot.docs.map((likeDoc) =>
                   deleteDoc(likeDoc.ref)
                 );
                 await Promise.all(deleteLikesPromises);
-                await deleteDoc(doc(db, "ward", userData.ward, originalPostId, "comments", commentId));
+                await deleteDoc(doc(db, "ward", originalPostId, "comments", commentId));
                 console.log('Post deleted successfully');
               } catch (error) {
                 console.error('Error deleting the post:', error);
@@ -236,7 +222,7 @@ export default function Comment({ comment, commentId, originalPostId }) {
 
 
   // Check if the post is already bookmarked
-  const userId = userDetails?.uid;
+  const userId = user?.id;
   const pstId = commentId;
   // Toggle bookmark
   const checkBookmark = async () => {
@@ -349,18 +335,20 @@ const submitReport = async () => {
     setShowModal(false);
   };
 
-
+const uid = comment?.uid
 
   return (
     <div>
     <div className={`w-full ${isHidden ? 'inline text-2xl sm:text-xl cursor-pointer dark:hover:bg-gray-900 hover:bg-gray-200 rounded-md p-1' : 'hidden'}`} onClick={handleUndo}>{showUndo && 'undo'}</div>
     <div className={`${isHidden ? 'hidden' : "flex p-3 cursor-pointer pl-20"}`}>
       {/* user image */}
+      <Link href={`/userProfile/${uid}`}>
       <img
-        className="h-11 w-11 rounded-full mr-4"
+        className="h-11 w-11 rounded-md mr-4"
         src={comment?.userImg}
         alt="user-img"
       />
+      </Link>
       {/* right side */}
       <div className="flex-1">
         {/* Header */}
@@ -368,17 +356,28 @@ const submitReport = async () => {
         <div className="flex items-center justify-between">
           {/* post user info */}
           <div className="flex items-center space-x-1 whitespace-nowrap">
-            <h4 className="font-bold text-[15px] sm:text-[16px] hover:underline">
+            <h4 className="font-bold text-[15px] sm:text-[16px]  max-w-20 truncate">
               {comment?.name}
+            </h4>
+            <h4 className="font-bold text-[15px] sm:text-[16px]  max-w-20 truncate">
+              {comment?.lastname}
             </h4>
             <span className="text-sm sm:text-[15px]">
               @{comment?.nickname} -{" "}
             </span>
-            <span className="text-sm sm:text-[15px] hover:underline">
+            <span className="text-sm sm:text-[15px] text-gray-400">
               <Moment fromNow>{comment?.timestamp?.toDate()}</Moment>
             </span>
           </div>
-
+          <div className="flex items-center">
+          {user?.id === comment?.uid && (
+           
+           <TrashIcon
+              onClick={user?.id === comment?.uid ? deleteRepost : deleteComment}
+             className="h-12 w-12 md:h-10 md:w-10 p-2 hover:text-red-600 hover:bg-red-100 rounded-full dark:hover:bg-gray-800"
+           />
+                     
+         )}
           {/* dot icon */}
           <Popover
                 aria-labelledby="profile-popover"
@@ -387,7 +386,7 @@ const submitReport = async () => {
                   <div className="w-64 text-xl sm:text-sm text-gray-500 dark:text-gray-300 bg-gray-300 dark:bg-gray-900 
                      py-2 space-y-3 border-none">
                      
-                     { comment?.id !== userDetails?.uid ? 
+                     { comment?.uid !== user?.id ? 
                         (
                           <>
                           <div className="flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900" onClick={handleNotInterested}>
@@ -397,7 +396,7 @@ const submitReport = async () => {
                     
 
                     <div className={`${userData?.name == comment?.name ? 'hidden' : 'flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900 '}`} >
-                    {hasFollowed[comment?.id] ? (
+                    {hasFollowed[comment?.uid] ? (
                       <UserRemoveIcon className="h-6" />
 
                     ) : (
@@ -405,7 +404,7 @@ const submitReport = async () => {
 
                     )}
                    
-                      <p onClick={() => followMember(comment?.id, userDetails)}>{hasFollowed[comment?.id] ? 'Unfollow' : 'Follow'} @{comment?.nickname}</p>
+                      <p onClick={() => followMember(comment?.uid, userDetails)}>{hasFollowed[comment?.uid] ? 'Unfollow' : 'Follow'} @{comment?.nickname}</p>
                     
                     </div>
                    
@@ -476,6 +475,7 @@ const submitReport = async () => {
                 <DotsHorizontalIcon className="dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-gray-900 rounded-full h-10 hover:text-sky-500 p-1 sm:p-2"/>
               
              </Popover>
+           </div>  
         </div>
 
         {/* post text and image */}
@@ -484,12 +484,7 @@ const submitReport = async () => {
         <p className="text-gray-800 text-[20px] sm:text-[16px] mb-2 dark:text-gray-300">
           {comment?.comment}
          </p>
-        {comment?.image && (
-         
-          <img src={comment?.image} alt="" className="h-32 w-full object-cover rounded-sm"/>
-        
-        )}
-        
+              
         </div>
         {comment?.from && <p>Recast from <span className="font-bold">{comment?.from}</span>{" "}<span className="text-gray-400 font-bold">@{comment?.fromNickname}</span></p>}
 
@@ -525,14 +520,7 @@ const submitReport = async () => {
           </div>
 
           {/* delete comment */}
-          {userDetails?.uid === comment?.id && (
-           
-           <TrashIcon
-              onClick={userDetails?.uid === comment?.id ? deleteRepost : deleteComment}
-             className="h-12 w-12 md:h-10 md:w-10 p-2 hover:text-red-600 hover:bg-red-100 rounded-full dark:hover:bg-gray-800"
-           />
-                     
-         )}
+          
 
           <Tooltip content='share' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
           <ShareIcon className="h-9 w-9 p-2 hover:text-sky-500 hover:bg-sky-100 cursor-pointer rounded-full dark:hover:bg-neutral-700" onClick={handleShare}/>

@@ -9,6 +9,8 @@ import Widgets from '../../components/Ward/Widgets';
 import CommentModal from '../../components/Ward/CommentModal';
 import WardTrends from '../../components/Ward/WardTrends';
 import { Button, Spinner, Tooltip } from 'flowbite-react';
+import { useUser } from '@clerk/nextjs';
+import Link from 'next/link';
 
 export default function TopicPostsPage() {
   const router = useRouter();
@@ -16,27 +18,14 @@ export default function TopicPostsPage() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
-  const [userDetails, setUserDetails] = useState(null);
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [isWidgetsVisible, setIsWidgetsVisible] = useState(false);
-  
-
-  const fetchUserData = async () => {
-    auth.onAuthStateChanged(async (user) => {
-      console.log(user)
-      setUserDetails(user)
-
-    })
-  }
-
-  useEffect(() => {
-    fetchUserData();
-  }, []);
+  const { user } = useUser()
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (userDetails) {
-        const q = query(collection(db, 'userPosts'), where('id', '==', userDetails.uid));
+      if (user?.id) {
+        const q = query(collection(db, 'userPosts'), where('uid', '==', user?.id));
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
@@ -46,15 +35,15 @@ export default function TopicPostsPage() {
     };
 
     fetchUserData();
-  }, [userDetails]);
+  }, [user?.id]);
 
   useEffect(() => {
-    if (!userData || !userData.ward) {
+    if (!userData || !userData?.ward) {
       setLoading(true);
       return;
     }
   
-    const q = query(collection(db, "ward", userData.ward), orderBy('timestamp', 'desc'));
+    const q = query(collection(db, "ward", userData.ward, "posts"), orderBy('timestamp', 'desc'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const filteredPosts = snapshot.docs
         .filter(doc => {
@@ -113,13 +102,14 @@ export default function TopicPostsPage() {
           <Sidebar />
         </div>
         {/* Feed */}
-        <div className="xl:ml-[370px] xl:min-w-[576px] min-w-[580px] sm:min-w-full flex-grow max-w-xl">
+        <div className="xl:ml-[370px] 2xl:ml-[560px] xl:min-w-[576px]  sm:min-w-full flex-grow max-w-xl">
           <div className="flex items-center space-x-2  py-2 px-3 sticky top-0 bg-white border-[1px] rounded-md border-gray-300 dark:border-gray-900 dark:bg-gray-950">
-            <div className="" onClick={() => router.push("/ward")}>
+            <Link href={`/ward`}>
           <Tooltip content='back' arrow={false} placement="bottom" className="p-1 flex text-xs bg-gray-500 -mt-1">
               <ArrowLeftIcon className="h-8 cursor-pointer animate-pulse" />
             </Tooltip>
-            </div>
+            </Link>
+           
             <h2 className="text-lg sm:text-xl font-bold cursor-pointer">
                {topic ? (topic):(loading && <Spinner size="sm" />)}
             </h2>

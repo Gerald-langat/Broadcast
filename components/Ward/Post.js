@@ -11,6 +11,8 @@ import Moment from "react-moment";
 import { Badge, Button, Carousel, Popover, Spinner, Tooltip } from 'flowbite-react';
 import { HiClock, HiCheck } from "react-icons/hi";
 import { useFollow } from '../FollowContext';
+import { useUser } from '@clerk/nextjs';
+import Link from 'next/link';
 
 
 export default function Post({ post, id }) {
@@ -22,7 +24,6 @@ export default function Post({ post, id }) {
   const [comments, setComments] = useState([]);
   const [userpost, setUserData] = useState({});
   const [loading, setLoading] =useState(false);
-  const [userDetails, setUserDetails] = useState(null);
   const [citeInput, setCiteInput] = useState("");
   const { hasFollowed, followMember } = useFollow();
   const [showModal, setShowModal] = useState(false);
@@ -31,21 +32,12 @@ export default function Post({ post, id }) {
   const [showUndo, setShowUndo] = useState(false);
   const [isReported, setIsReported] = useState({});
   const [isBookmarked, setIsBookmarked] = useState({});
-  
-  const fetchUserData = async () => {
-    auth.onAuthStateChanged(async (user) => {
-      setUserDetails(user)
-
-    })
-  }
-  useEffect(() => {
-    fetchUserData();
-  }, []);
+  const { user } = useUser()
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (userDetails) {
-        const q = query(collection(db, 'userPosts'), where('id', '==', userDetails.uid));
+      if (user?.id) {
+        const q = query(collection(db, 'userPosts'), where('uid', '==', user?.id));
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
@@ -55,119 +47,119 @@ export default function Post({ post, id }) {
       }
     };
     fetchUserData();
-  }, [userDetails]);
+  }, [user?.id]);
 
 
   useEffect(() => {
-    if(db || id || userpost || userpost.ward){
+    if(id){
     const unsubscribe = onSnapshot(
-      collection(db, "ward", userpost.ward, id, "likes"),
+      collection(db, "ward",  id, "likes"),
       (snapshot) => setLikes(snapshot.docs)
     );
     return () => unsubscribe();
   }
-}, [db, id, userpost]);
+}, [id]);
 
 
 useEffect(
   () =>{
-    if (!userpost || !userpost.ward) {
+    if (!id) {
       setLoading(true);
       return;
     }
     onSnapshot(
-      query(collection(db, "ward", userpost.ward, id, "comments")),
+      query(collection(db, "ward",  id, "comments")),
       (snapshot) => {
         setComments(snapshot.docs);
         setLoading(false);
       }
     ),
-  []
+  [id]
 });
 
-const deleteRepost = async () => {
-  if (window.confirm("Are you sure you want to delete this post?")) {
-    if (id || userpost) {
-      try {
-        const likesCollectionRef = collection(db, "ward", userpost.ward, id, "likes");
-        const likesSnapshot = await getDocs(likesCollectionRef);
-  
-        const deleteLikesPromises = likesSnapshot.docs.map((likeDoc) =>
-          deleteDoc(likeDoc.ref)
-        );
-        await Promise.all(deleteLikesPromises);
-     
-        await deleteDoc(doc(db, "ward", userpost.ward, id));
-        
-      } catch (error) {
-        console.error('Error deleting the post:', error);
-      }
-    } else {
-      console.log('No post document reference available to delete.');
-    }
-  }
-};
-  
-  useEffect(() => {
-    setHasLiked(
-      likes.some((like) => like.id === userDetails?.uid)
-    );
-  }, [likes, userDetails]);
-
-  async function likePost() {
-    if (userDetails || userpost) {
-      if (hasLiked) {
-        await deleteDoc(doc(db, "ward", userpost.ward, id, "likes", userDetails?.uid));
+    async function deletePost() {
+      if (window.confirm("Are you sure you want to delete this post?")) {
+        if (id || userpost) {
+          try {
+            const likesCollectionRef = collection(db, "ward", id, "likes");
+            const likesSnapshot = await getDocs(likesCollectionRef);
+      
+            const deleteLikesPromises = likesSnapshot.docs.map((likeDoc) =>
+              deleteDoc(likeDoc.ref)
+            );
+            await Promise.all(deleteLikesPromises);
+          await deleteDoc(doc(db, "ward", userpost.ward, "posts", id));
+    
+          // Delete all images associated with the post
+          const imageUrls = post?.data()?.images; // Assuming 'images' is an array of image URLs
+          if (imageUrls && imageUrls.length > 0) {
+            console.log(`Deleting ${imageUrls.length} images...`);
+            const deleteImagePromises = imageUrls.map((url, index) => {
+              const imageRef = ref(storage, `ward/${id}/image-${index}`);
+              return deleteObject(imageRef).then(() => {
+                console.log(`Image ${index} deleted successfully.`);
+              });
+            });
+            
+            // Wait for all the delete operations to complete
+            await Promise.all(deleteImagePromises);
+          }
+    
+          // Delete the video if it exists
+          if (post?.data()?.video) {
+            await deleteObject(ref(storage, `ward/${id}/video`));
+          }
+        } catch (error) {
+          console.error("An error occurred during deletion:", error);
+        }
       } else {
-        await setDoc(doc(db, "ward",  userpost.ward, id, "likes", userDetails?.uid), {
-          email: userDetails.email,
-        });
+        console.log("no data for deleting post")
       }
-    } else {
-      router.replace('/');
     }
   }
 
-  async function deletePost() {
+  const deleteRepost = async () => {
     if (window.confirm("Are you sure you want to delete this post?")) {
       if (id || userpost) {
         try {
-          const likesCollectionRef = collection(db, "ward", userpost.ward, id, "likes");
+          const likesCollectionRef = collection(db, "ward", id, "likes");
           const likesSnapshot = await getDocs(likesCollectionRef);
     
           const deleteLikesPromises = likesSnapshot.docs.map((likeDoc) =>
             deleteDoc(likeDoc.ref)
           );
           await Promise.all(deleteLikesPromises);
-       
-        await deleteDoc(doc(db, "ward", userpost.ward, id));
-       
-  
-        // Delete all images associated with the post
-        const imageUrls = post?.data()?.images; // Assuming 'images' is an array of image URLs
-        if (imageUrls && imageUrls.length > 0) {
-          
-          const deleteImagePromises = imageUrls.map((url, index) => {
-            const imageRef = ref(storage, `ward/${id}/image-${index}`);
-            return deleteObject(imageRef).then(() => {
-              
-            });
-          });          
-          // Wait for all the delete operations to complete
-          await Promise.all(deleteImagePromises);          
-        }  
-        // Delete the video if it exists
-        if (post?.data()?.video) {          
-          await deleteObject(ref(storage, `ward/${id}/video`));          
+          await deleteDoc(doc(db, "ward", userpost.ward, "posts", id));
+        } catch (error) {
+          console.error('Error deleting the post:', error);
         }
-      } catch (error) {
-        console.error("An error occurred during deletion:", error);
+      } else {
+        console.log('No post document reference available to delete.');
+      }
+    }
+  };
+  
+  useEffect(() => {
+    setHasLiked(
+      likes.some((like) => like.id === user?.id)
+    );
+  }, [likes, user?.id]);
+
+  async function likePost() {
+    if (user?.id) {
+      if (hasLiked) {
+        await deleteDoc(doc(db, "ward", id, "likes", user?.id));
+      } else {
+        await setDoc(doc(db, "ward",  id, "likes", user?.id), {
+          uid: user?.id,
+        });
       }
     } else {
-      console.log("no data for deleting")
+      router.replace('/signup');
     }
   }
-}
+
+
 
   const handleShare = async () => {
     if (navigator.share) {
@@ -189,33 +181,46 @@ const deleteRepost = async () => {
 
 
   useEffect(() => {
-    const fetchPost = async () =>{
-      if (!userpost || !userpost.ward || !id) {
-        setLoading(true);
-        return;
-      }
-      const postRef = doc(db, "ward", userpost.ward, id);
+    if (!id || !user?.id || !userpost?.ward) return;
+  
+    const fetchPost = async () => {
+      const postRef = doc(db, "ward", userpost?.ward, "posts", id);
       const docSnap = await getDoc(postRef);
-
-      if(docSnap.exists()){
+  
+      if (docSnap.exists()) {
         const postData = docSnap.data();
-    
-        await updateDoc(postRef, {views: (postData.views || 0) + 1})
-    } else {
-      console.log('No such document!');
-    }
+        const currentViews = postData.views || [];
+  
+        if (!Array.isArray(currentViews)) {
+          console.error("⚠️ Error: views is not an array!", currentViews);
+          return;
+        }
+  
+        if (!currentViews.includes(user.id)) {
+          await updateDoc(postRef, {
+            views: [...currentViews, user.id], // Add nickname to views array
+          });
+        } else {
+          console.log("Nickname already exists in views:", currentViews);
+        }
+      } else {
+        console.log("No such document!");
+      }
     };
-    setLoading(false);
+  
     fetchPost();
-  },[id, userpost])
+  }, [id, user?.id, userpost?.ward]);
+  
+    
+  const viewCount = Array.isArray(post?.data()?.views) ? post.data().views.length : 0;
 
   const repost = async () => {
     if (post) {
       // Get the post data, excluding unsupported fields
       const postData = post.data();
       try {
-        await addDoc(collection(db, 'ward', userpost.ward), {
-            id: userDetails.uid,
+        await addDoc(collection(db, 'ward', userpost.ward, "posts"), {
+            uid: user?.id,
             text: postData.text,
             userImg: userpost.userImg,
             timestamp: serverTimestamp(),
@@ -241,7 +246,7 @@ const deleteRepost = async () => {
   // recite post
 
 const cite = async () => {
-  if (!userDetails?.uid) { 
+  if (!user?.id) { 
     router.replace('/');
   }
   setLoading(true);
@@ -254,8 +259,8 @@ const cite = async () => {
      if (postData && typeof postData.text === 'string' && typeof citeInput === 'string' ) {
       const collectionName = userpost.ward;
       try {
-        await addDoc(collection(db, 'ward', collectionName), {
-          id: userDetails.uid,
+        await addDoc(collection(db, 'ward', collectionName, "posts"), {
+          id: user?.id,
           text: postData.text,
           citeInput: citeInput,
           userImg: userpost.userImg,
@@ -310,7 +315,7 @@ const handleUndo = () => {
 };
 
  // Check if the post is already bookmarked
- const userId = userDetails?.uid;
+ const userId = user?.id;
  const pstId = post?.id;
  // Toggle bookmark
  const checkBookmark = async () => {
@@ -428,6 +433,7 @@ useEffect(() => {
    setShowModal(false)
  };
 
+ const uid = post?.data()?.uid
 
   return (
     <div className='w-full'>
@@ -441,11 +447,14 @@ useEffect(() => {
      ) : (
        <>
      {post?.data()?.userImg && (
+      <Link href={`/userProfile/${uid}`}>
        <img
        className="sm:h-12 sm:w-12 h-14 w-14 rounded-md mr-4 object-fit shadow-gray-800 shadow-sm dark:shadow-gray-600"
        src={post?.data()?.userImg}
        alt="user-img"
      />
+
+     </Link>
      )}
 
      <div className="flex-1">
@@ -454,12 +463,12 @@ useEffect(() => {
          <div className="sm:flex sm:space-x-8">
          <div className="flex items-center space-x-2 whitespace-nowrap dark:text-gray-300 ">
            <HiCheck className="sm:h-4 h-6 sm:w-4 w-6 bg-green-800 rounded-full text-white"/>
-           <h4 className=" dark:text-gray-300 font-bold text-xl sm:text-[15px] max-w-20 hover:underline truncate">
+           <h4 className=" dark:text-gray-300 font-bold text-xl sm:text-[15px] max-w-20 truncate">
              {post?.data()?.name}
            </h4>
            <h4 className="font-bold text-xl sm:text-[15px] max-w-20 dark:text-gray-300 truncate"> {post?.data()?.lastname}</h4>
         <h4 className=" truncate flex-1 text-xl sm:text-[15px] max-w-20  dark:text-gray-300">@{post?.data()?.nickname}</h4>
-          <Badge className="text-[16px] hover:underline sm:-ml-28 dark:text-gray-300 md:text-sm py-0" color="gray"  icon={HiClock}>
+          <Badge className="text-[16px] sm:-ml-28 dark:text-gray-300 md:text-sm py-0" color="gray"  icon={HiClock}>
              <Moment fromNow>{post?.data()?.timestamp?.toDate()}</Moment>
            </Badge>
           
@@ -469,10 +478,10 @@ useEffect(() => {
          <div className="flex">
          <Tooltip content='Delete' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
          
-         {userDetails?.uid === post?.data()?.id && (
+         {user?.id === post?.data()?.uid && (
           
            <TrashIcon
-              onClick={userDetails?.uid === post?.data()?.id ? deleteRepost : deletePost}
+              onClick={user?.id === post?.data()?.uid ? deleteRepost : deletePost}
              className="h-12 w-12 md:h-10 md:w-10 p-2 hover:text-red-600 hover:bg-red-100 rounded-full dark:hover:bg-neutral-700"
            />
                      
@@ -486,7 +495,7 @@ useEffect(() => {
                 content={
                   <div className="w-64 text-xl sm:text-sm text-gray-500 dark:text-gray-300 bg-gray-300 dark:bg-neutral-800 
                      py-2 space-y-3 border-none">
-                     { post?.data()?.id !== userDetails?.uid ? 
+                     { post?.data()?.uid !== user?.id ? 
                         (
                           <>
                           <div className="flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900" onClick={handleNotInterested}>
@@ -496,7 +505,7 @@ useEffect(() => {
                     
 
                     <div className={`${userpost?.name == post?.data()?.name ? 'hidden' : 'flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900 '}`} >
-                    {hasFollowed[post?.data()?.id] ? (
+                    {hasFollowed[post?.data()?.uid] ? (
                       <UserRemoveIcon className="h-6" />
 
                     ) : (
@@ -504,7 +513,7 @@ useEffect(() => {
 
                     )}
                    
-                      <p onClick={() => followMember(post?.data()?.id, userDetails)}>{hasFollowed[post?.data()?.id] ? 'Unfollow' : 'Follow'} @{post?.data()?.nickname}</p>
+                      <p onClick={() => followMember(post?.data()?.uid)}>{hasFollowed[post?.data()?.uid] ? 'Unfollow' : 'Follow'} @{post?.data()?.nickname}</p>
                     
                     </div>
                    
@@ -695,7 +704,7 @@ useEffect(() => {
          <div className="flex items-center select-none z-50">
            <ChatIcon
              onClick={() => {
-               if (!userDetails) {
+               if (!user?.id) {
                  router.replace('/');
                } else {
                  setPostId(id);
@@ -772,7 +781,7 @@ useEffect(() => {
          <Tooltip content='view' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
            <div className="flex items-center">
                <EyeIcon className="h-12 w-12 sm:h-10 sm:w-10 p-2 hover:text-sky-500 hover:bg-blue-100 rounded-full dark:hover:bg-neutral-700"/>
-               <span className="text-[20px] sm:text-sm">{formatNumber(post?.data()?.views)}</span> 
+               <span className="text-[20px] sm:text-sm">{formatNumber(viewCount)}</span> 
            </div>
            </Tooltip>
         

@@ -165,7 +165,7 @@ export default function Comment({ comment, commentId, originalPostId }) {
         try {
           // Construct the new post data object
           const newPostData = {
-            uid: user.id,
+            uid: user?.id,
             comment: postData.comment,
             userImg: userData.userImg,
             timestamp: serverTimestamp(),

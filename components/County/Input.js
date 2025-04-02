@@ -16,10 +16,10 @@ import {
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadString } from "firebase/storage";
 import { useState, useRef, useEffect } from "react";
-import { auth, db, storage } from "../../firebase";
+import { db, storage } from "../../firebase";
 import Picker from 'emoji-picker-react'// Import your EmojiPicker component
 import { Popover, Spinner, Tooltip } from "flowbite-react";
-import { useRouter } from "next/router";
+import { useUser } from "@clerk/nextjs";
 
 
 export default function Input() {
@@ -31,25 +31,13 @@ export default function Input() {
   const videoPickerRef = useRef(null);
   const [emoji, setEmoji] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [userDetails, setUserDetails] = useState(null);
-  const router = useRouter();
   const [selectedFiles, setSelectedFiles] = useState([]);
-
-  const fetchUserData = async () => {
-    auth.onAuthStateChanged(async (user) => {
-      console.log(user)
-      setUserDetails(user)
-
-    })
-  }
-  useEffect(() => {
-    fetchUserData();
-  }, []);
+  const { user } = useUser()
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (userDetails) {
-        const q = query(collection(db, 'userPosts'), where('id', '==', userDetails.uid));
+      if (user?.id) {
+        const q = query(collection(db, 'userPosts'), where('uid', '==', user?.id));
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
@@ -59,7 +47,7 @@ export default function Input() {
     };
 
     fetchUserData();
-  }, [userDetails]);
+  }, [user?.id]);
 
   const sendPost = async () => {
     if (loading) return;
@@ -67,10 +55,10 @@ export default function Input() {
 
     try {
       if (userData) {
-        const collectionName = userData.county;
+        const collectionName = userData?.county;
         
-        const docRef = await addDoc(collection(db, "county", collectionName), {
-          id: userDetails.uid,
+        const docRef = await addDoc(collection(db, "county", collectionName, "posts"), {
+          uid: userData.uid,
           text: input,
           userImg: userData.userImg,
           timestamp: serverTimestamp(),
@@ -79,14 +67,14 @@ export default function Input() {
           nickname: userData.nickname,
           county:userData.county,
           category:userData.category,
-          views: 0
+          views: []
         });
 
         const imageUploadPromises = [];
         const imageUrls = [];
         if (selectedFiles.length > 0) {
           selectedFiles.forEach((file, index) => {
-            const imageRef = ref(storage, `county/${userDetails.uid}/image-${index}`);
+            const imageRef = ref(storage, `county/${docRef.id}/image-${index}`);
   
             // Upload each image and store the URL
             const uploadTask = uploadString(imageRef, file, "data_url").then(async () => {
@@ -101,12 +89,12 @@ export default function Input() {
           await Promise.all(imageUploadPromises);
   
           // Update Firestore document with all image URLs
-          await updateDoc(doc(db, "county", collectionName, docRef.id), {
+          await updateDoc(doc(db, "county", collectionName, "posts", docRef.id), {
             images: imageUrls,
           });
         }
 
-        const vidRef = ref(storage, `county/${userDetails.uid}/countyVideo`);
+        const vidRef = ref(storage, `county/${docRef.id}/countyVideo`);
          if (selectedVidFile) {
           let isVideo = false;
           if (selectedVidFile.type) {
@@ -114,7 +102,7 @@ export default function Input() {
           }
           await uploadString(vidRef, selectedVidFile, "data_url").then(async () => {
             const downloadURL = await getDownloadURL(vidRef);
-            await updateDoc(doc(db, "county", collectionName, docRef.id), {
+            await updateDoc(doc(db, "county", collectionName, "posts", docRef.id), {
               video: downloadURL,
             });
           });
@@ -166,7 +154,6 @@ export default function Input() {
       {userData && (
         <div className=" flex border-[1px] dark:bg-gray-950 border-gray-200 dark:border-gray-900 p-3 space-x-3 z-10 top-0 sticky-top rounded-md mt-1">
           <img
-            onClick={()=> router.replace('/')}
             src={userData.userImg}
             alt="user-img"
             className="h-11 w-11 rounded-md cursor-pointer hover:brightness-95 shadow-gray-800 shadow-sm dark:shadow-gray-600"

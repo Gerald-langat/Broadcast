@@ -15,11 +15,11 @@ import {
   getDocs,
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadString } from "firebase/storage";
-import { useSession, signOut } from "next-auth/react";
 import { useState, useRef, useEffect } from "react";
-import { auth, db, storage } from "../../firebase";
+import { db, storage } from "../../firebase";
 import Picker from 'emoji-picker-react'
 import { Popover, Spinner, Tooltip } from "flowbite-react";
+import { useUser } from "@clerk/nextjs";
 
 export default function Input() {
   const [input, setInput] = useState("");
@@ -32,23 +32,12 @@ export default function Input() {
   const [error, setError] = useState('');
   const [emoji, setEmoji] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [userDetails, setUserDetails] = useState(null);
-
-  const fetchUserData = async () => {
-    auth.onAuthStateChanged(async (user) => {
-      console.log(user)
-      setUserDetails(user)
-
-    })
-  }
-  useEffect(() => {
-    fetchUserData();
-  }, []);
+  const { user } = useUser()
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (userDetails) {
-        const q = query(collection(db, 'userPosts'), where('id', '==', userDetails.uid));
+      if (user?.id) {
+        const q = query(collection(db, 'userPosts'), where('uid', '==', user?.id));
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
@@ -58,7 +47,7 @@ export default function Input() {
     };
 
     fetchUserData();
-  }, [userDetails]);
+  }, [user?.id]);
 
   const sendPost = async () => {
     if (loading) return;
@@ -66,10 +55,10 @@ export default function Input() {
 
     try {
       if (userData) {
-        const collectionName = userData.ward;
+        const collectionName = userData?.ward;
         
-        const docRef = await addDoc(collection(db, "ward", collectionName), {
-          id: userDetails.uid,
+        const docRef = await addDoc(collection(db, "ward", collectionName, "posts"), {
+          uid: user?.id,
           text: input,
           userImg: userData.userImg,
           timestamp: serverTimestamp(),
@@ -78,7 +67,7 @@ export default function Input() {
           nickname: userData.nickname,
           ward:userData.ward,
           category:userData.category,
-          views: 0
+          views: []
         });
 
 
@@ -168,7 +157,6 @@ export default function Input() {
       {userData && (
         <div className="flex border-[1px] rounded-md bg-white dark:bg-gray-950 border-gray-200 dark:border-gray-900 p-3 space-x-3 z-10 top-0 mt-1">
           <img
-            onClick={signOut}
             src={userData.userImg}
             alt="user-img"
             className="h-11 w-11 rounded-md cursor-pointer hover:brightness-95 shadow-gray-800 shadow-sm dark:shadow-gray-600"

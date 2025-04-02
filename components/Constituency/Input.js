@@ -16,10 +16,10 @@ import {
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadString } from "firebase/storage";
 import { useState, useRef, useEffect } from "react";
-import { auth, db, storage } from "../../firebase";
+import { db, storage } from "../../firebase";
 import Picker from 'emoji-picker-react'// Import your EmojiPicker component
 import { Popover, Spinner, Tooltip } from "flowbite-react";
-import { useRouter } from "next/router";
+import { useUser } from "@clerk/nextjs";
 
 export default function Input() {
 
@@ -33,25 +33,12 @@ export default function Input() {
   const [error, setError] = useState('');
   const [emoji, setEmoji] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [userDetails, setUserDetails] = useState(null);
-  const router = useRouter();
-
-  const fetchUserData = async () => {
-    auth.onAuthStateChanged(async (user) => {
-      console.log(user)
-      setUserDetails(user)
-
-    })
-  }
-  useEffect(() => {
-    fetchUserData();
-  }, []);
-
+const { user } = useUser()
  
   useEffect(() => {
     const fetchUserData = async () => {
-      if (userDetails) {
-        const q = query(collection(db, 'userPosts'), where('id', '==', userDetails.uid));
+      if (user?.id) {
+        const q = query(collection(db, 'userPosts'), where('uid', '==', user?.id));
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
@@ -61,7 +48,7 @@ export default function Input() {
     };
 
     fetchUserData();
-  }, [userDetails]);
+  }, [user?.id]);
 
   const sendPost = async () => {
     if (loading) return;
@@ -69,10 +56,10 @@ export default function Input() {
 
     try {
       if (userData) {
-        const collectionName = userData.constituency;
+        const collectionName = userData?.constituency;
         
-        const docRef = await addDoc(collection(db, "constituency", collectionName), {
-          id: userDetails.uid,
+        const docRef = await addDoc(collection(db, "constituency", collectionName, "posts"), {
+          uid: user?.id,
           text: input,
           userImg: userData.userImg,
           timestamp: serverTimestamp(),
@@ -81,7 +68,7 @@ export default function Input() {
           nickname: userData.nickname,
           constituency:userData.constituency,
           category:userData.category,
-          views: 0
+          views: []
         });
 
 
@@ -104,7 +91,7 @@ export default function Input() {
           await Promise.all(imageUploadPromises);
   
           // Update Firestore document with all image URLs
-          await updateDoc(doc(db, "constituency", collectionName, docRef.id), {
+          await updateDoc(doc(db, "constituency", collectionName, "posts", docRef.id), {
             images: imageUrls,
           });
         }
@@ -117,7 +104,7 @@ export default function Input() {
           }
           await uploadString(vidRef, selectedVidFile, "data_url").then(async () => {
             const downloadURL = await getDownloadURL(vidRef);
-            await updateDoc(doc(db, "constituency",collectionName, docRef.id), {
+            await updateDoc(doc(db, "constituency",collectionName, "posts", docRef.id), {
               video: downloadURL,
             });
           });
@@ -167,8 +154,7 @@ export default function Input() {
       {userData && (
         <div className="flex border-[1px] bg-white dark:bg-gray-950 border-gray-200 p-3 space-x-3 z-10 top-0 sticky-top dark:border-gray-900 rounded-md mt-1">
           <img
-            onClick={() => router.replace('/')}
-            src={userData.userImg}
+            src={userData?.userImg}
             alt="user-img"
             className="h-11 w-11 rounded-md cursor-pointer hover:brightness-95"
           />

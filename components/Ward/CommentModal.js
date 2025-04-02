@@ -23,6 +23,7 @@ import Moment from "react-moment";
 import Picker from 'emoji-picker-react'
 import { Popover, Tooltip } from "flowbite-react";
 import { getDownloadURL, ref, uploadString } from "firebase/storage";
+import { useUser } from "@clerk/nextjs";
 
 export default function CommentModal() {
   
@@ -31,29 +32,17 @@ export default function CommentModal() {
   const [userData, setUserData] = useState({});
   const [post, setPost] = useState([]);
   const [input, setInput] = useState("");
-  const [userDetails, setUserDetails] = useState(null);
   const [loading, setLoading] = useState(false);
   const [emoji, setEmoji] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const filePickerRef = useRef(null);
   const [selectedFile, setSelectedFile] = useState(null);
-
-  const fetchUserData = async () => {
-    auth.onAuthStateChanged(async (user) => {
-      console.log(user)
-      setUserDetails(user)
-
-    })
-  }
-  useEffect(() => {
-    fetchUserData();
-  }, []);
- 
+  const { user } = useUser()
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (userDetails) {
-        const q = query(collection(db, 'userPosts'), where('id', '==', userDetails.uid));
+      if (user?.id) {
+        const q = query(collection(db, 'userPosts'), where('uid', '==', user?.id));
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
@@ -62,12 +51,12 @@ export default function CommentModal() {
       }
     };
     fetchUserData();
-  }, [userDetails]);
+  }, [user?.id]);
 
 
   useEffect(() => {
     if (userData && userData.ward && postId) {
-      onSnapshot(doc(db, "ward", userData.ward, postId), (snapshot) => {
+      onSnapshot(doc(db, "ward", userData.ward, "posts", postId), (snapshot) => {
         setPost(snapshot);
       });
     }
@@ -78,25 +67,15 @@ export default function CommentModal() {
   async function sendComment() {
     if(loading) return;
     setLoading(true);
-    const docRef = await addDoc(collection(db, "ward", userData.ward, postId, "comments"), {
+    await addDoc(collection(db, "ward",  postId, "comments"), {
       comment: input,
       name: userData.name,
       lastname: userData.lastname,
       userImg: userData.userImg,
       timestamp: serverTimestamp(),
       nickname:userData.nickname,
-      id: userDetails.uid,
+      uid: user?.id,
     });
-
-    const RepImage = ref(storage, `wardreply/${docRef.id}/image`);
-    if (selectedFile) {
-       await uploadString(RepImage, selectedFile, "data_url").then(async () => {
-         const downloadURL = await getDownloadURL(RepImage);
-         await updateDoc(doc(db, "ward", userData.ward, postId, "comments", docRef.id), {
-           image: downloadURL,
-         });
-       });
-     }
 
     setLoading(false);
     setOpen(false);
@@ -110,16 +89,7 @@ const closeMode = () => {
   setInput("");
 }
 
- //  images
- const addImageReply = (e) => {
-  const reader = new FileReader();
-  if (e.target.files[0]) {
-    reader.readAsDataURL(e.target.files[0]);
-  }
-  reader.onload = (readerEvent) => {
-    setSelectedFile(readerEvent.target.result);
-  };
-};
+
 
   return (
     <div>
@@ -147,7 +117,7 @@ const closeMode = () => {
                 src={post?.data()?.userImg}
                 alt="user-img"
               />
-              <h4 className="font-bold text-[15px] sm:text-[16px] hover:underline">
+              <h4 className="font-bold text-[15px] sm:text-[16px]">
                 {post?.data()?.name}
               </h4>
               <h4 className="font-bold">
@@ -156,7 +126,7 @@ const closeMode = () => {
               <span className="text-sm sm:text-[15px] font-bold">
                 @{post?.data()?.nickname} -{" "}
               </span>
-              <span className="text-sm sm:text-[15px] hover:underline">
+              <span className="text-sm sm:text-[15px]">
                 <Moment fromNow>{post?.data()?.timestamp?.toDate()}</Moment>
               </span>
             </div>
@@ -179,22 +149,8 @@ const closeMode = () => {
                 </div>
 
                 <div className="flex items-center justify-between pt-2.5">
-                  <div className="flex">
-                    <div
-                      className=""
-                       onClick={() => filePickerRef.current.click()}
-                    >
-          <Tooltip content='image' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-                      <PhotographIcon className="h-10 w-10 rounded-full cursor-pointer p-2 text-sky-500 hover:bg-sky-100 dark:hover:bg-gray-950" />
-                      <input
-                        type="file"
-                        hidden
-                        accept="image/*"
-                        ref={filePickerRef}
-                        onChange={addImageReply}
-                      />
-                      </Tooltip>
-                    </div>
+                  <div>
+                   
                     <Popover
                       aria-labelledby="profile-popover"
                        placement="left"
@@ -214,19 +170,7 @@ const closeMode = () => {
                       />
                    
                     </Popover>
-                    {selectedFile && (
-                    <div className="relative">
-                      <XIcon
-                        onClick={() => setSelectedFile(null)}
-                        className="border h-7 text-black absolute cursor-pointer shadow-md border-white m-1 rounded-full"
-                      />
-                      <img
-                        src={selectedFile}
-                        controls
-                        className={`${loading && "animate-pulse"} h-[200px] w-[300px] object-cover` }
-                      />
-                    </div>
-                  )}
+                
                   </div>
                   <button
                     onClick={sendComment}

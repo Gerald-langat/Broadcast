@@ -214,8 +214,8 @@ const viewCount = Array.isArray(post?.data()?.views) ? post.data().views.length 
 
   // repost
   const repost = async () => {
-    if(!userData?.uid) {
-      router.replace('/');
+    if(!user?.id) {
+      router.replace('/signup');
       return;
     }
     if (post) {
@@ -223,7 +223,7 @@ const viewCount = Array.isArray(post?.data()?.views) ? post.data().views.length 
       try {
         // Construct the new post data object
         const newPostData = {
-          uid: userData.uid,
+          uid: user?.id,
           text: postData.text,
           userImg: userData.userImg,
           timestamp: serverTimestamp(),
@@ -252,8 +252,8 @@ const viewCount = Array.isArray(post?.data()?.views) ? post.data().views.length 
   };
 
   const cite = async () => {
-    if (!userData?.uid) { 
-      router.replace('/');
+    if (!user?.id) { 
+      router.replace('/signup');
       return;
     }
     setLoading(true);
@@ -264,7 +264,7 @@ const viewCount = Array.isArray(post?.data()?.views) ? post.data().views.length 
       if (postData && typeof postData.text === 'string' && typeof citeInput === 'string') {
         try {
           await addDoc(collection(db, 'posts'), {
-            id: userData.uid,
+            uid: user?.id,
             text: postData.text,
             citeInput: citeInput,
             userImg: userData.userImg,

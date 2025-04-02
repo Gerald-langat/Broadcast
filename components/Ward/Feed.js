@@ -3,9 +3,10 @@ import Input from "./Input";
 import Post from "./Post";
 import { collection, getDocs, onSnapshot, orderBy, query, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { auth, db } from "../../firebase";
+import {  db } from "../../firebase";
 import { AnimatePresence, motion } from "framer-motion";
 import { Button, Spinner } from "flowbite-react";
+import { useUser } from "@clerk/nextjs";
 
 
 
@@ -13,24 +14,13 @@ export default function Feed() {
   const [posts, setPosts] = useState([]);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [userDetails, setUserDetails] = useState(null);
-
-  const fetchUserData = async () => {
-    auth.onAuthStateChanged(async (user) => {
-      console.log(user)
-      setUserDetails(user)
-
-    })
-  }
-  useEffect(() => {
-    fetchUserData();
-  }, []);
+  const { user } = useUser()
 
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (userDetails) {
-        const q = query(collection(db, 'userPosts'), where('id', '==', userDetails.uid));
+      if (user?.id) {
+        const q = query(collection(db, 'userPosts'), where('uid', '==', user?.id));
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
@@ -42,28 +32,28 @@ export default function Feed() {
 
     fetchUserData();
 
-  }, [userDetails]);
+  }, [user?.id]);
 
 
   useEffect(
     () =>{
-      if (!userData || !userData.ward) {
+      if (!userData || !userData?.ward) {
         setLoading(true);
         return;
       }
       onSnapshot(
-        query(collection(db, "ward", userData.ward), orderBy("timestamp", "desc")),
+        query(collection(db, "ward", userData.ward, "posts"), orderBy("timestamp", "desc")),
         (snapshot) => {
           setPosts(snapshot.docs);
           setLoading(false);
         }
       ),
-    []
+    [userData, userData?.ward]
 });
 
 
   return (
-    <div className="dark:bg-gray-950 xl:ml-[350px] xl:min-w-[576px] min-w-[580px] sm:w-screen xl:w-[576px] sm:px-10 md:px-24 px-4 xl:p-0 min-h-screen">
+    <div className="dark:bg-gray-950 xl:ml-[350px] 2xl:min-w-[700px] 2xl:ml-[560px] xl:min-w-[576px] min-w-[580px] sm:w-screen xl:w-[576px] sm:px-10 md:px-24 px-4 xl:p-0 min-h-screen">
      <div className="xl:border-0 sm:border-x-[1px] dark:border-gray-700 border-gray-200">
      {loading ? (
         <Button color="gray" className="border-0 items-center flex mt-4 sm:mt-0">

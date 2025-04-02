@@ -1,6 +1,6 @@
 import { auth, db, storage } from '../../firebase';
-import { ChartBarIcon, ChatIcon, DotsHorizontalIcon, EyeOffIcon, HeartIcon, PencilAltIcon, ReplyIcon, ShareIcon, ThumbUpIcon, TrashIcon, UserAddIcon, UserRemoveIcon } from '@heroicons/react/outline';
-import { addDoc, collection, deleteDoc, doc, getDocs, onSnapshot, query, serverTimestamp, setDoc, where } from 'firebase/firestore';
+import { ChartBarIcon, ChatIcon, DotsHorizontalIcon, EyeIcon, EyeOffIcon, HeartIcon, PencilAltIcon, ReplyIcon, ShareIcon, ThumbUpIcon, TrashIcon, UserAddIcon, UserRemoveIcon } from '@heroicons/react/outline';
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, query, serverTimestamp, setDoc, where } from 'firebase/firestore';
 import { Badge, Button, Carousel, Popover, Spinner, Tooltip } from 'flowbite-react';
 import React, { useEffect, useState } from 'react'
 import Moment from 'react-moment';
@@ -12,11 +12,11 @@ import { modalCountyState, postIdCounty } from '../../atoms/modalAtom';
 import { useRecoilState } from 'recoil';
 import { useFollow } from '../FollowContext';
 import { BookmarkIcon, FlagIcon } from '@heroicons/react/solid';
+import { useUser } from '@clerk/nextjs';
 
 function ConstituencyTrends({post, id}) {
 
   const[loading, setLoading] = useState(false);
-  const [userDetails, setUserDetails] = useState(null);
   const [likes, setLikes] = useState([]);
   const [comments, setComments] = useState([]);
   const [hasLiked, setHasLiked] = useState(false);
@@ -32,31 +32,22 @@ function ConstituencyTrends({post, id}) {
   const [showUndo, setShowUndo] = useState(false);
   const [isReported, setIsReported] = useState({});
   const [isBookmarked, setIsBookmarked] = useState({});
-
-  const fetchUserData = async () => {
-    auth.onAuthStateChanged(async (user) => {
-      setUserDetails(user)
-
-    })
-  }
-  useEffect(() => {
-    fetchUserData();
-  }, []);
+const { user } = useUser()
 
   useEffect(() => {
-    if(!id || !userpost || !userpost.county) return;
+    if(!id) return;
     const unsubscribe = onSnapshot(
-      collection(db, "county", userpost.county, id, "likes"),
+      collection(db, "county",  id, "likes"),
       (snapshot) => setLikes(snapshot.docs)
     );
     return () => unsubscribe(); 
-  }, [db, userpost]);
+  }, [id]);
 
 
 useEffect(() => {
   const fetchUserData = async () => {
-    if (userDetails) {
-      const q = query(collection(db, 'userPosts'), where('id', '==', userDetails.uid));
+    if (user?.id) {
+      const q = query(collection(db, 'userPosts'), where('uid', '==', user?.id));
       const querySnapshot = await getDocs(q);
 
       if (!querySnapshot.empty) {
@@ -66,16 +57,16 @@ useEffect(() => {
     }
   };
   fetchUserData();
-}, [userDetails]);
+}, [user?.id]);
 
 useEffect(
   () =>{
-    if (!userpost || !userpost.county) {
+    if (!id) {
       setLoading(false);
       return;
     }
     onSnapshot(
-      query(collection(db, "county", userpost.county, id, "comments")),
+      query(collection(db, "county", id, "comments")),
       (snapshot) => {
         setComments(snapshot.docs);
         setLoading(false);
@@ -88,22 +79,22 @@ useEffect(
 
   async function deletePost() {
     if (window.confirm("Are you sure you want to delete this post?")) {
-      if (id || userpost) {
+      if (id) {
         try {
-          const likesCollectionRef = collection(db, "county", userpost.county, id, "likes");
+          const likesCollectionRef = collection(db, "county", id, "likes");
           const likesSnapshot = await getDocs(likesCollectionRef);
     
           const deleteLikesPromises = likesSnapshot.docs.map((likeDoc) =>
             deleteDoc(likeDoc.ref)
           );
           await Promise.all(deleteLikesPromises);
-        await deleteDoc(doc(db, "county", userpost.county, id));  
+        await deleteDoc(doc(db, "county", userpost.county, "posts", id));  
         // Delete all images associated with the post
         const imageUrls = post?.data()?.images; // Assuming 'images' is an array of image URLs
         if (imageUrls && imageUrls.length > 0) {
           console.log(`Deleting ${imageUrls.length} images...`);
           const deleteImagePromises = imageUrls.map((url, index) => {
-            const imageRef = ref(storage, `county/${userDetails.uid}/image-${index}`);
+            const imageRef = ref(storage, `county/${id}/image-${index}`);
             return deleteObject(imageRef).then(() => {
               console.log(`Image ${index} deleted successfully.`);
             });
@@ -117,7 +108,7 @@ useEffect(
         // Delete the video if it exists
         if (post?.data()?.video) {
      
-          await deleteObject(ref(storage, `county/${userDetails.uid}/video`));          
+          await deleteObject(ref(storage, `county/${id}/video`));          
         }
 
       } catch (error) {
@@ -132,9 +123,9 @@ useEffect(
 // delete repost
   const deleteRepost = async () => {
     if (window.confirm("Are you sure you want to delete this post?")) {
-      if (id || userpost) {
+      if (id) {
         try {
-          const likesCollectionRef = collection(db, "county", userpost.county, id, "likes");
+          const likesCollectionRef = collection(db, "county", id, "likes");
           const likesSnapshot = await getDocs(likesCollectionRef);
     
           const deleteLikesPromises = likesSnapshot.docs.map((likeDoc) =>
@@ -142,7 +133,7 @@ useEffect(
           );
           await Promise.all(deleteLikesPromises);
 
-          await deleteDoc(doc(db, "county", userpost.county, id));
+          await deleteDoc(doc(db, "county", userpost.county, "posts", id));
         } catch (error) {
           console.error('Error deleting the post:', error);
         }
@@ -155,21 +146,21 @@ useEffect(
   
   useEffect(() => {
     setHasLiked(
-      likes.some((like) => like.id === userDetails?.uid)
+      likes.some((like) => like.id === user?.id)
     );
-  }, [likes, userDetails]);
+  }, [likes, user?.id]);
 
   async function likePost() {
-    if (userDetails || userpost || id) {
+    if (user?.id || id) {
       if (hasLiked) {
-        await deleteDoc(doc(db, "county", userpost.county, id, "likes", userDetails?.uid));
+        await deleteDoc(doc(db, "county", id, "likes", user?.id));
       } else {
-        await setDoc(doc(db, "county", userpost.county, id, "likes", userDetails?.uid), {
-          email: userDetails.email,
+        await setDoc(doc(db, "county", id, "likes", user?.id), {
+          uid: user?.id,
         });
       }
     } else {
-      router.replace('/');
+      router.replace('/signup');
     }
   }
 
@@ -196,10 +187,10 @@ useEffect(
     if (post) {
       // Get the post data, excluding unsupported fields
       const postData = post.data();
-      console.log('Post data:', postData);
+    
       try {
-        await addDoc(collection(db, 'county', userpost.county), {
-            id: userDetails.uid,
+        await addDoc(collection(db, 'county', userpost.county, "posts"), {
+            uid: user?.id,
             text: postData.text,
             userImg: userpost.userImg,
             timestamp: serverTimestamp(),
@@ -226,8 +217,8 @@ useEffect(
 
   // cite
   const cite = async () => {
-    if (!userDetails?.uid) { 
-      router.push('/');
+    if (!user?.id) { 
+      router.push('/signup');
     }
     setLoading(true);
   
@@ -237,8 +228,8 @@ useEffect(
        if (postData && typeof postData.text === 'string' && typeof citeInput === 'string' ) {
         const collectionName = userpost.county;
         try {
-          await addDoc(collection(db, 'county', collectionName), {
-            id: userDetails.uid,
+          await addDoc(collection(db, 'county', collectionName, "posts"), {
+            id: user?.id,
             text: postData.text,
             citeInput: citeInput,
             userImg: userpost.userImg,
@@ -293,7 +284,7 @@ useEffect(
   };
   
    // Check if the post is already bookmarked
-   const userId = userDetails?.uid;
+   const userId = user?.id;
    const pstId = post?.id;
    // Toggle bookmark
    const checkBookmark = async () => {
@@ -411,6 +402,40 @@ useEffect(
      setShowModal(false)
    };
 
+   useEffect(() => {
+      if (!id || !user?.id || !userpost?.county) return;
+    
+      const fetchPost = async () => {
+        const postRef = doc(db, "county", userpost?.county, "posts", id);
+        const docSnap = await getDoc(postRef);
+    
+        if (docSnap.exists()) {
+          const postData = docSnap.data();
+          const currentViews = postData.views || [];
+    
+          if (!Array.isArray(currentViews)) {
+            console.error("⚠️ Error: views is not an array!", currentViews);
+            return;
+          }
+    
+          if (!currentViews.includes(user.id)) {
+            await updateDoc(postRef, {
+              views: [...currentViews, user.id], // Add nickname to views array
+            });
+            console.log("✅ Updated views successfully!");
+          } else {
+            console.log("Nickname already exists in views:", currentViews);
+          }
+        } else {
+          console.log("No such document!");
+        }
+      };
+    
+      fetchPost();
+    }, [id, user?.id, userpost?.county]);
+
+    const viewCount = Array.isArray(post?.data()?.views) ? post.data().views.length : 0;
+
   return (
     <div className='w-full'>
 <div className={`w-full ${isHidden ? 'inline text-2xl sm:text-xl cursor-pointer dark:hover:bg-gray-900 hover:bg-gray-200 rounded-md p-1' : 'hidden'}`} onClick={handleUndo}>{showUndo && 'undo'}</div>
@@ -442,10 +467,10 @@ useEffect(
             </Badge>
             </div>
       <div className='flex'>
-      {userDetails?.uid === post?.data()?.id && (
+      {user?.id === post?.data()?.uid && (
             <Tooltip content='delete' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
             <TrashIcon
-              onClick={userDetails?.uid === post?.data()?.id ? deletePost : deleteRepost}
+              onClick={user?.id === post?.data()?.uid ? deletePost : deleteRepost}
               className="h-9 w-9 md:h-10 md:w-10 p-2 hover:text-red-600 hover:bg-red-100 rounded-full cursor-pointer dark:hover:bg-neutral-700"
             />
             </Tooltip>
@@ -456,7 +481,7 @@ useEffect(
                 content={
                   <div className="w-64 text-xl sm:text-sm text-gray-500 dark:text-gray-300 bg-gray-300 dark:bg-neutral-800 
                      py-2 space-y-3 border-none">
-                     { post?.data()?.id !== userDetails?.uid ? 
+                     { post?.data()?.uid !== user?.id ? 
                         (
                           <>
                           <div className="flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900" onClick={handleNotInterested}>
@@ -466,7 +491,7 @@ useEffect(
                     
 
                     <div className={`${userpost?.name == post?.data()?.name ? 'hidden' : 'flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900 '}`} >
-                    {hasFollowed[post?.data()?.id] ? (
+                    {hasFollowed[post?.data()?.uid] ? (
                       <UserRemoveIcon className="h-6" />
 
                     ) : (
@@ -474,7 +499,7 @@ useEffect(
 
                     )}
                    
-                      <p onClick={() => followMember(post?.data()?.id, userDetails)}>{hasFollowed[post?.data()?.id] ? 'Unfollow' : 'Follow'} @{post?.data()?.nickname}</p>
+                      <p onClick={() => followMember(post?.data()?.uid)}>{hasFollowed[post?.data()?.uid] ? 'Unfollow' : 'Follow'} @{post?.data()?.nickname}</p>
                     
                     </div>
                    
@@ -736,7 +761,12 @@ useEffect(
               </span>
             )}
           </div>
-          
+          <Tooltip content='view' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
+           <div className="flex items-center">
+               <EyeIcon className="h-12 w-12 sm:h-10 sm:w-10 p-2 hover:text-sky-500 hover:bg-blue-100 rounded-full dark:hover:bg-neutral-700"/>
+               <span className="text-[20px] sm:text-sm">{formatNumber(viewCount)}</span> 
+           </div>
+           </Tooltip>
           <Tooltip content='share' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
           <ShareIcon className="h-9 w-9 md:h-10 md:w-10 p-2 hover:text-sky-500 hover:bg-sky-100 cursor-pointer rounded-full dark:hover:bg-neutral-700" onClick={handleShare}/>
           </Tooltip>

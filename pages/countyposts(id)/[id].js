@@ -12,6 +12,7 @@ import Comment from '../../components/County/Comment';
 import Post from '../../components/County/Post';
 import { Button, Spinner, Tooltip } from 'flowbite-react';
 import Link from 'next/link';
+import { useUser } from '@clerk/nextjs';
 
 
 
@@ -19,28 +20,18 @@ const WardPost = () => {
   const router = useRouter();
   const { id } = router.query;
   const [post, setPost] = useState(null);
-  const [userDetails, setUserDetails] = useState(null);
   const [userData, setUserData] = useState(null);
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [isWidgetsVisible, setIsWidgetsVisible] = useState(false);
-  
+  const { user } = useUser()
 
-  const fetchUserData = async () => {
-    auth.onAuthStateChanged(async (user) => {
-      console.log(user)
-      setUserDetails(user)
 
-    })
-  }
-  useEffect(() => {
-    fetchUserData();
-  }, []);
   useEffect(() => {
     const fetchUserData = async () => {
-      if (userDetails) {
-        const q = query(collection(db, 'userPosts'), where('id', '==', userDetails.uid));
+      if (user?.id) {
+        const q = query(collection(db, 'userPosts'), where('uid', '==', user?.id));
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
@@ -50,15 +41,15 @@ const WardPost = () => {
       }
     };
     fetchUserData();
-  }, [userDetails]);
+  }, [user?.id]);
 
 
   useEffect(
     () =>{
-      if (!userData || !userData.county || !id) 
+      if (!userData || !userData?.county || !id) 
         return;
       setLoading(true);
-       const unsubscribe = onSnapshot(doc(db, "county", userData.county, id), (snapshot) => {
+       const unsubscribe = onSnapshot(doc(db, "county", userData.county, "posts", id), (snapshot) => {
         setPost(snapshot),
         setLoading(false);
     });
@@ -69,11 +60,11 @@ const WardPost = () => {
   
 useEffect(
   () =>{
-    if (!userData || !userData.county) {
+    if (!userData || !userData?.county) {
       return;
     }
     onSnapshot(
-      query(collection(db, "county", userData.county, id, "comments"), orderBy("timestamp", 'desc')),
+      query(collection(db, "county", id, "comments"), orderBy("timestamp", 'desc')),
       (snapshot) => {
         setComments(snapshot.docs);
       }
@@ -122,7 +113,7 @@ const toggleHome = () => {
         <div className="hidden xl:inline">
         <Sidebar />
       </div>
-        <div className="xl:ml-[370px]  xl:min-w-[576px]  sm:min-w-full flex-grow max-w-xl">
+        <div className="xl:ml-[370px] 2xl:ml-[560px] xl:min-w-[576px]  sm:min-w-full flex-grow max-w-xl">
           <div className="flex items-center space-x-2  py-2 px-3 sticky top-0 bg-white dark:bg-gray-950 border-[1px] rounded-md border-gray-300 dark:border-gray-900">
           <Tooltip content='back' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
             
@@ -177,7 +168,7 @@ const toggleHome = () => {
             </div>
           </div>
         )}
-        <div className='hidden xl:inline'>
+        <div className='hidden xl:inline 2xl:ml-16'>
         <Widgets />
         </div>
         {/* Modal */}
