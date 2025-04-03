@@ -35,7 +35,6 @@ import Link from "next/link";
 export default function Comment({ comment, commentId, originalPostId }) {
   const [likes, setLikes] = useState([]);
   const [hasLiked, setHasLiked] = useState(false);
-  const [userDetails, setUserDetails] = useState(null);
   const [userData, setUserData] = useState({});
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -374,7 +373,7 @@ const uid = comment?.uid
            
            <TrashIcon
               onClick={user?.id === comment?.uid ? deleteRepost : deleteComment}
-             className="h-12 w-12 md:h-10 md:w-10 p-2 hover:text-red-600 hover:bg-red-100 rounded-full dark:hover:bg-gray-800"
+             className="h-12 w-12 md:h-9 md:w-9 p-2 hover:text-red-600 hover:bg-red-100 rounded-full dark:hover:bg-gray-800"
            />
                      
          )}
@@ -404,7 +403,7 @@ const uid = comment?.uid
 
                     )}
                    
-                      <p onClick={() => followMember(comment?.uid, userDetails)}>{hasFollowed[comment?.uid] ? 'Unfollow' : 'Follow'} @{comment?.nickname}</p>
+                      <p onClick={() => followMember(comment?.uid )}>{hasFollowed[comment?.uid] ? 'Unfollow' : 'Follow'} @{comment?.nickname}</p>
                     
                     </div>
                    

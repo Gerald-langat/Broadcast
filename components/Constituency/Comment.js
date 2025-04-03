@@ -29,6 +29,7 @@ import { Popover, Tooltip } from "flowbite-react";
 import { useRouter } from "next/router";
 import { useFollow } from "../FollowContext";
 import { useUser } from "@clerk/nextjs";
+import Link from "next/link";
 
 export default function Comment({ comment, commentId, originalPostId }) {
   const [likes, setLikes] = useState([]);
@@ -348,7 +349,7 @@ export default function Comment({ comment, commentId, originalPostId }) {
     
 <Link href={`/userProfile/${uid}`}>
       <img
-        className="h-11 w-11 rounded-full mr-4"
+        className="h-11 w-11 rounded-md mr-4"
         src={comment?.userImg}
         alt="user-img"
       />

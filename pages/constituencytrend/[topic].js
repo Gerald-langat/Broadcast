@@ -100,7 +100,7 @@ export default function TopicPostsPage() {
             <Sidebar />
             </div>
         {/* Feed */}
-        <div className="xl:ml-[370px] 2xl:ml-[560px] xl:min-w-[576px] 2xl:min-w-[700px] sm:min-w-full flex-grow">
+        <div className="xl:ml-[350px] 2xl:ml-[560px] xl:min-w-[576px] 2xl:min-w-[700px]  sm:min-w-full flex-grow max-w-xl">
           <div className="flex items-center space-x-2  p-2 sticky top-0 bg-white border-[1px] rounded-md border-gray-300 dark:border-gray-900 dark:bg-gray-950">
           <Tooltip content='back' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
             <Link href={'/constituency'}>

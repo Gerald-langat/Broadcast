@@ -1,13 +1,11 @@
-import { auth, db, storage } from '../../firebase';
+import { db, storage } from '../../firebase';
 import { ChatIcon, DotsHorizontalIcon, EyeIcon, EyeOffIcon, HeartIcon, PencilAltIcon, ReplyIcon, ShareIcon, TrashIcon, UserAddIcon, UserRemoveIcon } from '@heroicons/react/outline';
 import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, query, serverTimestamp, setDoc, where } from 'firebase/firestore';
-import { Badge, Button, Carousel, Popover, Spinner, Tooltip } from 'flowbite-react';
+import { Badge, Carousel, Popover,  Tooltip } from 'flowbite-react';
 import React, { useEffect, useState } from 'react'
 import Moment from 'react-moment';
 import { HiClock } from "react-icons/hi";
 import { useRouter } from 'next/router';
-import Comment from './Comment';
-import { AnimatePresence, motion } from 'framer-motion';
 import { modalWardState, postIdWard } from '../../atoms/modalAtom';
 import { useRecoilState } from 'recoil';
 import { BookmarkIcon, FlagIcon } from '@heroicons/react/solid';
@@ -18,7 +16,6 @@ import Link from 'next/link';
 function SearchPost({post, id}) {
 
   const[loading, setLoading] = useState(false);
-  const [userDetails, setUserDetails] = useState(null);
   const [likes, setLikes] = useState([]);
   const [comments, setComments] = useState([]);
   const [hasLiked, setHasLiked] = useState(false);
@@ -63,11 +60,11 @@ useEffect(() => {
 useEffect(
   () =>{
     if (!id) {
-      setLoading(false);
+      setLoading(true);
       return;
     }
     onSnapshot(
-      query(collection(db, "ward", id, "comments"), where("timestamp", "==", "desc")),
+      query(collection(db, "ward",  id, "comments")),
       (snapshot) => {
         setComments(snapshot.docs);
         setLoading(false);
@@ -497,7 +494,7 @@ const handleCancel = () => {
 
                     )}
                    
-                      <p onClick={() => followMember(post?.data()?.uid, userDetails)}>{hasFollowed[post?.data()?.uid] ? 'Unfollow' : 'Follow'} @{post?.data()?.nickname}</p>
+                      <p onClick={() => followMember(post?.data()?.uid)}>{hasFollowed[post?.data()?.uid] ? 'Unfollow' : 'Follow'} @{post?.data()?.nickname}</p>
                     
                     </div>
                    
@@ -572,8 +569,8 @@ const handleCancel = () => {
         </div>
     </div>
       <div className='ml-14'>
-    {post?.data()?.citeInput ? (<div><p onClick={() => router.push(`/constituencyposts(id)/${id}`)}></p>{post?.data()?.citeInput}
-      <div className="border rounded-md border-gray-300 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-neutral-700"  onClick={() => router.push(`/constituencyposts(id)/${id}`)}>
+    {post?.data()?.citeInput ? (<div><p onClick={() => router.push(`/wardposts(id)/${id}`)}></p>{post?.data()?.citeInput}
+      <div className="border rounded-md border-gray-300 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-neutral-700"  onClick={() => router.push(`/wardposts(id)/${id}`)}>
       <div className="flex p-1">
       {post?.data()?.citeUserImg && (
         <>
@@ -590,7 +587,7 @@ const handleCancel = () => {
     </>
     )}
       </div>
-      <p className="ml-14" onClick={() => router.push(`/constituencyposts(id)/${id}`)}>{post?.data()?.text}</p>
+      <p className="ml-14" onClick={() => router.push(`/wardposts(id)/${id}`)}>{post?.data()?.text}</p>
       {post?.data()?.images?.length  > 1 ? (
           <Carousel className="rounded-2xl mr-2 h-[300px] w-[500px] sm:w-full xl:h-[250px] sm:h-[600px]">
             {post?.data()?.images.map((imageUrl, index) => (
@@ -630,7 +627,7 @@ const handleCancel = () => {
       ):(
         <>
         <p
-          onClick={() => router.push(`/constituencyposts(id)/${id}`)}
+          onClick={() => router.push(`/wardposts(id)/${id}`)}
           className="text-gray-800 w-96 sm:w-[490px] text-[20px] sm:text-[16px] mb-2 dark:text-gray-300 line-clamp-3 break-words cursor-pointer"
         >
           {post?.data()?.text}
@@ -688,7 +685,7 @@ const handleCancel = () => {
 
           <ChatIcon
             onClick={() => {
-              if (!userDetails) {
+              if (!user?.id) {
                 router.replace('/signup');
               } else {
                 setPostId(id);
@@ -775,28 +772,6 @@ const handleCancel = () => {
       </div>
       
     </div>
-    {comments.length > 0 && (
-          <div className="">
-            <AnimatePresence>
-              {comments.map((comment) => (
-                <motion.div
-                  key={comment.id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 1 }}
-                >
-                  <Comment
-                    key={comment.id}
-                    commentId={comment.id}
-                    originalPostId={id}
-                    comment={comment.data()}
-                  />
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
-        )}
   </div>
     
   )

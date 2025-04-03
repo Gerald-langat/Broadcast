@@ -784,28 +784,7 @@ const viewCount = Array.isArray(post?.data()?.views) ? post.data().views.length 
           </>
       )}
     </div>
-    {comments.length > 0 && (
-            <div className="">
-              <AnimatePresence>
-                {comments.map((comment) => (
-                  <motion.div
-                    key={comment.id}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 1 }}
-                  >
-                    <Comment
-                      key={comment.id}
-                      commentId={comment.id}
-                      originalPostId={id}
-                      comment={comment.data()}
-                    />
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </div>
-          )}
+    
     </div>
   )
 }

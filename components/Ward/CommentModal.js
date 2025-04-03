@@ -35,8 +35,6 @@ export default function CommentModal() {
   const [loading, setLoading] = useState(false);
   const [emoji, setEmoji] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const filePickerRef = useRef(null);
-  const [selectedFile, setSelectedFile] = useState(null);
   const { user } = useUser()
 
   useEffect(() => {

@@ -113,7 +113,7 @@ const toggleHome = () => {
         <div className="hidden xl:inline">
         <Sidebar />
       </div>
-        <div className="xl:ml-[370px] 2xl:ml-[560px] xl:min-w-[576px]  sm:min-w-full flex-grow max-w-xl">
+        <div className="xl:ml-[350px]  2xl:ml-[560px] xl:min-w-[576px] 2xl:min-w-[700px]  sm:min-w-full flex-grow max-w-xl">
           <div className="flex items-center space-x-2  py-2 px-3 sticky top-0 bg-white dark:bg-gray-950 border-[1px] rounded-md border-gray-300 dark:border-gray-900">
           <Tooltip content='back' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
             
@@ -168,7 +168,7 @@ const toggleHome = () => {
             </div>
           </div>
         )}
-        <div className='hidden xl:inline 2xl:ml-16'>
+        <div className='hidden xl:inline 2xl:ml-14'>
         <Widgets />
         </div>
         {/* Modal */}

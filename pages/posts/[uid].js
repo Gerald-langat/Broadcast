@@ -9,8 +9,8 @@ import CommentModal from '../../components/National/CommentModal';
 import Head from 'next/head';
 import { Button, Spinner, Tooltip } from 'flowbite-react';
 import StatusModal from '../../components/National/StatusModal';
-import NationTrends from '../../components/National/NationTrends';
 import Link from 'next/link';
+import SearchPost from '../../components/National/NationSearch';
 
 const WardPost = () => {
   const router = useRouter();
@@ -107,7 +107,7 @@ const WardPost = () => {
         <Sidebar />
         </div>
         {/* Feed */}
-        <div className="xl:ml-[350px] 2xl:mr-[150px] 2xl:ml-[560px] xl:min-w-[576px] 2xl:min-w-[600px]  sm:min-w-full flex-grow max-w-xl">
+        <div className="xl:ml-[350px] 2xl:mr-[150px] 2xl:ml-[560px] xl:min-w-[576px] 2xl:min-w-[700px]  sm:min-w-full flex-grow max-w-xl">
           <div className="flex items-center space-x-2  py-2 px-3 sticky top-0 dark:bg-gray-950 bg-white border-[1px] rounded-md dark:border-gray-900
      border-gray-200">
           <Tooltip content='back' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
@@ -132,7 +132,7 @@ const WardPost = () => {
               {posts.map((post) => (
                <div key={post.id}>
                
-                 <NationTrends  key={post.id} id={post.id} post={post}/>
+                 <SearchPost  key={post.id} id={post.id} post={post}/>
                  
                </div>
               ))}
@@ -150,7 +150,7 @@ const WardPost = () => {
             </div>
           </div>
         )}
-    <div className='hidden xl:inline ml-14'>
+    <div className='hidden xl:inline ml-6'>
           <Widgets />
        </div>
         <CommentModal />

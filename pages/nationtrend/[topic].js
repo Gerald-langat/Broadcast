@@ -127,7 +127,7 @@ export default function TopicPostsPage() {
             </div>
           </div>
         )}
-    <div className='hidden xl:inline ml-14'>
+    <div className='hidden xl:inline ml-6'>
           <Widgets />
        </div>
         <CommentModal />

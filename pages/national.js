@@ -75,7 +75,7 @@ function Home() {
             </div>
           </div>
         )}
-        <div className="hidden xl:block w-1/4">
+        <div className="hidden xl:ml-0 lg:ml-32 lg:block w-1/4">
           <Widgets />
         </div>
 

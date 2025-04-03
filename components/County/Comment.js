@@ -345,7 +345,7 @@ export default function Comment({ comment, commentId, originalPostId }) {
       {/* user image */}
       <Link href={`/userProfile/${uid}`}>
       <img
-        className="h-11 w-11 rounded-full mr-4"
+        className="h-11 w-11 rounded-md mr-4"
         src={comment?.userImg}
         alt="user-img"
       />

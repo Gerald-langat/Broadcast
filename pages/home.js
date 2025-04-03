@@ -470,8 +470,8 @@ function Form() {
             <Modal.Body>
               <div className='space-y-6'>
                 <p className='text-base leading-relaxed text-gray-500 dark:text-gray-400'>
-                  Welcome to Broadcast ("the App"). By using the App, you agree to be bound by these Terms of Service
-                  ("Terms"). Broadcast is a political app that allows users to share, discuss, and stay updated on
+                  Welcome to Broadcast. By using the App, you agree to be bound by these Terms of Service
+                  . Broadcast is a political app that allows users to share, discuss, and stay updated on
                   political news and events. You must be at least 18 years old to use the App. To use certain features
                   of the App, you must create an account and provide accurate and complete information. You are
                   responsible for maintaining the confidentiality of your account credentials. You agree not to use the

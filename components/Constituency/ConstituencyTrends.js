@@ -701,7 +701,7 @@ useEffect(() => {
                 <ChatIcon
                   onClick={() => {
                     if (!user?.id) {
-                      router.replace('/');
+                      router.replace('/signup');
                     } else {
                       setPostId(id);
                       setOpen(!open);

@@ -451,7 +451,7 @@ useEffect(
       <div className='flex space-x-4 flex-1 items-center'>
       <div className='flex space-x-2 items-center'>
       <img
-        className="h-11 w-11 rounded-full"
+        className="h-11 w-11 rounded-md"
         src={post?.data()?.userImg}
         alt="user-img"
       />
@@ -687,8 +687,8 @@ useEffect(
 
             <ChatIcon
               onClick={() => {
-                if (!userDetails) {
-                  router.push('/');
+                if (!user?.id) {
+                  router.push('/signup');
                 } else {
                   setPostId(id);
                   setOpen(!open);
@@ -775,28 +775,6 @@ useEffect(
           </>
       )}
     </div>
-    {comments.length > 0 && (
-            <div className="">
-              <AnimatePresence>
-                {comments.map((comment) => (
-                  <motion.div
-                    key={comment.id}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 1 }}
-                  >
-                    <Comment
-                      key={comment.id}
-                      commentId={comment.id}
-                      originalPostId={id}
-                      comment={comment.data()}
-                    />
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </div>
-          )}
     </div>
   )
 }

@@ -180,7 +180,7 @@ async function likePost() {
   // recast
   const repost = async () => {
     if(!user?.id) {
-      router.replace('/');
+      router.replace('/signup');
       return;
     }
     if (post) {
@@ -205,7 +205,7 @@ async function likePost() {
           ...(postData.video && { video: postData.video }),
         };
   
-         await addDoc(collection(db, 'posts'), newPostData);
+         await addDoc(collection(db, 'national'), newPostData);
         
       } catch (error) {
         console.error('Error reposting the post:', error);
@@ -217,7 +217,7 @@ async function likePost() {
 
   const cite = async () => {
     if (!user?.id) { 
-      router.replace('/');
+      router.replace('/signup');
       return;
     }
     setLoading(true);
@@ -228,7 +228,7 @@ async function likePost() {
       // Check if postData and properties are defined and of correct type
       if (postData && typeof postData.text === 'string' && typeof citeInput === 'string') {
         try {
-          await addDoc(collection(db, 'posts'), {
+          await addDoc(collection(db, 'national'), {
             uid: user?.id,
             text: postData.text,
             citeInput: citeInput,
@@ -405,6 +405,41 @@ async function likePost() {
   const handleCancel = () => {
     setShowModal(false);
   };
+
+  useEffect(() => {
+    if (!id || !user?.id) return;
+  
+    const fetchPost = async () => {
+      const postRef = doc(db, "national", id);
+      const docSnap = await getDoc(postRef);
+  
+      if (docSnap.exists()) {
+        const postData = docSnap.data();
+        const currentViews = postData.views || [];
+  
+        if (!Array.isArray(currentViews)) {
+          console.error("⚠️ Error: views is not an array!", currentViews);
+          return;
+        }
+  
+        if (!currentViews.includes(user.id)) {
+          await updateDoc(postRef, {
+            views: [...currentViews, user.id], // Add nickname to views array
+          });
+          console.log("✅ Updated views successfully!");
+        } else {
+          console.log("Nickname already exists in views:", currentViews);
+        }
+      } else {
+        console.log("No such document!");
+      }
+    };
+  
+    fetchPost();
+  }, [id, user?.id]);
+  
+    
+  const viewCount = Array.isArray(post?.data()?.views) ? post.data().views.length : 0;
 
   return (
     <div className='w-full'>
@@ -732,7 +767,7 @@ async function likePost() {
           <Tooltip content='view' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
             <div className="flex items-center">
                 <EyeIcon className="h-12 w-12 md:h-10 md:w-10 p-2 hover:text-sky-500 hover:bg-blue-100 rounded-full dark:hover:bg-neutral-700"/>
-                <span className='text-[20px] sm:text-sm select-none'>{formatNumber(post?.data()?.views)}</span> 
+                <span className='text-[20px] sm:text-sm select-none'>{formatNumber(viewCount)}</span> 
             </div>
             </Tooltip>
           <Tooltip content='share' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
@@ -744,28 +779,6 @@ async function likePost() {
           </>
       )}
     </div>
-    {comments.length > 0 && (
-            <div className="">
-              <AnimatePresence>
-                {comments.map((comment) => (
-                  <motion.div
-                    key={comment.id}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 1 }}
-                  >
-                    <Comment
-                      key={comment.id}
-                      commentId={comment.id}
-                      originalPostId={id}
-                      comment={comment.data()}
-                    />
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </div>
-          )}
     </div>
   )
 }
