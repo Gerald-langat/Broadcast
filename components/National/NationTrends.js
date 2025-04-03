@@ -1,6 +1,6 @@
 import {db, storage } from '../../firebase';
 import { BookmarkIcon, ChatIcon, DotsHorizontalIcon, EyeIcon, EyeOffIcon, HeartIcon, PencilAltIcon, ReplyIcon, ShareIcon, TrashIcon, UserAddIcon, UserRemoveIcon } from '@heroicons/react/outline';
-import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, query, serverTimestamp, setDoc, where } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, query, serverTimestamp, setDoc, updateDoc, where } from 'firebase/firestore';
 import { Alert, Badge, Button, Carousel, Popover, Spinner, Tooltip } from 'flowbite-react';
 import React, { useEffect, useState } from 'react'
 import Moment from 'react-moment';
@@ -101,7 +101,6 @@ const deleteRepost = async () => {
       }
 
       if (!currentViews.includes(user.id)) {
-        console.log(`Adding ${user.id} to views...`);
         await updateDoc(postRef, {
           views: [...currentViews, user.id], // Add nickname to views array
         });

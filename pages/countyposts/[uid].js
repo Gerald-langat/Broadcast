@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { collection, getDocs, onSnapshot, orderBy, query, where } from 'firebase/firestore';
-import { auth, db } from '../../firebase';
+import { db } from '../../firebase';
 import { ArrowLeftIcon, HomeIcon, MenuAlt1Icon, SearchIcon } from "@heroicons/react/outline";
 import Sidebar from '../../components/National/Sidebar';
 import Widgets from '../../components/County/Widgets';

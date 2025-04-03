@@ -1,7 +1,7 @@
 import { auth, db, storage } from '../../firebase';
 import { ChartBarIcon, ChatIcon, DotsHorizontalIcon, EyeIcon, EyeOffIcon, HeartIcon, PencilAltIcon, ReplyIcon, ShareIcon, ThumbUpIcon, TrashIcon, UserAddIcon, UserRemoveIcon } from '@heroicons/react/outline';
-import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, query, serverTimestamp, setDoc, where } from 'firebase/firestore';
-import { Badge, Button, Carousel, Popover, Spinner, Tooltip } from 'flowbite-react';
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, query, serverTimestamp, setDoc, updateDoc, where } from 'firebase/firestore';
+import { Alert, Badge, Button, Carousel, Popover, Spinner, Tooltip } from 'flowbite-react';
 import React, { useEffect, useState } from 'react'
 import Moment from 'react-moment';
 import { HiClock } from "react-icons/hi";
@@ -32,6 +32,8 @@ function ConstituencyTrends({post, id}) {
   const [showUndo, setShowUndo] = useState(false);
   const [isReported, setIsReported] = useState({});
   const [isBookmarked, setIsBookmarked] = useState({});
+    const [alertMessage, setAlertMessage] = useState(null);
+    const [showAlert, setShowAlert] = useState(false);
 const { user } = useUser()
 
   useEffect(() => {
@@ -205,12 +207,22 @@ useEffect(
             ...(postData.video && {video:postData.video,})
           // Add any other fields from postData you need, excluding unsupported fields
         });
-        console.log('Post reposted successfully!');
+        setShowAlert(true);
+        setTimeout(() => {
+          setShowAlert(false);
+        }, 1000);
+
+        setAlertMessage("Cast recasted successfully!");
+        
       } catch (error) {
-        console.error('Error reposting the post:', error);
+        console.error('Error recasting the cast:', error);
+        setAlertMessage("Failed to cite Cast. Please try again.");
+
       }
     } else {
-      console.log('No post data available to repost.');
+      console.log('No cast data available to recast.');
+      setAlertMessage("Invalid input. Please check your text.");
+
     }
   };
 
@@ -248,17 +260,26 @@ useEffect(
             ...(postData.images && { images: postData.images }),
             ...(postData.video && { video: postData.video }),
         });
+        setShowAlert(true);
+        setTimeout(() => {
+          setShowAlert(false);
+        }, 1000);
+
+        setAlertMessage("Cast cited successfully!");
+
         } catch (error) {
-          console.error('Error citing the post:', error);
+          console.error('Error reposting the cast:', error);
+          setAlertMessage("Failed to cite Cast. Please try again.");
         }
       } else {
         console.error('Invalid data detected. postData.text or citeInput is not a string.');
+        setAlertMessage("Invalid input. Please check your text.");
       }
   
       setLoading(false);
       setCiteInput("");
     } else {
-      console.log('No post data available to repost.');
+      console.log('No post data available to cast.');
     }
   };
   
@@ -438,6 +459,11 @@ useEffect(
 
   return (
     <div className='w-full'>
+    {showAlert && (
+              <Alert color="success">
+                <span className="font-medium">{alertMessage}</span>
+              </Alert>
+            )}
 <div className={`w-full ${isHidden ? 'inline text-2xl sm:text-xl cursor-pointer dark:hover:bg-gray-900 hover:bg-gray-200 rounded-md p-1' : 'hidden'}`} onClick={handleUndo}>{showUndo && 'undo'}</div>
     <div className={`w-full ${isHidden ? 'hidden' : 'pt-1 px-2 border-[1px] dark:border-gray-900 rounded-md border-gray-300 sm:min-w-full mt-1'}`}>
     {loading ? (

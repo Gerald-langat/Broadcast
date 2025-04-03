@@ -208,7 +208,7 @@ export default function Widgets() {
           </Link>
       </div>
       <br></br>
-      <div className="dark:bg-gray-950  text-gray-700  bg-slate-50 rounded-xl pt-2 mt-36 sm:mt-20 fixed -ml-12 w-full xl:w-[75%] min-h-full">
+      <div className="dark:bg-gray-950  text-gray-700  lg:w-[380px] 2xl:w-[400px] sm:w-[88%] w-[570px] bg-slate-50 rounded-xl pt-2 mt-36 sm:mt-20 fixed -ml-12  min-h-full">
       <h4 className="font-bold text-3xl sm:text-xl px-4 text-black dark:text-gray-300">Trends for you</h4>
       {loading ? (
             <Button color="gray" className="border-0">

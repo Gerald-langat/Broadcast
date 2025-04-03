@@ -8,7 +8,7 @@ import { useRouter } from "next/router";
 import { ChatIcon, DotsHorizontalIcon, ShareIcon, TrashIcon, EyeOffIcon,  UserAddIcon, HeartIcon, EyeIcon, ReplyIcon, PencilAltIcon, UserRemoveIcon } from "@heroicons/react/outline";
 import { FlagIcon, BookmarkIcon } from '@heroicons/react/solid'
 import Moment from "react-moment";
-import { Badge, Button, Carousel, Popover, Spinner, Tooltip } from 'flowbite-react';
+import { Alert, Badge, Button, Carousel, Popover, Spinner, Tooltip } from 'flowbite-react';
 import { HiClock, HiCheck } from "react-icons/hi";
 import { useFollow } from '../FollowContext';
 import { useUser } from '@clerk/nextjs';
@@ -32,6 +32,8 @@ export default function Post({ post, id }) {
   const [showUndo, setShowUndo] = useState(false);
   const [isReported, setIsReported] = useState({});
   const [isBookmarked, setIsBookmarked] = useState({});
+     const [alertMessage, setAlertMessage] = useState(null);
+        const [showAlert, setShowAlert] = useState(false)
   const { user } = useUser()
 
   useEffect(() => {
@@ -235,11 +237,22 @@ useEffect(
             ...(postData.video && {video:postData.video,})
         });
         
+        setShowAlert(true);
+        setTimeout(() => {
+          setShowAlert(false);
+        }, 1000);
+
+        setAlertMessage("Cast recasted successfully!");
+        
       } catch (error) {
-        console.error('Error reposting the post:', error);
+        console.error('Error recasting the cast:', error);
+        setAlertMessage("Failed to cite Cast. Please try again.");
+
       }
     } else {
-      console.log('No post data available to repost.');
+      console.log('No cast data available to recast.');
+      setAlertMessage("Invalid input. Please check your text.");
+
     }
   };
 
@@ -279,17 +292,26 @@ const cite = async () => {
           ...(postData.images && { images: postData.images }),
           ...(postData.video && { video: postData.video }),
       });
+      setShowAlert(true);
+      setTimeout(() => {
+        setShowAlert(false);
+      }, 1000);
+
+      setAlertMessage("Cast cited successfully!");
+
       } catch (error) {
-        console.error('Error citing the post:', error);
+        console.error('Error reposting the cast:', error);
+        setAlertMessage("Failed to cite Cast. Please try again.");
       }
     } else {
       console.error('Invalid data detected. postData.text or citeInput is not a string.');
+      setAlertMessage("Invalid input. Please check your text.");
     }
 
     setLoading(false);
     setCiteInput("");
   } else {
-    console.log('No post data available to repost.');
+    console.log('No post data available to cast.');
   }
 };
 
@@ -437,6 +459,11 @@ useEffect(() => {
 
   return (
     <div className='w-full'>
+    {showAlert && (
+                       <Alert color="success">
+                         <span className="font-medium">{alertMessage}</span>
+                       </Alert>
+                     )}
     <div className={`w-full ${isHidden ? 'inline text-2xl sm:text-xl cursor-pointer dark:hover:bg-gray-900 hover:bg-gray-200 rounded-md p-1' : 'hidden'}`} onClick={handleUndo}>{showUndo && 'undo'}</div>
         <div className={`${isHidden ? 'hidden' : "flex cursor-pointer border-[1px] border-gray-200 dark:border-gray-900 dark:text-gray-300 z-40 flex-grow h-full flex-1 p-2 rounded-md mt-1 w-full"}`}>
   {loading ? (

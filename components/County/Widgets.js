@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { collection, getDocs, onSnapshot, where } from 'firebase/firestore';
-import { auth, db } from '../../firebase';
+import { db } from '../../firebase';
 import Trends from './Trends';
 import { query } from 'firebase/database';
 import SearchComponent from './Search';
 import { SearchIcon, XIcon } from '@heroicons/react/outline';
-import { useRouter } from 'next/router';
 import { Button, Spinner } from 'flowbite-react';
 import Link from 'next/link';
 import { useUser } from '@clerk/nextjs';
@@ -98,7 +97,7 @@ export default function Widgets() {
     const fetchData = async () => {
        try {
       if (!querySearch) {
-        setProducts([]); // Clear results if no search query
+        setPosts([]); // Clear results if no search query
         return;
       }
   
