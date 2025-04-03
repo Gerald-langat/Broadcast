@@ -153,7 +153,12 @@ export default function Sidebar() {
           
           <div className="mt-2 mb-2.5 xl:items-start w-[292px] md:ml-14 -ml-20">
          
+         <div className='flex justify-between w-full'>
             <h2 className="font-bold ml-4 dark:text-gray-300 text-2xl sm:text-lg">Members</h2>
+            <Link href={`/members`}>
+            <p className='text-xs text-blue-500'>View all Members</p>
+            </Link>
+        </div>
             <div className="overflow-y-scroll scrollbar-hide h-50 w-[400px] sm:w-[300px]">
   <div className="h-[500px] sm:h-[250px] overflow-auto scrollbar-hide w-full">
     {posts.map((post) => (

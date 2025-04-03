@@ -3,14 +3,12 @@ import MediaFeed from '../components/Media/MediaFeed'
 import { HomeIcon, MenuAlt1Icon, SearchIcon } from '@heroicons/react/outline'
 import Widgets from '../components/National/Widgets';
 import Sidebar from '../components/National/Sidebar';
-import { useRouter } from 'next/router';
 
 
 function media() {
 
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [isWidgetsVisible, setIsWidgetsVisible] = useState(false);
-  const router = useRouter();
  
 
   const toggleSidebar = () => {

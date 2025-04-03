@@ -1,6 +1,16 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { collection, addDoc, deleteDoc, doc, getDocs, query, where, onSnapshot } from "firebase/firestore";
-import { auth, db } from '../firebase';
+import React, { createContext, useContext, useState, useEffect } from "react";
+import {
+  collection,
+  addDoc,
+  deleteDoc,
+  doc,
+  getDocs,
+  query,
+  where,
+  onSnapshot,
+} from "firebase/firestore";
+import { useUser } from "@clerk/nextjs";
+import { db } from "../firebase";
 
 const FollowContext = createContext();
 
@@ -8,15 +18,15 @@ export const useFollow = () => useContext(FollowContext);
 
 export const FollowProvider = ({ children }) => {
   const [hasFollowed, setHasFollowed] = useState({});
-  const userDetails = auth.currentUser;
+  const { user } = useUser();
   const [posts, setPosts] = useState([]);
   const [followloading, setFollowLoading] = useState({});
 
   // Fetch posts in real-time
   useEffect(() => {
-    const q = query(collection(db, 'userPosts'));
+    const q = query(collection(db, "userPosts"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      setPosts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      setPosts(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
     });
 
     return () => unsubscribe();
@@ -25,72 +35,72 @@ export const FollowProvider = ({ children }) => {
   // Fetch follow status for all posts
   useEffect(() => {
     const fetchFollowStatus = async () => {
-      if (!userDetails?.uid || posts.length === 0) return;
-  
+      if (!user?.id || posts.length === 0) return;
+
       const followStatuses = {};
       const promises = posts.map((post) => {
-        const postId = post?.id;
+        const postId = post?.uid;
         return getDocs(
           query(
             collection(db, "following"),
-            where("followerId", "==", userDetails.uid),
+            where("followerId", "==", user.id),
             where("followingId", "==", postId)
           )
         ).then((followDoc) => {
           followStatuses[postId] = !followDoc.empty;
         });
       });
-  
+
       await Promise.all(promises);
       setHasFollowed(followStatuses);
     };
-  
+
     fetchFollowStatus();
-  }, [posts, userDetails]); // Runs when posts or user changes
-  
+  }, [posts, user]); // Runs when posts or user changes
 
   // Follow or Unfollow function
-  // Follow or Unfollow function
   const followMember = async (postId) => {
-    if (!userDetails?.uid || !postId) return;
-    setFollowLoading((prev) => ({ ...prev, [postId]: true }));  
+    if (!user?.id || !postId) return;
+    setFollowLoading((prev) => ({ ...prev, [postId]: true }));
     setHasFollowed((prev) => ({
       ...prev,
       [postId]: !prev[postId], // Toggle UI instantly
     }));
-  
+
     try {
       if (hasFollowed[postId]) {
         // Unfollow Logic
         const followingQuery = query(
           collection(db, "following"),
-          where("followerId", "==", userDetails.uid),
+          where("followerId", "==", user.id),
           where("followingId", "==", postId)
         );
 
         const followerQuery = query(
           collection(db, "following"),
           where("followerId", "==", postId),
-          where("followingId", "==", userDetails.uid)
+          where("followingId", "==", user.id)
         );
-  
+
         const followingSnapshot = await getDocs(followingQuery, followerQuery);
-        const batchDeletes = followingSnapshot.docs.map(docSnapshot =>
+        const batchDeletes = followingSnapshot.docs.map((docSnapshot) =>
           deleteDoc(doc(db, "following", docSnapshot.id))
         );
-  
+
         await Promise.all(batchDeletes);
       } else {
         // Follow Logic
-        const followedUserQuery = query(collection(db, "userPosts"), where("id", "==", userDetails.uid));
+        const followedUserQuery = query(
+          collection(db, "userPosts"),
+          where("uid", "==", user.id)
+        );
         const followedUserSnapshot = await getDocs(followedUserQuery);
-  
+
         if (!followedUserSnapshot.empty) {
           const followedUserData = followedUserSnapshot.docs[0].data();
-  
+
           await addDoc(collection(db, "following"), {
             followerId: postId,
-            id:userDetails.uid,
             name: followedUserData.name,
             nickname: followedUserData.nickname,
             userImg: followedUserData.userImg,
@@ -98,15 +108,17 @@ export const FollowProvider = ({ children }) => {
           });
         }
 
-        const followingUserQuery = query(collection(db, "userPosts"), where("id", "==", postId));
+        const followingUserQuery = query(
+          collection(db, "userPosts"),
+          where("uid", "==", postId)
+        );
         const followingUserSnapshot = await getDocs(followingUserQuery);
-  
+
         if (!followingUserSnapshot.empty) {
           const followingUserData = followingUserSnapshot.docs[0].data();
-  
+
           await addDoc(collection(db, "following"), {
-            followingId: userDetails.uid,
-            id:postId,
+            followingId: user.id,
             name: followingUserData.name,
             nickname: followingUserData.nickname,
             userImg: followingUserData.userImg,
@@ -119,12 +131,12 @@ export const FollowProvider = ({ children }) => {
     }
     setFollowLoading((prev) => ({ ...prev, [postId]: false }));
   };
-  
-
 
   return (
-    <FollowContext.Provider value={{ hasFollowed, followMember, followloading }}>
+    <FollowContext.Provider
+      value={{ hasFollowed, followMember, followloading }}
+    >
       {children}
     </FollowContext.Provider>
-  );
+ );
 };
