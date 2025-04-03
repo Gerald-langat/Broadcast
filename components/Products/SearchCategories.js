@@ -1,12 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
-import { collection, getDocs, query, where } from 'firebase/firestore';
-import { db } from '../../firebase';
-import { Card, Carousel } from 'flowbite-react';
+import { Carousel } from 'flowbite-react';
+import Link from 'next/link';
 
 
 function SearchCategories({ data, id }) {
-  const router = useRouter();
+
 
 
 
@@ -39,8 +36,8 @@ function SearchCategories({ data, id }) {
             />
       )}
  
-    
-    <div className='cursor-pointer' onClick={() => router.push(`/products/${id}`)}>
+    <Link href={`/products/${id}`}>
+    <div className='cursor-pointer'>
     <p className="font-normal text-gray-700 dark:text-gray-400 truncate p-2">
             {data?.data()?.description || 'No description available.'}
         </p>
@@ -49,7 +46,7 @@ function SearchCategories({ data, id }) {
         Price: KES {Number(data?.data()?.cost).toLocaleString('en-KE')}
                 </p>
     </div>
-
+</Link>
     </div>
   );
 }

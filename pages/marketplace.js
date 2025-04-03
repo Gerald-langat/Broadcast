@@ -1,4 +1,5 @@
-import { auth, db, storage } from '../firebase';
+import { useUser } from '@clerk/nextjs';
+import { db, storage } from '../firebase';
 import { ArrowLeftIcon, PhotographIcon, XIcon } from '@heroicons/react/outline'
 import { addDoc, collection, doc, getDocs, query, serverTimestamp, updateDoc, where } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadString } from 'firebase/storage';
@@ -6,6 +7,7 @@ import { Dropdown } from 'flowbite-react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react'
+import Link from 'next/link';
 
 function MarketPlace() {
 const filePickerRef = useRef();
@@ -15,20 +17,11 @@ const [input, setInput] = useState("");
 const [inputNum, setInputNum] = useState("");
 const [userData, setUserData] = useState("");
 const [loading, setLoading] = useState(false);
-const [userDetails, setUserDetails] = useState(null);
 const categories = ['Electronics', 'Vehicles & Trucks', 'Machineries', 'Buildings & Land', 'Fashion', 'Phones & Tablets', 'Agricultural'];
 const [error, setError] = useState(null);
 const [selectedCategory, setSelectedCategory] = useState(null);
 const [productName, setProductName] = useState(null);
-
-  const fetchUserData = async () => {
-    auth.onAuthStateChanged(async (user) => {
-      setUserDetails(user)
-    })
-  }
-  useEffect(() => {
-    fetchUserData();
-  }, []);
+const { user } = useUser()
 
 
   const handleSelect = (category) => {
@@ -37,8 +30,8 @@ const [productName, setProductName] = useState(null);
 
 useEffect(() => {
   const fetchUserData = async () => {
-    if (userDetails) {
-      const q = query(collection(db, 'userPosts'), where('id', '==', userDetails.uid));
+    if (user?.id) {
+      const q = query(collection(db, 'userPosts'), where('uid', '==', user?.id));
       const querySnapshot = await getDocs(q);
 
       if (!querySnapshot.empty) {
@@ -49,7 +42,7 @@ useEffect(() => {
   };
 
   fetchUserData();
-}, [userDetails]);
+}, [user?.id]);
 
 // send product to db
 const sendPost = async (e) => {
@@ -58,7 +51,7 @@ const sendPost = async (e) => {
   try {
     if (userData) {
       const docRef = await addDoc(collection(db, 'marketplace'), {
-        id: userDetails.uid,
+        uid: user?.id,
         description: input,
         cost: inputNum,
         userImg:userData.userImg,
@@ -147,14 +140,17 @@ const removeSelectedFile = (index) => {
       <div className='flex justify-between border-b-[1px] border-gray-200 dark:border-gray-900 w-full pb-2'>
 
       <div className='flex items-center space-x-3 p-3'>
-          <ArrowLeftIcon className='h-6 dark:text-gray-200 text-gray-700 animate-pulse cursor-pointer' onClick={() => router.replace('/home')}/>
+      <Link href={`/national`}>
+          <ArrowLeftIcon className='h-6 dark:text-gray-200 text-gray-700 animate-pulse cursor-pointer'/>
+          </Link>
           <span className='text-lg dark:text-gray-200'>Home</span>
       </div>
       <div className='flex space-x-3 items-center p-3'>
-      <div className='border-[1px] dark:border-gray-900 rounded-md border-gray-400 p-1 hover:bg-neutral-700 cursor-pointer text-gray-600 hover:text-gray-300 dark:text-gray-300' 
-        onClick={() => router.push('/products')}>
+      <Link href={`/products`}>
+      <div className='border-[1px] dark:border-gray-900 rounded-md border-gray-400 p-1 hover:bg-neutral-700 cursor-pointer text-gray-600 hover:text-gray-300 dark:text-gray-300'>
         <p>View Products</p>
       </div>
+      </Link>
       <img src={userData.userImg} className='h-8 w-8 rounded-md shadow-sm shadow-gray-600' />
       </div>
         

@@ -8,6 +8,7 @@ import { useRouter } from 'next/router';
 import SearchProducts from './SearchProducts';
 import SearchCategories from './SearchCategories';
 import { ArrowDownWideNarrow } from 'lucide-react';
+import Link from 'next/link';
 
 
 function ProductsFeed() {
@@ -161,9 +162,11 @@ function ProductsFeed() {
         <div className='flex flex-col items-center justify-center px-1'>
           <div className='md:px-8 py-4 shadow-md w-full flex lg:justify-between justify-center space-x-3 px-2 -ml-3'>
           <div className='flex space-x-8'>
-            <ArrowLeftIcon className='h-10 p-1 text-gray-500 hover:bg-slate-400 hover:text-gray-200 dark:text-gray-200 rounded-full cursor-pointer dark:hover:bg-slate-800 hidden lg:inline' onClick={() => router.push('/marketplace')} />
-             <div className='flex items-center'>
-            
+          <Link href={`/marketplace`}>
+            <ArrowLeftIcon className='h-10 p-1 text-gray-500 hover:bg-slate-400 hover:text-gray-200 dark:text-gray-200 rounded-full cursor-pointer dark:hover:bg-slate-800 hidden lg:inline' />
+            </Link> 
+            <div className='flex items-center'>
+            <p>View categories</p>
                 <Popover 
                 aria-labelledby="area-popover"
                 open={open}
@@ -203,24 +206,32 @@ function ProductsFeed() {
               </div>
              
             </form>
-
-            <HomeIcon className='h-10 p-1 dark:text-gray-400 text-gray-500 rounded-full cursor-pointer hover:bg-slate-400 hover:text-gray-200 dark:hover:bg-slate-800 hidden lg:inline' onClick={() => router.push('/home')} />
+          <Link href={`/national`}>
+            <HomeIcon className='h-10 p-1 dark:text-gray-400 text-gray-500 rounded-full cursor-pointer hover:bg-slate-400 hover:text-gray-200 dark:hover:bg-slate-800 hidden lg:inline' />
+          </Link>
           </div>
 
           <div className='flex  w-full space-x-3 px-2'>
             <div className='border-r-md shadow-gray-600 z-30 min-h-screen lg:hidden '>
-              <div className='flex space-x-3 px-1 py-3 items-center cursor-pointer text-gray-700 dark:text-gray-300' onClick={() => router.push('/marketplace')}>
+            <Link href={`/marketplace`}>
+              <div className='flex space-x-3 px-1 py-3 items-center cursor-pointer text-gray-700 dark:text-gray-300'>
                 <ArrowLeftIcon className='h-8 w-8' />
                 <span className='hidden sm:inline'>Back</span>
               </div>
-              <div className='flex space-x-3 px-1 py-3 items-center cursor-pointer text-gray-700 dark:text-gray-300' onClick={() => router.push('/home')}>
+              </Link>
+              <Link href={`/national`}>
+              <div className='flex space-x-3 px-1 py-3 items-center cursor-pointer text-gray-700 dark:text-gray-300'>
                 <HomeIcon className='h-8 w-8' />
                 <span className='hidden sm:inline'>Home</span>
               </div>
-              <div className='flex space-x-3 px-1 py-3 items-center cursor-pointer text-gray-700 dark:text-gray-300' onClick={() => router.push('/profile')}>
+              </Link>
+
+              <Link href={`/profile`}>
+              <div className='flex space-x-3 px-1 py-3 items-center cursor-pointer text-gray-700 dark:text-gray-300'>
                 <UserIcon className='h-8 w-8' />
                 <span className='hidden sm:inline truncate'>Profile</span>
               </div>
+              </Link>
             </div>
      
           

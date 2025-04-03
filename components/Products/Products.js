@@ -1,11 +1,10 @@
 import { Carousel } from 'flowbite-react';
-import { useRouter } from 'next/router';
 import { db } from '../../firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 function Products({data, id}) {
-    const router = useRouter();
     const [post, setPost] = useState(null);
   
     useEffect(() => {
@@ -57,8 +56,8 @@ function Products({data, id}) {
                 />
           )}
      
-        
-        <div className='cursor-pointer' onClick={() => router.push(`/products/${id}`)}>
+        <Link href={`/products/${id}`}>
+        <div className='cursor-pointer'>
         <p className="font-normal text-gray-700 dark:text-gray-400 truncate p-2">
                 {data?.data()?.description || 'No description available.'}
             </p>
@@ -67,7 +66,7 @@ function Products({data, id}) {
             Price: KES {Number(data?.data()?.cost).toLocaleString('en-KE')}
                     </p>
         </div>
-          
+          </Link>
         </div>
           
   )

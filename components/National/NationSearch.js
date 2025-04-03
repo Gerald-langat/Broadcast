@@ -1,12 +1,10 @@
 import {  db, storage } from '../../firebase';
 import { BookmarkIcon, ChatIcon, DotsHorizontalIcon, EyeIcon, EyeOffIcon, HeartIcon, PencilAltIcon, ReplyIcon, ShareIcon, TrashIcon, UserAddIcon, UserRemoveIcon } from '@heroicons/react/outline';
-import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, query, serverTimestamp, setDoc, where } from 'firebase/firestore';
-import { AnimatePresence, motion } from 'framer-motion';
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, query, serverTimestamp, setDoc, updateDoc, where } from 'firebase/firestore';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react'
-import Comment from './Comment';
 import Moment from 'react-moment';
-import { Badge, Button, Carousel, Popover, Spinner, Tooltip } from 'flowbite-react';
+import { Alert, Badge, Button, Carousel, Popover, Spinner, Tooltip } from 'flowbite-react';
 import { HiClock } from "react-icons/hi";
 import { modalState, postIdState } from '../../atoms/modalAtom';
 import { useRecoilState } from 'recoil';
@@ -33,6 +31,8 @@ function SearchPost({post, id}) {
   const [isBookmarked, setIsBookmarked] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [reportReason, setReportReason] = useState("");
+  const [alertMessage, setAlertMessage] = useState(null);
+    const [showAlert, setShowAlert] = useState(false);
 const { user } = useUser()
 
 
@@ -72,7 +72,7 @@ async function likePost() {
         });
       }
     } else {
-      router.replace('/');
+      router.replace('/signup');
     }
   }
 
@@ -86,7 +86,7 @@ async function likePost() {
 
  // delete Repost
  const deleteRepost = async () => {
-  if (window.confirm("Are you sure you want to delete this post?")) {
+  if (window.confirm("Are you sure you want to delete this recast?")) {
     if (id) {
       try {
         const likesCollectionRef = collection(db, "national", id, "likes");
@@ -109,7 +109,7 @@ async function likePost() {
 
    //delete post
    async function deletePost() {
-   if (window.confirm("Are you sure you want to delete this post?")) {
+   if (window.confirm("Are you sure you want to delete this cast?")) {
      if (id) {
      try {      
        const likesCollectionRef = collection(db, "national", id, "likes");
@@ -206,13 +206,24 @@ async function likePost() {
         };
   
          await addDoc(collection(db, 'national'), newPostData);
+       
+         setShowAlert(true);
+          setTimeout(() => {
+            setShowAlert(false);
+          }, 1000);
+  
+          setAlertMessage("Cast recasted successfully!");
+          
+        } catch (error) {
+          console.error('Error recastting the post:', error);
+          setAlertMessage("Failed to cite Cast. Please try again.");
+  
+        }
+      } else {
+        console.log('No post data available to repost.');
+        setAlertMessage("Invalid input. Please check your text.");
         
-      } catch (error) {
-        console.error('Error reposting the post:', error);
       }
-    } else {
-      console.log('No post data available to repost.');
-    }
   };
 
   const cite = async () => {
@@ -248,14 +259,24 @@ async function likePost() {
             ...(postData.image && { image: postData.image }),
             ...(postData.video && { video: postData.video }),
         });
+        setShowAlert(true);
+        setTimeout(() => {
+          setShowAlert(false);
+        }, 1000);
+
+        setAlertMessage("Cast cited successfully!");
         } catch (error) {
           console.error('Error reposting the post:', error);
+          setAlertMessage("Failed to cite Cast. Please try again.");
+
          } finally {
           setLoading(false); // Ensure loading is false after try/catch
           setCiteInput(""); // Reset the input
         }
       } else {
         console.error('Invalid data detected. postData.text or citeInput is not a string.');
+        setAlertMessage("Invalid input. Please check your text.");
+
       }
       setLoading(false);
     } else {
@@ -443,6 +464,11 @@ async function likePost() {
 
   return (
     <div className='w-full'>
+    {showAlert && (
+          <Alert color="success">
+            <span className="font-medium">{alertMessage}</span>
+          </Alert>
+        )}
 <div className={`w-full ${isHidden ? 'inline text-2xl sm:text-xl cursor-pointer dark:hover:bg-gray-900 hover:bg-gray-200 rounded-md p-1' : 'hidden'}`} onClick={handleUndo}>{showUndo && 'undo'}</div>
     <div className={`${isHidden ? 'hidden' : 'border-[1px] dark:border-gray-900 border-gray-200 px-4 min-w-full rounded-md mt-1'}`}>
       {loading ? (
@@ -472,7 +498,7 @@ async function likePost() {
           <Tooltip content='delete' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
 
             <TrashIcon
-              onClick={user?.id === post?.data()?.id ? deleteRepost : deletePost}
+              onClick={user?.id === post?.data()?.uid ? deleteRepost : deletePost}
               className="h-12 w-12 md:h-10 md:w-10 p-2 hover:text-red-600 hover:bg-red-100 rounded-full cursor-pointer dark:hover:bg-neutral-700"
             />
             </Tooltip>
@@ -501,7 +527,7 @@ async function likePost() {
 
                     )}
                    
-                      <p onClick={() => followMember(post?.data()?.uid, userDetails)}>{hasFollowed[post?.data()?.uid] ? 'Unfollow' : 'Follow'} @{post?.data()?.nickname}</p>
+                      <p onClick={() => followMember(post?.data()?.uid)}>{hasFollowed[post?.data()?.uid] ? 'Unfollow' : 'Follow'} @{post?.data()?.nickname}</p>
                     
                     </div>
                    

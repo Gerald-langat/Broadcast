@@ -11,6 +11,8 @@ import MessageContainer from './MessageContainer';
 import Messages from './Messages';
 import Message from './Message';
 import { Carousel, Tooltip } from 'flowbite-react';
+import { useUser } from '@clerk/nextjs';
+import Link from 'next/link';
 
 function product() {
     const router = useRouter();
@@ -30,35 +32,24 @@ function product() {
     const [userData, setUserData] = useState(null);
     const [selectedMessage, setSelectedMessage] = useState(null);
     const [isReserved, setIsReserved] = useState(false);
-
+    const { user } = useUser()
     const handleMessageClick = (userPost) => {
       setSelectedMessage(userPost); // Set the clicked post to display chat
      
     };
-
-    const fetchUseData = async () => {
-      auth.onAuthStateChanged(async (user) => {
-        console.log(user)
-        setUserDetails(user)
-      })
-    }
-    useEffect(() => {
-      fetchUseData();
-    }, []);
   
     useEffect(() => {
       const fetchUserData = async () => {
-        if (userDetails) {
-          const q = query(collection(db, 'userPosts'), where('id', '==', userDetails.uid));
+        if (user?.id) {
+          const q = query(collection(db, 'userPosts'), where('uid', '==', user?.id));
           const querySnapshot = await getDocs(q);
-          console.log(userDetails.uid)
           if (!querySnapshot.empty) {
             setUserData(querySnapshot.docs[0].data());
           }
         }
       };
       fetchUserData();
-    }, [userDetails]);
+    }, [user?.id]);
 
     const handleToggle = () => {
       setIsContactVisible(!isContactVisible); // Toggle visibility
@@ -68,17 +59,6 @@ function product() {
       setIsMessagesVisible(!isMessagesVisible); // Toggle visibility
       setIsContactVisible(false);
     };
-
-
-    const fetchUserData = async () => {
-        auth.onAuthStateChanged(async (user) => {
-          console.log(user)
-          setUserDetails(user)
-        })
-      }
-      useEffect(() => {
-        fetchUserData();
-      }, []);
 
 
 
@@ -128,24 +108,24 @@ useEffect(() => {
 }
 
   async function likeProduct() {
-    if (userDetails || id || userData) {
+    if (user?.id || id) {
       if (hasLiked) {
-        await deleteDoc(doc(db, "marketplace", id, "likes", userDetails.uid));
+        await deleteDoc(doc(db, "marketplace", id, "likes", user?.id));
       } else {
-        await setDoc(doc(db, "marketplace", id, "likes", userDetails.uid), {
-          username: userData.name,
+        await setDoc(doc(db, "marketplace", id, "likes", user?.id), {
+          uid: user?.id,
         });
       }
     } else {
-      router.replace('/');
+      router.replace('/signup');
     }
   }
 
   useEffect(() => {
     const checkReservationStatus = async () => {
-      if (!userDetails?.uid || !id) return;
+      if (!user?.id || !id) return;
 
-      const docRef = doc(db, "marketplace", id, "reserve", userDetails.uid);
+      const docRef = doc(db, "marketplace", id, "reserve", user.id);
       const docSnap = await getDoc(docRef);
 
       // If the document exists, it means the user has reserved the item
@@ -158,11 +138,11 @@ useEffect(() => {
     };
 
     checkReservationStatus();
-  }, [id, userDetails]);
+  }, [id, user?.id]);
 
   
   const reserve = async () => {
-    if (!userDetails?.uid) return;
+    if (!user?.id) return;
   
     try {
       const docRef = doc(db, "marketplace", id);
@@ -190,9 +170,9 @@ useEffect(() => {
     
 
   useEffect(() => {
-    if(userDetails){
+    if(user?.id){
     setHasLiked(
-      likes.findIndex((like) => like.id === userDetails.uid) !== -1
+      likes.findIndex((like) => like.id === user.id) !== -1
     );
   }
   }, [likes]);
@@ -205,18 +185,18 @@ useEffect(() => {
   
     try {
       // Ensure that userDetails and id (post or product ID) are defined before proceeding
-      if (!userDetails?.uid || !id ) {
+      if (!user?.id || !id ) {
         throw new Error("Missing required data (userDetails, post ID, or recipient ID).");
       }
   
       await addDoc(collection(db, "marketplace", id, "messages"), {
-        id: userDetails.uid,   // The ID of the user sending the message           // The product or post ID
+        uid: user?.id,   // The ID of the user sending the message           // The product or post ID
         name: userData.name,
         productId: id,
         lastname: userData.lastname,
         userImg:userData.userImg,
         nickname: userData.nickname,
-        recipientId: posts.data().id, // The ID of the recipient (seller)
+        recipientId: posts.data().uid, // The ID of the recipient (seller)
         messagetext: input,
         timestamp: serverTimestamp(),
       });
@@ -241,7 +221,7 @@ useEffect(() => {
 
 
   useEffect(() => {
-    fetchUserData();
+  
     if(!id) return;
       const q = query(
         collection(db, "marketplace", id, "messages")
@@ -277,10 +257,10 @@ useEffect(() => {
           ...doc.data()
         }));
   
-        const userId = userDetails?.uid;
+        const userId = user?.id;
         // Remove duplicates based on 'id'
         const uniquePosts = posts.filter((post, index, self) =>
-          index === self.findIndex((p) => p.id === post.id) && post.id !== userId
+          index === self.findIndex((p) => p.uid === post.uid) && post.uid !== userId
         );
   
         setUserPosts(uniquePosts);
@@ -291,7 +271,7 @@ useEffect(() => {
     };
   
     fetchPost();
-  }, [id, userDetails]);
+  }, [id, user?.id]);
   
   const formatNumber = (number) => {
     if (number >= 1000000) {
@@ -313,11 +293,17 @@ useEffect(() => {
       <div className='border-b-[1px] shadow-md p-6 dark:border-gray-600'>
         <div className='flex items-center justify-between w-full'>
             <div>
-                <ArrowLeftIcon className='h-8  text-gray-600 cursor-pointer hover:text-gray-950 dark:text-gray-300' onClick={() => router.replace('/products')}/>
+            <Link href={`/products`}>
+                <ArrowLeftIcon className='h-8  text-gray-600 cursor-pointer hover:text-gray-950 dark:text-gray-300'/>
+            </Link>
             </div>
             <div className='items-center space-x-3 flex text-gray-600 dark:text-gray-300'>
-                <OfficeBuildingIcon className=' h-8 cursor-pointer hover:text-gray-950 dark:hover:text-gray-500' onClick={() => router.replace('/marketplace')}/>
-                <HomeIcon className=' h-8 cursor-pointer hover:text-gray-950 dark:hover:text-gray-500' onClick={() => router.replace('/home')}/>
+            <Link href={`/marketplace`}>
+                <OfficeBuildingIcon className=' h-8 cursor-pointer hover:text-gray-950 dark:hover:text-gray-500' />
+              </Link>
+              <Link href={`/national`}>
+                <HomeIcon className=' h-8 cursor-pointer hover:text-gray-950 dark:hover:text-gray-500' />
+            </Link>
             </div>
         </div>
       </div>
@@ -354,7 +340,7 @@ useEffect(() => {
   <div className='flex justify-between pr-4 py-2 border-b-[1px] dark:border-gray-600 items-center'>
     <p className='font-bold'>{posts?.data()?.product}</p>
     <Tooltip content={posts?.data()?.name} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-      <img src={posts?.data()?.userImg} className='h-6 w-6 rounded-full' />
+      <img src={posts?.data()?.userImg} className='h-6 w-6 rounded-md' />
     </Tooltip>
   </div>
 
@@ -393,16 +379,16 @@ useEffect(() => {
     </div>
 
     {/* Contact and View Message buttons */}
-    <div className={`${userDetails?.uid === posts?.data()?.id ? 'hidden' : 'bg-green-600 text-white p-1 rounded-md cursor-pointer'}`} onClick={handleToggle}>
+    <div className={`${user?.id === posts?.data()?.uid ? 'hidden' : 'bg-green-600 text-white p-1 rounded-md cursor-pointer'}`} onClick={handleToggle}>
       Contact seller
     </div>
 
-    <div className={`${userDetails?.uid !== posts?.data()?.id ? 'hidden' : 'bg-green-600 text-white p-1 rounded-md cursor-pointer'}`} onClick={handleMessageToggle}>
+    <div className={`${user?.id !== posts?.data()?.uid ? 'hidden' : 'bg-green-600 text-white p-1 rounded-md cursor-pointer'}`} onClick={handleMessageToggle}>
       View message
     </div>
 
     {/* Delete or Reserve button */}
-    {userDetails?.uid === posts?.data()?.id ? (
+    {user?.id === posts?.data()?.uid ? (
       <TrashIcon className='h-10 p-2 hover:text-red-600 hover:bg-red-300 rounded-full dark:hover:bg-red-900 cursor-pointer' onClick={deleteProduct} />
     ) : (
       <div className={`bg-${isReserved ? 'gray' : 'red'}-600 p-1 rounded-md font-bold text-white mr-3 cursor-pointer`}
@@ -430,7 +416,7 @@ useEffect(() => {
 
 {/* Contact Visible Section */}
 {isContactVisible && (
-  <div className={`${userDetails?.uid === posts?.data()?.id ? 'hidden' : 'w-full border h-96 p-2 rounded-md flex flex-col border-l-[1px] border-r-[1px] border-b-[1px] sm:border-t-[1px] border-t-0 sm:border-l-0 dark:border-gray-600'}`}>
+  <div className={`${user?.id === posts?.data()?.id ? 'hidden' : 'w-full border h-96 p-2 rounded-md flex flex-col border-l-[1px] border-r-[1px] border-b-[1px] sm:border-t-[1px] border-t-0 sm:border-l-0 dark:border-gray-600'}`}>
     <div className='flex-grow overflow-y-auto scrollbar-hide'>
       {messages.map((messageDoc) => (
         <motion.div

@@ -1,13 +1,11 @@
-import { auth, db, storage } from '../../firebase';
+import {db, storage } from '../../firebase';
 import { BookmarkIcon, ChatIcon, DotsHorizontalIcon, EyeIcon, EyeOffIcon, HeartIcon, PencilAltIcon, ReplyIcon, ShareIcon, TrashIcon, UserAddIcon, UserRemoveIcon } from '@heroicons/react/outline';
 import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, query, serverTimestamp, setDoc, where } from 'firebase/firestore';
-import { Badge, Button, Carousel, Popover, Spinner, Tooltip } from 'flowbite-react';
+import { Alert, Badge, Button, Carousel, Popover, Spinner, Tooltip } from 'flowbite-react';
 import React, { useEffect, useState } from 'react'
 import Moment from 'react-moment';
 import { HiClock } from "react-icons/hi";
 import { useRouter } from 'next/router';
-import Comment from './Comment';
-import { AnimatePresence, motion } from 'framer-motion';
 import { modalState, postIdState } from '../../atoms/modalAtom';
 import { useRecoilState } from 'recoil';
 import { useFollow } from '../FollowContext';
@@ -32,6 +30,8 @@ function NationTrends({post, id}) {
   const [isBookmarked, setIsBookmarked] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [reportReason, setReportReason] = useState("");
+  const [alertMessage, setAlertMessage] = useState(null);
+    const [showAlert, setShowAlert] = useState(false);
   const { user } = useUser()
 
   useEffect(() => {
@@ -61,7 +61,7 @@ useEffect(
 
 // delete Repost
 const deleteRepost = async () => {
-  if (window.confirm("Are you sure you want to delete this post?")) {
+  if (window.confirm("Are you sure you want to delete this recast?")) {
     if (id) {
       try {
         const likesCollectionRef = collection(db, "national", id, "likes");
@@ -122,7 +122,7 @@ const viewCount = Array.isArray(post?.data()?.views) ? post.data().views.length 
 
   //delete post
   async function deletePost() {
-  if (window.confirm("Are you sure you want to delete this post?")) {
+  if (window.confirm("Are you sure you want to delete this cast?")) {
     if (id) {
     try {      
       const likesCollectionRef = collection(db, "national", id, "likes");
@@ -240,14 +240,23 @@ const viewCount = Array.isArray(post?.data()?.views) ? post.data().views.length 
           ...(postData.video && { video: postData.video }),
         };
   
-        await addDoc(collection(db, 'posts'), newPostData);
-        console.log('Post reposted successfully!');
+        await addDoc(collection(db, 'national'), newPostData);
+        setShowAlert(true);
+        setTimeout(() => {
+          setShowAlert(false);
+        }, 1000);
+
+        setAlertMessage("Cast recasted successfully!");
         
       } catch (error) {
-        console.error('Error reposting the post:', error);
+        console.error('Error recasting the cast:', error);
+        setAlertMessage("Failed to cite Cast. Please try again.");
+
       }
     } else {
-      console.log('No post data available to repost.');
+      console.log('No cast data available to recast.');
+      setAlertMessage("Invalid input. Please check your text.");
+
     }
   };
 
@@ -263,7 +272,7 @@ const viewCount = Array.isArray(post?.data()?.views) ? post.data().views.length 
       // Check if postData and properties are defined and of correct type
       if (postData && typeof postData.text === 'string' && typeof citeInput === 'string') {
         try {
-          await addDoc(collection(db, 'posts'), {
+          await addDoc(collection(db, 'national'), {
             uid: user?.id,
             text: postData.text,
             citeInput: citeInput,
@@ -284,11 +293,21 @@ const viewCount = Array.isArray(post?.data()?.views) ? post.data().views.length 
             ...(postData.image && { image: postData.image }),
             ...(postData.video && { video: postData.video }),
         });
+        setShowAlert(true);
+        setTimeout(() => {
+          setShowAlert(false);
+        }, 1000);
+
+        setAlertMessage("Cast cited successfully!");
         } catch (error) {
           console.error('Error reposting the post:', error);
+          setAlertMessage("Failed to cite Cast. Please try again.");
+
         }
       } else {
         console.error('Invalid data detected. postData.text or citeInput is not a string.');
+        setAlertMessage("Invalid input. Please check your text.");
+
       }
   
       setLoading(false);
@@ -444,6 +463,11 @@ const viewCount = Array.isArray(post?.data()?.views) ? post.data().views.length 
 
   return (
     <div className='w-full'>
+     {showAlert && (
+          <Alert color="success">
+            <span className="font-medium">{alertMessage}</span>
+          </Alert>
+        )}
 <div className={`w-full ${isHidden ? 'inline text-2xl sm:text-xl cursor-pointer dark:hover:bg-gray-900 hover:bg-gray-200 rounded-md p-1' : 'hidden'}`} onClick={handleUndo}>{showUndo && 'undo'}</div>
     <div className={`${isHidden ? 'hidden' : 'border-[1px] dark:border-gray-900 border-gray-200 px-4 sm:min-w-full rounded-md mt-1'}`}>
       {loading ? (

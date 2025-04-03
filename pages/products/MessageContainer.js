@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import Moment from 'react-moment';
-import { auth, db } from '../../firebase';
-import { DotsHorizontalIcon, EmojiHappyIcon, TrashIcon } from '@heroicons/react/outline';
+import { db } from '../../firebase';
+import { DotsHorizontalIcon, TrashIcon } from '@heroicons/react/outline';
 import { Popover } from 'flowbite-react';
-import EmojiPicker from 'emoji-picker-react';
-import { addDoc, collection, deleteDoc, doc, getDocs, Query, query, updateDoc, where } from 'firebase/firestore';
+import { collection, deleteDoc, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import { ReactionBarSelector } from '@charkour/react-reactions';
 
 const emojiMap = {

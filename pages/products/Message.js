@@ -5,43 +5,33 @@ import { addDoc, collection, getDocs, onSnapshot, orderBy, query, serverTimestam
 import MessageContainer2 from './MessageContainer2';
 import { motion } from 'framer-motion';
 import { Spinner } from 'flowbite-react';
+import { useUser } from '@clerk/nextjs';
 
 
 function Message({ post, id, originalId }) {
-    const [userDetails, setUserDetails] = useState(null);
     const [input, setInput] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [userData, setUserData] = useState(null);
     const [messages, setMessages] = useState([]);
     const endOfMessagesRef = useRef();
-
-
-    const fetchUseData = async () => {
-      auth.onAuthStateChanged(async (user) => {
-        console.log(user)
-        setUserDetails(user)
-      })
-    }
-    useEffect(() => {
-      fetchUseData();
-    }, []);
+    const { user } = useUser()
 
 
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (userDetails) {
-        const q = query(collection(db, 'userPosts'), where('id', '==', userDetails.uid));
+      if (user?.id) {
+        const q = query(collection(db, 'userPosts'), where('uid', '==', user?.id));
         const querySnapshot = await getDocs(q);
-        console.log(userDetails.uid)
+
         if (!querySnapshot.empty) {
           setUserData(querySnapshot.docs[0].data());
         }
       }
     };
     fetchUserData();
-  }, [userDetails]);
+  }, [user?.id]);
 
 
   const sendPost = async (e) => {
@@ -51,17 +41,17 @@ function Message({ post, id, originalId }) {
 
     try {
       // Ensure that userDetails and id (post or product ID) are defined before proceeding
-      if (!userDetails?.uid || !id || !post?.id) {
+      if (!user?.id || !id || !post?.uid) {
         throw new Error("Missing required data (userDetails, post ID, or recipient ID).");
       }
   
       await addDoc(collection(db, "marketplace", originalId, "messages"), {
-        id: userDetails.uid,   // The ID of the user sending the message          // The product or post ID
+        uid: user?.id,   // The ID of the user sending the message          // The product or post ID
         name: userData.name,
         lastname: userData.lastname,
         nickname: userData.nickname,
         userImg: userData.userImg,
-        recipientId: post.id, // The ID of the recipient (seller)
+        recipientId: post.uid, // The ID of the recipient (seller)
         messagetext: input,
         timestamp: serverTimestamp(),
       });
@@ -87,14 +77,14 @@ function Message({ post, id, originalId }) {
 
   useEffect(() => {
   
-    if (!id || !originalId || !userDetails?.uid) {
+    if (!uid || !originalu || !user?.id) {
 setLoading(true)
     } else {
       
       const q = query(
         collection(db, "marketplace", originalId, "messages"),
-        where('id', 'in', [userDetails.uid, id]),       // Messages sent by you or the recipient
-        where('recipientId', 'in', [userDetails.uid, id]) // Messages received by you or the recipient
+        where('uid', 'in', [user.id, uid]),       // Messages sent by you or the recipient
+        where('recipientId', 'in', [user.id, uid]) // Messages received by you or the recipient
       );
   
       const unsub = onSnapshot(q, (snapshot) => {
@@ -106,7 +96,7 @@ setLoading(true)
   
       return () => unsub();
     }
-  }, [id, originalId, userDetails]);
+  }, [uid, originalId, user?.id]);
 
 
   

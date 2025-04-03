@@ -27,14 +27,13 @@ import {
   where,
 } from "firebase/firestore";
 
-import { auth, db, storage } from "../../firebase";
+import { db } from "../../firebase";
 import { useState, useEffect } from "react";
-import { deleteObject, ref } from "firebase/storage";
 import { useRecoilState } from "recoil";
 import { modalState, postIdState } from "../../atoms/modalAtom";
 import { useRouter } from "next/router";
 import { HiClock, HiCheck } from "react-icons/hi";
-import { Badge, Button, Carousel, Popover, Spinner, Tooltip } from "flowbite-react";
+import { Alert, Badge, Button, Carousel, Popover, Spinner, Tooltip } from "flowbite-react";
 import { FlagIcon, BookmarkIcon } from "@heroicons/react/solid";
 import { useFollow } from "../FollowContext";
 import Link from "next/link";
@@ -49,7 +48,6 @@ export default function Post({ post, id }) {
   const [likes, setLikes] = useState([]);
   const [hasLiked, setHasLiked] = useState(false);
   const [comments, setComments] = useState([]);
-  const [userDetails, setUserDetails] = useState(null);
   const [citeInput, setCiteInput] = useState(""); 
   const [loading, setLoading] = useState(false);
   const { hasFollowed, followMember } = useFollow();
@@ -60,7 +58,9 @@ export default function Post({ post, id }) {
   const [isReported, setIsReported] = useState({});
   const [isBookmarked, setIsBookmarked] = useState({});
   const [userData, setUserData] = useState(null);
-  const { user } = useUser()
+  const { user } = useUser();
+  const [alertMessage, setAlertMessage] = useState(null);
+  const [showAlert, setShowAlert] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -119,7 +119,7 @@ export default function Post({ post, id }) {
 
   // delete Repost
   const deleteRepost = async () => {
-    if (window.confirm("Are you sure you want to delete this post?")) {
+    if (window.confirm("Are you sure you want to delete this recast?")) {
       if (id) {
         try {
           const likesCollectionRef = collection(db, "national", id, "likes");
@@ -300,12 +300,22 @@ const handleShare = async () => {
         };
   
        await addDoc(collection(db, 'national'), newPostData);
+       setShowAlert(true);
+        setTimeout(() => {
+          setShowAlert(false);
+        }, 1000);
+
+        setAlertMessage("Cast reposted successfully!");
         
       } catch (error) {
         console.error('Error reposting the post:', error);
+        setAlertMessage("Failed to cite Cast. Please try again.");
+
       }
     } else {
       console.log('No post data available to repost.');
+      setAlertMessage("Invalid input. Please check your text.");
+      
     }
   };
 
@@ -344,17 +354,26 @@ const handleShare = async () => {
             ...(postData.images && { images: postData.images }),
             ...(postData.video && { video: postData.video }),
         });
+        setShowAlert(true);
+        setTimeout(() => {
+          setShowAlert(false);
+        }, 1000);
+
+        setAlertMessage("Cast cited successfully!");
+
         } catch (error) {
-          console.error('Error reposting the post:', error);
+          console.error('Error reposting the cast:', error);
+          setAlertMessage("Failed to cite Cast. Please try again.");
         }
       } else {
         console.error('Invalid data detected. postData.text or citeInput is not a string.');
+        setAlertMessage("Invalid input. Please check your text.");
       }
   
       setLoading(false);
       setCiteInput("");
     } else {
-      console.log('No post data available to repost.');
+      console.log('No post data available to cast.');
     }
   };
   // numCount
@@ -507,6 +526,12 @@ const handleShare = async () => {
 
   return (
    <div className='flex-col'>
+   {showAlert && (
+      <Alert color="success">
+        <span className="font-medium">{alertMessage}</span>
+      </Alert>
+    )}
+
 <div className={`w-full ${isHidden ? 'inline text-2xl sm:text-xl cursor-pointer dark:hover:bg-gray-800 hover:bg-gray-200 rounded-md p-1' : 'hidden'}`} onClick={handleUndo}>{showUndo && 'undo'}</div>
     
     <div className={`${isHidden ? 'hidden' : "flex cursor-pointer border-[1px] border-gray-200 dark:border-gray-900 bg-white dark:bg-gray-950 dark:text-gray-300 z-40 flex-grow h-full flex-1 p-2 rounded-md mt-1 sm:w-full"}`}>
@@ -578,7 +603,7 @@ const handleShare = async () => {
                     
 
                     <div className={`${userData?.name == post?.data()?.name ? 'hidden' : 'flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-800 '}`} >
-                    {hasFollowed[post?.data()?.id] ? (
+                    {hasFollowed[post?.data()?.uid] ? (
                       <UserRemoveIcon className="h-6" />
 
                     ) : (
@@ -586,7 +611,7 @@ const handleShare = async () => {
 
                     )}
                    
-                      <p onClick={() => followMember(post?.data()?.id, userDetails)}>{hasFollowed[post?.data()?.id] ? 'Unfollow' : 'Follow'} @{post?.data()?.nickname}</p>
+                      <p onClick={() => followMember(post?.data()?.uid)}>{hasFollowed[post?.data()?.uid] ? 'Unfollow' : 'Follow'} @{post?.data()?.nickname}</p>
                     
                     </div>
                    
