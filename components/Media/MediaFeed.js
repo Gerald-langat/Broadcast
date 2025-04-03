@@ -9,6 +9,7 @@ import {  XIcon } from 'lucide-react';
 import { HomeIcon,  OfficeBuildingIcon, PauseIcon, UserIcon } from '@heroicons/react/outline'
 import { useRouter } from 'next/router';
 import SearchComponent from './SearchList';
+import Link from 'next/link';
 
 function MediaFeed() {
   const [posts, setPosts] = useState([]);
@@ -21,7 +22,7 @@ function MediaFeed() {
     const fetchPost = async () => {
       try {
         const q = query(
-          collection(db, "posts"), 
+          collection(db, "national"), 
           orderBy("timestamp", "desc")
         );
         const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -48,14 +49,14 @@ function MediaFeed() {
   
         // Query for matching names
         const q1 = query(
-          collection(db, 'posts'),
+          collection(db, 'national'),
           where('name', '>=', querySearch),
           where('name', '<=', querySearch + '\uf8ff')
         );
   
         // Query for matching nickname
         const q2 = query(
-          collection(db, 'posts'),
+          collection(db, 'national'),
           where('nickname', '>=', querySearch),
           where('nickname', '<=', querySearch + '\uf8ff')
         );
@@ -117,34 +118,40 @@ function MediaFeed() {
               <HomeIcon className="h-10 sm:h-8" />
               <span className="hidden md:inline font-bold text-xl">Home</span>
             </div>
+            <Link href={`/marketplace`}>
             <div
               className="flex sm:items-center space-x-2 cursor-pointer dark:hover:bg-gray-900 hover:bg-gray-300 p-1 w-fit rounded-full"
-              onClick={() => router.push('/marketplace')}
+             
             >
               <OfficeBuildingIcon className="h-10 sm:h-8" />
               <span className="hidden md:inline font-bold text-xl truncate">MarketPlace</span>
             </div>
+            </Link>
+            <Link href={`/media`}>
             <div
               className="flex sm:items-center space-x-2 cursor-pointer dark:hover:bg-gray-900 hover:bg-gray-300 p-1 w-fit rounded-full"
-              onClick={() => router.push('/media')}
             >
               <PauseIcon className="h-10 sm:h-8" />
               <span className="hidden md:inline font-bold text-xl">Media</span>
             </div>
+            </Link>
+            <Link href={`/products`}>
             <div
               className="flex sm:items-center space-x-2 cursor-pointer dark:hover:bg-gray-900 hover:bg-gray-300 p-1 w-fit rounded-full"
-              onClick={() => router.push('/products')}
             >
               <ShoppingCartIcon className="h-10 sm:h-8" />
               <span className="hidden md:inline font-bold text-xl">Products</span>
             </div>
+            </Link>
+            <Link href={`/profile`}>
             <div
               className="flex sm:items-center space-x-2 cursor-pointer dark:hover:bg-gray-900 hover:bg-gray-300 p-1 w-fit rounded-full"
-              onClick={() => router.push('/profile')}
+           
             >
               <UserIcon className="h-10 sm:h-8" />
               <span className="hidden md:inline font-bold text-xl">Profile</span>
             </div>
+            </Link>
           </div>
           </div>
 
