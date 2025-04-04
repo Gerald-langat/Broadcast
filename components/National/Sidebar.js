@@ -4,12 +4,13 @@ import { auth, db } from '../../firebase';
 import { useRecoilState } from 'recoil';
 import { useRouter } from 'next/router';
 import { modalStatus } from '../../atoms/modalAtom';
-import { Button, Spinner, Tooltip } from 'flowbite-react';
+import { Avatar, Button, Spinner, Tooltip } from 'flowbite-react';
 import { HomeIcon, InboxInIcon, NewspaperIcon, OfficeBuildingIcon, PauseIcon, PlusIcon, UserIcon } from '@heroicons/react/outline';
 import { useFollow } from '../FollowContext';
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
 import { SignedIn, SignedOut, SignInButton, useUser } from '@clerk/nextjs';
+import Image from 'next/image';
 
 
 export default function Sidebar() {
@@ -151,7 +152,7 @@ export default function Sidebar() {
             </Link>
           </div>
           
-          <div className="mt-2 mb-2.5 xl:items-start w-[292px] md:ml-14 -ml-20">
+          <div className="mt-2 mb-2.5 xl:items-start w-[320px] md:ml-14 -ml-20  h-[550px]">
          
          <div className='flex justify-between w-full'>
             <h2 className="font-bold ml-4 dark:text-gray-300 text-2xl sm:text-lg">Members</h2>
@@ -159,50 +160,63 @@ export default function Sidebar() {
             <p className='text-xs text-blue-500'>View all Members</p>
             </Link>
         </div>
-            <div className="overflow-y-scroll scrollbar-hide h-50 w-[400px] sm:w-[300px]">
-  <div className="h-[500px] sm:h-[250px] overflow-auto scrollbar-hide w-full">
-    {posts.map((post) => (
-      <div key={post.id} className="flex items-center  dark:border-gray-900 p-1 w-full">
-        <div className="m-4">
-          <img className="h-14 w-14 sm:h-10 sm:w-10 rounded-md shadow-gray-800 shadow-sm dark:shadow-gray-600" src={post?.userImg} alt="user-img" />
-        </div>
-        <div className="flex-1 w-full">
-          <div>
-            <div className="flex dark:text-gray-200 text-2xl sm:text-lg">
-              <p className="mr-1">{post?.name}</p>
-              <p className="mr-1">{post?.lastname}</p>
-            </div>
-            <div className="font-bold text-lg truncate w-28 sm:text-sm text-gray-500">@{post?.nickname}</div>
+
+        <div className="h-[500px] w-[300px] overflow-auto scrollbar-hide">
+  {posts.map((post) => (
+    <div key={post.id} className="flex items-center dark:border-gray-900 p-1 w-full">
+      {/* Profile Image or Initials */}
+      <div className="m-4">
+        {post?.userImg ? (
+          <Image
+            className="h-14 w-14 sm:h-10 sm:w-10 rounded-md shadow-gray-800 shadow-sm dark:shadow-gray-600"
+            src={post.userImg} 
+            alt="User Profile"
+            width={400}
+            height={400}
+            layout="intrinsic"
+          />
+        ) : (
+          <p className="w-10 h-10 rounded-md bg-green-500 flex justify-center items-center text-white font-bold">
+            {post?.name?.charAt(0)}{post?.lastname?.charAt(0)}
+          </p>
+        )}
+      </div>
+
+      {/* User Info */}
+      <div className="flex-1 w-full">
+        <div>
+          <div className="flex dark:text-gray-200 text-2xl sm:text-lg">
+            <p className="mr-1">{post?.name}</p>
+            <p className="mr-1">{post?.lastname}</p>
+          </div>
+          <div className="font-bold text-lg truncate w-28 sm:text-sm text-gray-500">
+            @{post?.nickname}
           </div>
         </div>
-        <div className="ml-auto">
-
-        <p  
-  className={`${
-    userPosts?.name === post?.name 
-      ? 'hidden' 
-      : 'font-bold text-blue-500 sm:text-sm text-2xl cursor-pointer space-y-2'
-  }`}
-  onClick={() => {
-  
-    followMember(post?.id);
-    
-  }}
->
- {followloading[post?.id] ? (
-    <Spinner aria-label="Loading spinner" size="sm" />
-  ) : hasFollowed[post?.id] ? (
-    <p>Unfollow</p>
-  ) : (
-    "Follow"
-  )}
-</p>
-        </div>
       </div>
-      
-    ))}
-  </div>
+
+      {/* Follow Button */}
+      <div className="ml-auto">
+        <p
+          className={`${
+            userPosts?.name === post?.name ? 'hidden' : 'font-bold text-blue-500 sm:text-sm text-lg cursor-pointer'
+          }`}
+          onClick={() => followMember(post?.id)}
+        >
+          {followloading[post?.id] ? (
+            <Spinner aria-label="Loading spinner" size="sm" />
+          ) : hasFollowed[post?.id] ? (
+            "Unfollow"
+          ) : (
+            "Follow"
+          )}
+        </p>
+      </div>
+    </div>
+  ))}
 </div>
+
+
 
           </div>
 

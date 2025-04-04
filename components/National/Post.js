@@ -101,6 +101,8 @@ export default function Post({ post, id }) {
     setHasLiked(
       likes.findIndex((like) => like.id === user.id) !== -1
     );
+  } else {
+    router.replace('/signup')
   }
   }, [likes]);
 
@@ -297,7 +299,7 @@ const handleShare = async () => {
          
           ...(postData.category && { category: postData.category }),
           ...(postData.images && { images: postData.images }),
-          ...(postData.video && { video: postData.video }),
+          ...(postData.videos && { videos: postData.videos }),
         };
   
        await addDoc(collection(db, 'national'), newPostData);
@@ -352,8 +354,8 @@ const handleShare = async () => {
           
             
             ...(postData.category && { category: postData.category }),
-            ...(postData.images && { images: postData.images }),
-            ...(postData.video && { video: postData.video }),
+            ...(postData.Images && { Images: postData.Images }),
+            ...(postData.videos && { videos: postData.videos }),
         });
         setShowAlert(true);
         setTimeout(() => {
@@ -434,13 +436,13 @@ const handleShare = async () => {
         }));
       } else {
         // Add bookmark
-        const images = post?.data()?.images || [];
-        const video = post?.data()?.video || null;
+        const Images = post?.data()?.Images || [];
+        const video = post?.data()?.videos || null;
 
         // Add new document to the collection
         const bookmarkData = { pstId, timestamp: Date.now() };
-        if (images.length) bookmarkData.images = images;
-        if (video) bookmarkData.video = video;
+        if (Images.length) bookmarkData.Images = Images;
+        if (video) bookmarkData.videos = video;
 
         await setDoc(docRef, bookmarkData); // Use setDoc to ensure consistent doc IDs
         setIsBookmarked((prev) => ({
@@ -545,7 +547,7 @@ const handleShare = async () => {
         <>
       {post?.data()?.userImg && (
 <Link href={`/userProfile/${uid}`}>
-             <Image
+             <img
         className="sm:h-12 sm:w-12 h-14 w-14 rounded-md mr-4 object-fit shadow-gray-800 shadow-sm dark:shadow-gray-600"
         src={post?.data()?.userImg}
         alt="user-img"
@@ -695,7 +697,7 @@ const handleShare = async () => {
         <div className="flex p-1">
         {post?.data()?.citeUserImg && (
           <>
-        <Image
+        <img
         className="h-8 w-8 rounded-md mr-4"
         src={post?.data()?.citeUserImg}
         alt="user-img"
@@ -711,29 +713,19 @@ const handleShare = async () => {
         </div>
         <p className="ml-14 text-[20px] sm:text-[16px]" onClick={() => router.push(`/posts(id)/${id}`)}>{post?.data()?.text}</p>
 
-        {post?.data()?.images?.length > 1 ? (
-          <Carousel className={`${!post?.data()?.images ? 'hidden' : "top-0  h-[300px] w-full"}`}>
-            {post?.data()?.images.map((imageUrl, index) => {
-              return (
-                <Image
-                  key={index}
-                  className="object-cover w-full h-full" 
-                  src={imageUrl}
-                  alt={`image-${index}`}
-                />
-              );
-            })}
-          </Carousel>
-        ) : (
+       
           <Image
-            className={`${!post?.data()?.images ? 'hidden' : "w-full  h-[300px] object-cover rounded-t-md"}`}
-            src={post?.data()?.images} // Ensure this is a single image
+            className={`${!post?.data()?.images ? 'hidden' : "inline object-cover"}`}
+            src={post?.data()?.Images} // Ensure this is a single image
             alt=""
+            width={620}
+  height={20} 
+  style={{ height: "300px" }}
           />
-        )}
+        {/* )} */}
 
-     
-        {post?.data()?.video && (
+        
+        {post?.data()?.videos && (
           <video autoPlay
           onClick={(e) => { 
             e.stopPropagation(); // Prevent the click event from bubbling up
@@ -741,11 +733,12 @@ const handleShare = async () => {
             e.currentTarget.pause();
           }}
           className="rounded-md h-[300px] w-[500px] sm:w-full sm:h-[600px] xl:h-[250px] mr-2 object-cover"
-          src={post?.data()?.video}
+          src={post?.data()?.videos}
           alt=""
           controls
         />
         )}
+
         </div>
         </div>
         ):(
@@ -757,12 +750,12 @@ const handleShare = async () => {
             {post?.data()?.text} 
         </p>
 
-        {post?.data()?.images?.length > 1 ? (
+        {/* {post?.data()?.images?.length > 1 ? (
             <Carousel className={`${!post?.data()?.images ? 'hidden' : "rounded-md h-[300px] w-[450px] sm:w-full sm:h-[600px] xl:h-[250px] mr-2 object-cover"}`}>
               {post?.data()?.images.map((imageUrl, index) => {
               console.log(imageUrl, index); // Check what images are being loaded
                 return(
-                <Image
+                <img
                   key={index}
                   className="object-cover h-full w-full"
                   src={imageUrl}
@@ -771,16 +764,20 @@ const handleShare = async () => {
               );
               })}
             </Carousel>
-          ) : (
-            <Image
-                  className={` ${!post?.data()?.images ? 'hidden' : "rounded-md h-[300px] w-[450px] sm:w-full sm:h-[600px] xl:h-[250px] mr-2 object-cover"}`}
-                  src={post?.data()?.images}
-                  alt=''
-                />
-          )}
+          ) : ( */}
+          <Image
+  className={` ${!post?.data()?.images ? 'hidden' : "inline rounded-md"}`}
+  src={post?.data()?.images}
+  alt=''
+  width={620}
+  height={20} 
+  style={{ height: "500px" }}
+/>
+
+          {/* )} */}
 
      
-         {post?.data()?.video && (
+         {post?.data()?.videos && (
           <video autoPlay
           onClick={(e) => { 
             e.stopPropagation(); // Prevent the click event from bubbling up
@@ -789,7 +786,7 @@ const handleShare = async () => {
          
           }}
           className="rounded-2xl h-[300px] w-[450px] sm:w-full xl:h-[250px] sm:h-[600px] mr-2 object-cover"
-          src={post?.data()?.video}
+          src={post?.data()?.videos}
           alt=""
           controls
         />
@@ -805,7 +802,7 @@ const handleShare = async () => {
             <ChatIcon
               onClick={() => {
                 if (!user.id) {
-                  router.replace('/');
+                  router.replace('/signup');
                 } else {
                   setPostId(id);
                   setOpen(!open);

@@ -37,7 +37,7 @@ export default function Input() {
   const [emoji, setEmoji] = useState("");
   const [userDetails, setUserDetails] = useState(null);
   const router = useRouter();
-  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [selectedFile, setSelectedFile] = useState(null);
   const { user } = useUser()
 
   useEffect(() => {
@@ -71,38 +71,25 @@ export default function Input() {
           constituency: userData.constituency,
           ward: userData.ward,
           category:userData.category,
-          views: 0
+          views: []
         });
 
-        const imageUploadPromises = [];
-        const imageUrls = [];
-        if (selectedFiles.length > 0) {
-          selectedFiles.forEach((file, index) => {
-            const imageRef = ref(storage, `national/${docRef.id}/image-${index}`);
-            // Upload each image and store the URL
-            const uploadTask = uploadString(imageRef, file, "data_url").then(async () => {
-              const downloadURL = await getDownloadURL(imageRef);
-              imageUrls.push(downloadURL);
+        const imgRef = ref(storage, `national/${docRef.id}/images`);
+       if (selectedFile) {
+          await uploadString(imgRef, selectedFile, "data_url").then(async () => {
+            const downloadURL = await getDownloadURL(imgRef);
+            await updateDoc(doc(db, "national", docRef.id), {
+              images: downloadURL,
             });
-          
-            imageUploadPromises.push(uploadTask);
-          });
-  
-          // Wait for all images to upload
-          await Promise.all(imageUploadPromises);
-  
-          // Update Firestore document with all image URLs
-          await updateDoc(doc(db, "national", docRef.id), {
-            images: imageUrls,
           });
         }
         
-        const vidRef = ref(storage, `national/${docRef.id}/video`);
+        const vidRef = ref(storage, `national/${docRef.id}/videos`);
        if (selectedVidFile) {
           await uploadString(vidRef, selectedVidFile, "data_url").then(async () => {
             const downloadURL = await getDownloadURL(vidRef);
             await updateDoc(doc(db, "national", docRef.id), {
-              video: downloadURL,
+              videos: downloadURL,
             });
           });
         }
@@ -139,7 +126,7 @@ export default function Input() {
             constituency: userData.constituency,
             ward: userData.ward,
             category:userData.category,
-            views: 0
+            views: []
           });
         }
 
@@ -157,7 +144,7 @@ export default function Input() {
             constituency: userData.constituency,
             ward: userData.ward,
             category:userData.category,
-            views: 0
+            views: []
           });
         }
 
@@ -178,18 +165,13 @@ export default function Input() {
   };
 
   const addImageToPost = (e) => {
-    const files = e.target.files;
-    const fileReaders = [];
-  
-    for (let i = 0; i < files.length; i++) {
-      const reader = new FileReader();
-      fileReaders.push(reader);
-      reader.readAsDataURL(files[i]);
-  
-      reader.onload = (readerEvent) => {
-        setSelectedFiles((prevFiles) => [...prevFiles, readerEvent.target.result]);
-      };
+    const reader = new FileReader();
+    if (e.target.files[0]) {
+      reader.readAsDataURL(e.target.files[0]);
     }
+    reader.onload = (readerEvent) => {
+      setSelectedFile(readerEvent.target.result);
+    };
   };
 
 
@@ -276,7 +258,7 @@ export default function Input() {
               </div>
             )}
               <div className="flex gap-2 flex-wrap border-none">
-                {selectedFiles.map((file, index) => (
+                {selectedFile && (
                   <div key={index} className="border-none">
                     <XIcon
                       onClick={() => removeSelectedFile(index)}
@@ -288,7 +270,7 @@ export default function Input() {
                       alt={`image-${index}`}
                     />
                   </div>
-                ))}
+                )}
               </div>
               </>
             )}
