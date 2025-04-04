@@ -22,7 +22,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx"
-, "middleware.js", "pages/signup.js"  ],
+, "middleware.js", "pages/index.js"  ],
   "exclude": [
     "node_modules"
   ]

@@ -35,10 +35,9 @@ export default function Input() {
   const [postToConst, setPostToConst] = useState(false);
   const [postToCounty, setPostToCounty] = useState(false);
   const [emoji, setEmoji] = useState("");
-  const [userDetails, setUserDetails] = useState(null);
-  const router = useRouter();
   const [selectedFile, setSelectedFile] = useState(null);
   const { user } = useUser()
+  const router = useRouter();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -97,7 +96,7 @@ export default function Input() {
         if (postToWard) {
           const wardCollection = collection(db, "ward", userData.ward, "posts");
           await addDoc(wardCollection, {
-            uid: userDetails.uid,
+            uid: userData.uid,
             text: input,
             userImg: userData.userImg,
             timestamp: serverTimestamp(),
@@ -115,7 +114,7 @@ export default function Input() {
         if (postToConst) {
           const ConstituencyCollection = collection(db, "constituency", userData.constituency, "posts");
           await addDoc(ConstituencyCollection, {
-            uid: userDetails.uid,
+            uid: userData.uid,
             text: input,
             userImg: userData.userImg,
             timestamp: serverTimestamp(),
@@ -133,7 +132,7 @@ export default function Input() {
         if (postToCounty) {
           const countyCollection = collection(db, "county", userData.county, "posts");
           await addDoc(countyCollection, {
-            uid: userDetails.uid,
+            uid: userData.uid,
             text: input,
             userImg: userData.userImg,
             timestamp: serverTimestamp(),
