@@ -22,6 +22,7 @@ import {
 import { getDownloadURL, ref, uploadString } from "firebase/storage";
 import { Spinner, Tooltip } from "flowbite-react";
 import Picker from 'emoji-picker-react'
+import { useUser } from "@clerk/nextjs";
 
 export default function StatusModal() {
   
@@ -36,24 +37,12 @@ export default function StatusModal() {
   const videoPickerRef = useRef(null);
   const [emoji, setEmoji] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false); // State for EmojiPicker
-  const [userDetails, setUserDetails] = useState(null);
- 
-
-  const fetchUserData = async () => {
-    auth.onAuthStateChanged(async (user) => {
-      console.log(user)
-      setUserDetails(user)
-
-    })
-  }
-  useEffect(() => {
-    fetchUserData();
-  }, []);
+ const { user } = useUser()
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (userDetails) {
-        const q = query(collection(db, 'userPosts'), where('id', '==', userDetails.uid));
+      if (user?.id) {
+        const q = query(collection(db, 'userPosts'), where('uid', '==', user?.id));
         const querySnapshot = await getDocs(q);
         if (!querySnapshot.empty) {
           setUserData(querySnapshot.docs[0].data());
@@ -62,16 +51,16 @@ export default function StatusModal() {
     };
 
     fetchUserData();
-  }, [userDetails]);
+  }, [user?.id]);
 
   const sendStatus = async () => {
-    if (loading || !userDetails?.uid) return;
+    if (loading || !user?.id) return;
     setLoading(true);
 
     try {
       if (userData) {
         const docRef = await addDoc(collection(db, 'status'), {
-          id: userDetails.uid,
+          uid: user?.id,
           text: input,
           userImg: userData.userImg,
           timestamp: serverTimestamp(),
@@ -157,7 +146,7 @@ export default function StatusModal() {
         <Modal
           isOpen={open}
           onRequestClose={() => setOpen(false)}
-          className="lg:max-w-lg lg:w-[90%] w-[90%] absolute sm:left-[60%] left-[77%] max-h-[60%] top-24 translate-x-[-80%] bg-white dark:bg-gray-950 rounded-xl shadow-md z-50">
+          className="lg:max-w-lg lg:w-[90%] w-[90%] absolute sm:left-[60%] left-[77%] max-h-[60%] top-24 translate-x-[-80%] bg-white dark:bg-gray-950 rounded-xl shadow-md ">
           <div className="p-1">
             <div className="border-b border-gray-600 rounded-md py-2 px-1.5">
           <Tooltip content='close' arrow={false} placement="right" className="p-1 text-xs bg-gray-500">

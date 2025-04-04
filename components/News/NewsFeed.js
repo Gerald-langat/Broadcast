@@ -8,13 +8,15 @@ import News from "./News";
 
 export default function Feed() {
   const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchPost = async () => {
-      const q = query(
-        collection(db, "posts"), 
-        where('category', '==', 'News and Media Outlet'), 
+      setLoading(true)
+      try{
+         const q = query(
+        collection(db, "national"), 
+        where('category', '!=', 'Personal Account'), 
         orderBy("timestamp", "desc")
       );
       
@@ -24,14 +26,20 @@ export default function Feed() {
       });
   
       return () => unsubscribe();
+    } catch(error){
+        console.log("the error", error)
+      }
+     
     };
+      
     
     fetchPost();
   }, []);
   
   return (
-    <div className="dark:bg-gray-950 sm:border-x-[1px] dark:border-gray-700
-     border-gray-200 xl:min-w-[576px] min-w-[580px] sm:w-screen xl:max-w-[620px] sm:px-10 md:px-24 px-4 xl:px-0 h-screen">
+    <div className="dark:bg-gray-950 dark:border-gray-700 
+    border-gray-200 w-full sm:w-screen lg:min-w-[500px] 
+    lg:max-w-[620px] 2xl:min-w-[700px] sm:px-4 md:px-8 xl:px-0 min-h-screen 2xl:ml-20 ml-0 ">
      <div className="xl:border-0 sm:border-x-[1px] dark:border-gray-700 border-gray-200">
       {loading ? (
         <Button color="gray" className="border-0">

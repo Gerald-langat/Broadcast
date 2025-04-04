@@ -49,7 +49,7 @@ export default function Feed() {
         <Stories />
       </div>
       
-      <div className="top-0 sticky bg-white z-50 dark:bg-gray-950">
+      <div className="top-0 sticky z-5 bg-white dark:bg-gray-950">
         <Input />
       </div>
 

@@ -1,31 +1,20 @@
 import { useEffect, useState } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/outline';
-import { auth, db } from '../firebase';
+import { db } from '../firebase';
 import { collection, deleteDoc, onSnapshot, orderBy, query } from 'firebase/firestore';
 import Story from './Story';
+import { useUser } from '@clerk/nextjs';
 
 function Stories() {
   const [posts, setPosts] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
 const [loading, setLoading ] = useState(false);
-const [userDetails, setUserDetails] = useState(null);
- 
-
-const fetchUserData = async () => {
-  auth.onAuthStateChanged(async (user) => {
-    console.log(user)
-    setUserDetails(user)
-
-  })
-}
-useEffect(() => {
-  fetchUserData();
-}, []);
+const { user } = useUser()
 
   const postsPerPage = 5;
   
   useEffect(() => {
-    if (!userDetails?.uid) return;
+    if (!user?.id) return;
   
     const q = query(
       collection(db, 'status'),
@@ -67,7 +56,7 @@ useEffect(() => {
     return () => {
       unsubscribe();
     };
-  }, [userDetails?.uid]);
+  }, [user?.id]);
   
   
   const handlePrevClick = () => {

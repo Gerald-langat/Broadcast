@@ -5,6 +5,7 @@ import { DotsHorizontalIcon, TrashIcon  } from '@heroicons/react/outline';
 import { Popover } from 'flowbite-react';
 import { ReactionBarSelector } from '@charkour/react-reactions';
 import { collection, deleteDoc, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
+import { useUser } from '@clerk/nextjs';
 
 const emojiMap = {
   happy: "😊",
@@ -16,7 +17,7 @@ const emojiMap = {
 };
 
 function MessageContainer({ message, id }) {
-  const [userDetails, setUserDetails] = useState(null);
+  const { user } = useUser()
 
   const handleReactionSelect = async (reaction) => {
     try {
@@ -32,7 +33,7 @@ function MessageContainer({ message, id }) {
         
         // Update the document with the selected emoji
         await updateDoc(docRef, {
-          emojiID: userDetails.uid,
+          emojiID: user?.id,
           emoji: emojiMap[reaction] || reaction // Set the emoji
         });
       });
@@ -65,19 +66,11 @@ function MessageContainer({ message, id }) {
     }
   }
   // Fetch user data on component mount
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        setUserDetails(user);
-      }
-    });
 
-    return () => unsubscribe();
-  }, []);
 
   
 
-  const userId = userDetails?.uid;
+  const userId = user?.id;
 
   
   return (
@@ -94,10 +87,10 @@ function MessageContainer({ message, id }) {
     </p>
 
           <div className="absolute left-0 w-full flex justify-end p-1">
-          {message?.emojiID === userDetails?.uid && (
+          {message?.emojiID === user?.id && (
             <span className="text-lg">{message?.emoji}</span>
           )}
-          {message?.emojiID !== userDetails?.uid && (
+          {message?.emojiID !== user?.id && (
             <span className="text-lg">{message?.emoji}</span>
           )}
           </div>
@@ -163,10 +156,10 @@ function MessageContainer({ message, id }) {
     />
     
           <div className="absolute  left-0 w-full flex  p-1">
-          {message?.emojiID === userDetails?.uid && (
+          {message?.emojiID === user?.id && (
             <span className="text-lg">{message?.emoji}</span>
           )}
-          {message?.emojiID !== userDetails?.uid && (
+          {message?.emojiID !== user?.id && (
             <span className="text-lg">{message?.emoji}</span>
           )}
           </div>

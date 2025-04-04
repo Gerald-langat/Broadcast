@@ -1,15 +1,14 @@
-import { useRouter } from 'next/router';
+import Link from "next/link";
 
 
 function SearchComponent({ post }) {
-  const router = useRouter();
-  const name = post.name;
-  const nickname = post.nickname;
+
+
   return (
     <div>
       {post && (
-        <div className="flex cursor-pointer items-center dark:hover:bg-gray-900 py-5 sm:py-2 hover:bg-slate-100 w-full"
-         onClick={() =>  router.push(`/mediapost/${ name || nickname}`)}>
+        <Link href={`/mediapost/${post.name}`}>
+        <div className="flex cursor-pointer items-center dark:hover:bg-gray-900 py-5 sm:py-2 hover:bg-slate-100 w-full">
           
           <div className="flex items-center">
             <img
@@ -26,6 +25,7 @@ function SearchComponent({ post }) {
             </div>
 
         </div>
+        </Link>
       )}
     </div>
   );

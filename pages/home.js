@@ -4,8 +4,8 @@ import { addDoc, collection, doc, getDocs, query, serverTimestamp, updateDoc, wh
 import { getDownloadURL, ref, uploadString } from 'firebase/storage';
 import countyData from '../county.json';
 import { Cursor, useTypewriter } from 'react-simple-typewriter';
-import { Button, Dropdown, Modal, Popover, Tooltip } from 'flowbite-react';
-import { auth, db, storage } from '../firebase';
+import { Button,  Modal, Popover, Tooltip } from 'flowbite-react';
+import {  db, storage } from '../firebase';
 import Head from 'next/head';
 import BackgroundCircles from '../components/BackgroundCircles';
 import { ChevronDownIcon } from '@heroicons/react/outline';

@@ -113,7 +113,7 @@ export default function Sidebar() {
           )}
           
           <div className='-ml-20 md:ml-16 w-[292px]'>
-          <Link href='/home'>
+          <Link href='/national'>
             <div className='flex cursor-pointer items-center space-x-4 dark:text-gray-200 dark:hover:bg-gray-900 hover:bg-gray-200 rounded-full w-full px-2 sm:py-2 py-4'>
               <HomeIcon className='h-9'/>
               <span className='text-2xl sm:text-lg'>Home</span>
@@ -137,13 +137,13 @@ export default function Sidebar() {
               <span className='text-2xl sm:text-lg'>MarketPlace</span>
             </div>
             </Link>
-            <Link href='/messages'>
+            <Link href={'/messages'}>
             <div className='flex  items-center space-x-4 dark:text-gray-200 dark:hover:bg-gray-900 hover:bg-gray-200 rounded-full w-full px-2 sm:py-2 py-4 cursor-pointer' onClick={() => router.push('/messages')}>
               <InboxInIcon className='h-9'/>
               <span className='text-2xl sm:text-lg'>Message</span>
             </div>
             </Link>
-            <Link href='/profile'>
+            <Link href={'/profile'}>
             <div className='flex items-center space-x-4 dark:text-gray-200 dark:hover:bg-gray-900 hover:bg-gray-200 rounded-full w-full px-2 sm:py-2 py-4 cursor-pointer' onClick={() => router.push('/profile')}>
               <UserIcon className='h-9'/>
               <span className='text-2xl sm:text-lg'>Profile</span>

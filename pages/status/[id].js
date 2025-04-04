@@ -6,6 +6,7 @@ import Head from 'next/head';
 import { Spinner } from 'flowbite-react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { deleteObject } from 'firebase/storage';
+import { useUser } from '@clerk/nextjs';
 
 export default function StatusPage() {
   const router = useRouter();
@@ -14,56 +15,47 @@ export default function StatusPage() {
   const [currentIndex, setCurrentIndex] = useState(0); // Track the current status index
   const [progress, setProgress] = useState(0); // Progress for the current status
   const [loading, setLoading] = useState(true);
-  const [userDetails, setUserDetails] = useState(null);
   const [isPaused, setIsPaused] = useState(false);
   const timerRef = useRef(null);
-  
-
-  const fetchUserData = async () => {
-    auth.onAuthStateChanged(async (user) => {
-      console.log(user)
-      setUserDetails(user)
-    })
-  } 
-  useEffect(() => {
-    fetchUserData();
-  }, []);
+  const { user } = useUser()
 
   useEffect(() => {
     if (!id) return;
   
-    const q = query(collection(db, 'status'), where('id', '==', id));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const statusList = snapshot.docs.map((doc) => ({
-        docId: doc.id, // Include document ID
-        ...doc.data(),
-      })); // Use parentheses for implicit return
-  
-      setStatuses(statusList);
+    const docRef = doc(db, "status", id);
+    
+    const unsubscribe = onSnapshot(docRef, (snapshot) => {
+      if (snapshot.exists()) {
+        setStatuses([{ docId: snapshot.id, ...snapshot.data() }]); // Convert single doc to array
+      } else {
+        setStatuses([]); // Handle case where document does not exist
+      }
       setLoading(false);
     });
   
-    return () => unsubscribe();
+    return () => unsubscribe && unsubscribe(); // Cleanup function
   }, [id]);
+  
    
   // delete status
-  async function deleteStatus(docId) {
-    if (!docId) {
-      console.error("docId is undefined");
+  async function deleteStatus() {
+    if (!id) {
+      console.error("id is undefined");
       return;
     }
     if (window.confirm("Are you sure you want to delete this status?")) {
       try {
         console.log("Deleting Firestore document...");
-        await deleteDoc(doc(db, "status", docId));
-        await deleteObject(ref(storage, `status/${docId}/video`));
+        await deleteDoc(doc(db, "status", id));
+        await deleteObject(ref(storage, `status/${id}/video`));
         console.log("Firestore document deleted successfully.");
-        console.log('this is the best id', docId);
-        setStatuses((prev) => prev.filter((status) => status.docId !== docId)); // Update local state
+        console.log('this is the best id', id);
+        setStatuses((prev) => prev.filter((status) => status.id !== id)); // Update local state
       } catch (error) {
         console.error("Error deleting Firestore document:", error);
       }
     }
+    router.replace('/national')
   }
   
   const pauseOrResume = () => {
@@ -82,7 +74,7 @@ export default function StatusPage() {
               setCurrentIndex((prevIndex) => prevIndex + 1);
               return 0;
             } else {
-              router.push('/home'); // Exit when all statuses are viewed
+              router.push('/national'); // Exit when all statuses are viewed
               return prev;
             }
           }
@@ -101,7 +93,7 @@ export default function StatusPage() {
       setCurrentIndex(currentIndex + 1);
       setProgress(0);
     } else {
-      router.push('/home'); // Exit when reaching the end
+      router.push('/national'); // Exit when reaching the end
     }
   };
 
@@ -119,7 +111,7 @@ export default function StatusPage() {
   }
 
   if (!statuses){
-    router.replace('/home')
+    router.replace('/national')
   }
 
   return (
@@ -168,8 +160,8 @@ export default function StatusPage() {
         <div className='flex space-x-2 ml-auto mt-4 z-50'>
         {/* delete */}
         <button
-            onClick={() => deleteStatus(statuses[currentIndex]?.docId)}
-            className={`${id == userDetails.uid ? " z-50 bg-red-500 text-white px-4 py-2 rounded" : "hidden"}`}
+            onClick={() => deleteStatus(statuses[currentIndex]?.id)}
+            className={`${statuses[currentIndex]?.uid == user?.id ? " z-50 bg-red-500 text-white px-4 py-2 rounded" : "hidden"}`}
           >
             Delete
         </button>
@@ -194,8 +186,8 @@ export default function StatusPage() {
           </p>
         </div>
       <button
-      onClick={() => deleteStatus(statuses[currentIndex]?.docId)}
-      className={`${id == userDetails?.uid ? "absolute top-4 right-4 z-50 bg-red-500 text-white px-4 py-2 rounded" : "hidden"}`}
+      onClick={() => deleteStatus(statuses[currentIndex]?.id)}
+      className={`${statuses[currentIndex]?.uid == user?.id ? "absolute top-4 right-4 z-50 bg-red-500 text-white px-4 py-2 rounded" : "hidden"}`}
     >
       Delete
     </button>

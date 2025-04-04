@@ -4,19 +4,16 @@ import { db } from '../../firebase';
 import { collection, getDocs, onSnapshot, orderBy, query, where } from 'firebase/firestore';
 import { Button, Spinner } from 'flowbite-react';
 import { AnimatePresence, motion } from 'framer-motion'; 
-import { SearchIcon, ShoppingCartIcon } from '@heroicons/react/outline';
+import { SearchIcon } from '@heroicons/react/outline';
 import {  XIcon } from 'lucide-react';
-import { HomeIcon,  OfficeBuildingIcon, PauseIcon, UserIcon } from '@heroicons/react/outline'
-import { useRouter } from 'next/router';
 import SearchComponent from './SearchList';
-import Link from 'next/link';
+import Sidebar from '../National/Sidebar';
 
 function MediaFeed() {
   const [posts, setPosts] = useState([]);
   const [qSearch, setQuerySearch] = useState([]);
   const [loading, setLoading] = useState(true);
   const [querySearch, setQuery] = useState('');
-  const router = useRouter();
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -25,19 +22,27 @@ function MediaFeed() {
           collection(db, "national"), 
           orderBy("timestamp", "desc")
         );
+  
         const unsubscribe = onSnapshot(q, (snapshot) => {
-          setPosts(snapshot.docs);
+          const filteredPosts = snapshot.docs
+            .map(doc => ({ id: doc.id, ...doc.data() })) // Correct id extraction
+            .filter(post => post.mediaType === "image" || post.mediaType === "video" || post.name); // Ensure correct filtering
+  
+          setPosts(filteredPosts);
         });
-        return () => unsubscribe && unsubscribe(); // Ensure unsubscribe exists before returning it
+  
+        return () => unsubscribe && unsubscribe();
       } catch (err) {
         console.error(err);
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchPost();
-  }, []); // Removed 'posts' as a dependency to avoid an infinite loop
+  }, []);
+  
+   // Removed 'posts' as a dependency to avoid an infinite loop
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,14 +54,14 @@ function MediaFeed() {
   
         // Query for matching names
         const q1 = query(
-          collection(db, 'national'),
+          collection(db, 'userPosts'),
           where('name', '>=', querySearch),
           where('name', '<=', querySearch + '\uf8ff')
         );
   
         // Query for matching nickname
         const q2 = query(
-          collection(db, 'national'),
+          collection(db, 'userPosts'),
           where('nickname', '>=', querySearch),
           where('nickname', '<=', querySearch + '\uf8ff')
         );
@@ -107,60 +112,17 @@ function MediaFeed() {
           <span className="pl-3 animate-pulse">Loading...</span>
         </Button>
       ) : (
-        <div className="flex md:px-8 lg:px-10">
+        <div className="flex w-4/4 ">
           {/* Sidebar */}
-          <div className="hidden sm:inline w-1/4 ">
-          <div className='space-y-6 top-14 sticky'>
-            <div
-              className="flex sm:items-center mt-14 space-x-2 cursor-pointer dark:hover:bg-gray-900 hover:bg-gray-300 p-1 w-fit rounded-full"
-              onClick={() => router.push('/home')}
-            >
-              <HomeIcon className="h-10 sm:h-8" />
-              <span className="hidden md:inline font-bold text-xl">Home</span>
-            </div>
-            <Link href={`/marketplace`}>
-            <div
-              className="flex sm:items-center space-x-2 cursor-pointer dark:hover:bg-gray-900 hover:bg-gray-300 p-1 w-fit rounded-full"
-             
-            >
-              <OfficeBuildingIcon className="h-10 sm:h-8" />
-              <span className="hidden md:inline font-bold text-xl truncate">MarketPlace</span>
-            </div>
-            </Link>
-            <Link href={`/media`}>
-            <div
-              className="flex sm:items-center space-x-2 cursor-pointer dark:hover:bg-gray-900 hover:bg-gray-300 p-1 w-fit rounded-full"
-            >
-              <PauseIcon className="h-10 sm:h-8" />
-              <span className="hidden md:inline font-bold text-xl">Media</span>
-            </div>
-            </Link>
-            <Link href={`/products`}>
-            <div
-              className="flex sm:items-center space-x-2 cursor-pointer dark:hover:bg-gray-900 hover:bg-gray-300 p-1 w-fit rounded-full"
-            >
-              <ShoppingCartIcon className="h-10 sm:h-8" />
-              <span className="hidden md:inline font-bold text-xl">Products</span>
-            </div>
-            </Link>
-            <Link href={`/profile`}>
-            <div
-              className="flex sm:items-center space-x-2 cursor-pointer dark:hover:bg-gray-900 hover:bg-gray-300 p-1 w-fit rounded-full"
-           
-            >
-              <UserIcon className="h-10 sm:h-8" />
-              <span className="hidden md:inline font-bold text-xl">Profile</span>
-            </div>
-            </Link>
-          </div>
-          </div>
-
+          <div className='hidden w-2/4 lg:inline '>
+         <Sidebar />
+        </div>
           {/* Center Section */}
           <div className="flex flex-col justify-center w-full relative">
-            {/* Search Bar */}
-            <div className=" flex flex-col py-1 justify-center items-center space-x-4 w-full top-0 z-10  sticky space-y-2">
-              <form className="flex items-center px-4 w-full py-2 sm:w-[400px] space-x-4 rounded-full">
-                <div className="flex items-center border-[1px] w-full rounded-full dark:border-gray-500">
+            <div className=" flex flex-col justify-center items-center space-x-4 w-full top-0 z-10  sticky space-y-2">
+            <div className=" dark:bg-gray-950 z-50 flex justify-center  w-full top-0 sticky border-x-0 border-b-[1px] shadow-sm ">
+              <form className="flex items-center px-4 w-1/2 py-2  space-x-4 rounded-md">
+                <div className="flex items-center border-[1px] w-full rounded-md dark:border-gray-500">
                   <SearchIcon className="h-10 sm:h-8 ml-2 text-gray-600 dark:text-gray-500" />
                   <input
                     type="text"
@@ -174,34 +136,30 @@ function MediaFeed() {
                     onClick={clear}
                   />
                 </div>
-              </form>
+              </form> 
+          </div>
 
-              <div className='absolute top-14 dark:shadow-gray-400  shadow-md shadow-gray-400 overflow-y-auto container
-               sm:w-[400px] z-50 fit max-h-80 rounded-lg flex flex-grow '>
+              <div className='dark:bg-gray-950 z-50 flex justify-center w-1/2 top-0 sticky border-x-0  px-4 '>
               {querySearch && (            
-              <div className=" dark:bg-gray-950 sm:w-[400px] ">
+              <div className=" dark:bg-gray-950 w-full mx-auto border-b-[1px] shadow-sm">
                 {qSearch.map((post) => (
                       <>
                       <div key={post.id}>  
                         <SearchComponent 
                           key={post.id} 
                           post={post} 
-                         
+                         id={post.id}
+                        
                           />
                     </div>
                     </>
                     ))}
-              </div>
-                  
+              </div>     
                 )}
               </div>
-                </div>
-
-            
-
             {/* Media Grid */}
-            <div className="flex justify-center items-center w-full md:h-[700px] scrollbar-hide p-6 top-4 sticky">
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+            
+              <div className="w-full  grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
                 <AnimatePresence>
                   {posts.map((post) => (
                     <motion.div
@@ -216,8 +174,8 @@ function MediaFeed() {
                   ))}
                 </AnimatePresence>
               </div>
-            </div>
           </div>
+        </div>
         </div>
       )}
     </div>

@@ -5,7 +5,6 @@ import Trends from './Trends';
 import { query } from 'firebase/database';
 import SearchComponent from './Search';
 import { SearchIcon, XIcon } from '@heroicons/react/outline';
-import { useRouter } from 'next/router';
 import { Button, Spinner } from 'flowbite-react';
 import Link from 'next/link';
 // import LiveStream from '../../pages/liveStream/livestream';
@@ -16,7 +15,6 @@ export default function Widgets() {
   const [querySearch, setQuery] = useState('');
   const [trends, setTrendPosts] = useState([]);
   const [trendingTopics, setTrendingTopics] = useState([]);
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {

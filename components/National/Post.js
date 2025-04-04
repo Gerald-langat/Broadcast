@@ -38,6 +38,7 @@ import { FlagIcon, BookmarkIcon } from "@heroicons/react/solid";
 import { useFollow } from "../FollowContext";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
+import Image from "next/image";
 
 
 
@@ -294,7 +295,7 @@ const handleShare = async () => {
           citeUserImg: postData.userImg,
           // Include image and video only if they are defined
          
-          ...(postData.category && { fromCategory: postData.category }),
+          ...(postData.category && { category: postData.category }),
           ...(postData.images && { images: postData.images }),
           ...(postData.video && { video: postData.video }),
         };
@@ -350,7 +351,7 @@ const handleShare = async () => {
             // Include image and video only if they are defined
           
             
-            ...(postData.category && { fromCategory: postData.category }),
+            ...(postData.category && { category: postData.category }),
             ...(postData.images && { images: postData.images }),
             ...(postData.video && { video: postData.video }),
         });
@@ -400,7 +401,7 @@ const handleShare = async () => {
 
 
   // Check if the post is already bookmarked
-  const userId = userData?.uid;
+  const userId = user?.id;
   const pstId = post?.id;
   // Toggle bookmark
   const checkBookmark = async () => {
@@ -544,7 +545,7 @@ const handleShare = async () => {
         <>
       {post?.data()?.userImg && (
 <Link href={`/userProfile/${uid}`}>
-             <img
+             <Image
         className="sm:h-12 sm:w-12 h-14 w-14 rounded-md mr-4 object-fit shadow-gray-800 shadow-sm dark:shadow-gray-600"
         src={post?.data()?.userImg}
         alt="user-img"
@@ -694,7 +695,7 @@ const handleShare = async () => {
         <div className="flex p-1">
         {post?.data()?.citeUserImg && (
           <>
-        <img
+        <Image
         className="h-8 w-8 rounded-md mr-4"
         src={post?.data()?.citeUserImg}
         alt="user-img"
@@ -714,7 +715,7 @@ const handleShare = async () => {
           <Carousel className={`${!post?.data()?.images ? 'hidden' : "top-0  h-[300px] w-full"}`}>
             {post?.data()?.images.map((imageUrl, index) => {
               return (
-                <img
+                <Image
                   key={index}
                   className="object-cover w-full h-full" 
                   src={imageUrl}
@@ -724,14 +725,14 @@ const handleShare = async () => {
             })}
           </Carousel>
         ) : (
-          <img
+          <Image
             className={`${!post?.data()?.images ? 'hidden' : "w-full  h-[300px] object-cover rounded-t-md"}`}
             src={post?.data()?.images} // Ensure this is a single image
             alt=""
           />
         )}
 
-        
+     
         {post?.data()?.video && (
           <video autoPlay
           onClick={(e) => { 
@@ -761,7 +762,7 @@ const handleShare = async () => {
               {post?.data()?.images.map((imageUrl, index) => {
               console.log(imageUrl, index); // Check what images are being loaded
                 return(
-                <img
+                <Image
                   key={index}
                   className="object-cover h-full w-full"
                   src={imageUrl}
@@ -771,7 +772,7 @@ const handleShare = async () => {
               })}
             </Carousel>
           ) : (
-            <img
+            <Image
                   className={` ${!post?.data()?.images ? 'hidden' : "rounded-md h-[300px] w-[450px] sm:w-full sm:h-[600px] xl:h-[250px] mr-2 object-cover"}`}
                   src={post?.data()?.images}
                   alt=''

@@ -1,20 +1,19 @@
 import Head from 'next/head';
 import React, { useEffect, useRef, useState } from 'react';
-import { auth, db, storage } from '../../firebase';
-import { addDoc, collection, doc, getDocs, onSnapshot, orderBy, query, serverTimestamp, updateDoc, where } from 'firebase/firestore';
+import { db, storage } from '../../firebase';
+import { addDoc, collection, doc, getDocs, onSnapshot, query, serverTimestamp, updateDoc, where } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadString } from 'firebase/storage';
-import Moment from 'react-moment';
 import { SendHorizonalIcon } from 'lucide-react';
 import MessageContainer from './MessageContainer';
 import {  motion } from "framer-motion";
-import { EmojiHappyIcon, MenuAlt1Icon, PhotographIcon, SearchIcon, XIcon } from '@heroicons/react/outline';
+import { EmojiHappyIcon, PhotographIcon, XIcon } from '@heroicons/react/outline';
 import EmojiPicker from 'emoji-picker-react';
 import { Spinner } from 'flowbite-react';
+import { useUser } from '@clerk/nextjs';
 
 
-function Message({ post, id }) {
+function Message({ post, uid }) {
   const [input, setInput] = useState('');  // Initialize input with empty string
-  const [userDetails, setUserDetails] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [messages, setMessages] = useState([]);
@@ -24,24 +23,12 @@ function Message({ post, id }) {
   const filePickerRef = useRef(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const endOfMessagesRef = useRef();
-
-
-  // Fetch user details on component mount
-  const fetchUserData = async () => {
-    auth.onAuthStateChanged(async (user) => {
-      console.log(user)
-      setUserDetails(user)
-
-    })
-  }
-  useEffect(() => {
-    fetchUserData();
-  }, []);
+  const { user } = useUser()
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (userDetails) {
-        const q = query(collection(db, 'userPosts'), where('id', '==', userDetails.uid));
+      if (user?.id) {
+        const q = query(collection(db, 'userPosts'), where('uid', '==', user?.id));
         const querySnapshot = await getDocs(q);
         if (!querySnapshot.empty) {
           setUserData(querySnapshot.docs[0].data());
@@ -49,19 +36,18 @@ function Message({ post, id }) {
       }
     };
     fetchUserData();
-  }, [userDetails]);
+  }, [user?.id]);
 
 
   useEffect(() => {
-    fetchUserData();
   
-    if ( !id || !userDetails?.uid) {
+    if ( !uid || !user?.id) {
     setLoading(true);
     } else {
       const q = query(
         collection(db, 'DMs'),
-        where('id', 'in', [userDetails.uid, id]),       // Messages sent by you or the recipient
-        where('recipientId', 'in', [userDetails.uid, id]), // Messages received by you or the recipient
+        where('uid', 'in', [user.id, uid]),       // Messages sent by you or the recipient
+        where('recipientId', 'in', [user.id, uid]), // Messages received by you or the recipient
        
       );
   
@@ -74,7 +60,7 @@ function Message({ post, id }) {
   
       return () => unsub();
     }
-  }, [id, userDetails]);
+  }, [uid, user?.id]);
   
   
   
@@ -85,14 +71,14 @@ function Message({ post, id }) {
     setLoading(true);
   
     try {
-      if (userDetails || post) {
+      if (user?.id || userData || post) {
         const messageData = {
-          id: userDetails.uid,      
-          recipientId: id,
+          uid: user?.id,      
+          recipientId: post?.uid,
           messagetext: input,
           userImg: userData.userImg || '', // Assuming userDetails contains the image
           timestamp: serverTimestamp(),
-          name: userDetails.displayName || '',
+          name: userData.name || '',
         };
   
         // Add message to Firestore under the 'DMs' collection and get the reference to the newly created document
@@ -145,117 +131,107 @@ function Message({ post, id }) {
   }
   
   return (
-    <div className='h-screen flex flex-col'>
+    <div className="h-screen flex flex-col bg-white dark:bg-gray-900">
     <Head>
-      <title>{post?.name && post?.lastname ? `${post.name} ${post.lastname}` : 'Loading...'}</title>
+      <title>{post?.name && post?.lastname ? `${post.name} ${post.lastname}` : "Loading..."}</title>
       <meta name="description" content="Generated and created by redAnttech" />
       <link rel="icon" href="../../images/Brod.png" />
     </Head>
   
     {/* Chat Header */}
     {post && (
-      <div className="flex items-center p-4 border-b dark:border-gray-700">
-       
+      <div className="flex items-center p-4 border-b dark:border-gray-700 bg-white dark:bg-gray-800">
         <div className="flex items-center">
           <img
-            className="sm:h-9 sm:w-9 h-12 w-12 rounded-full mb-1 ml-1 mt-1 mr-1"
+            className="h-12 w-12 sm:h-9 sm:w-9 rounded-full ml-2"
             src={post.userImg}
             alt="user-img"
           />
         </div>
-        <div className="flex space-x-2 text-2xl sm:text-sm">
-          <p>{post.name}</p>
-          <p>{post.lastname}</p>
-          <p className="text-gray-400">@{post.nickname}</p>
+        <div className="ml-3 text-lg sm:text-sm text-gray-900 dark:text-gray-200">
+          <p className="font-semibold">{post.name} {post.lastname}</p>
+          <p className="text-gray-500">@{post.nickname}</p>
         </div>
       </div>
     )}
   
     {/* Chat Messages */}
-    {loading ? <Spinner className='h-6'/> : (
-
-    <div className="flex-1 overflow-y-auto scrollbar-hide" onClick={() => setShowEmojiPicker(false)}>
-  {messages.map((messageDoc) => (
-        
-        <motion.div
-          key={messageDoc.id}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 1 }}
-        >
-          <MessageContainer key={messageDoc.id} id={messageDoc.id} message={messageDoc} />
-        </motion.div>
-      ))}
-
-      
-      
-  <div ref={endOfMessagesRef} />
-       
+    <div className="flex-1 overflow-y-auto px-4 pt-4 pb-16 scrollbar-hide" onClick={() => setShowEmojiPicker(false)}>
+      {loading ? (
+        <div className="flex justify-center items-center h-full">
+          <Spinner className="h-6" />
+        </div>
+      ) : (
+        messages.map((messageDoc) => (
+          <motion.div
+            key={messageDoc.id}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1 }}
+          >
+            <MessageContainer id={messageDoc.id} message={messageDoc} />
+          </motion.div>
+        ))
+      )}
+      <div ref={endOfMessagesRef} />
     </div>
-
-  )}
-
+  
     {/* Input Form */}
-    <form onSubmit={sendPost} className="relative mb-2 bottom-0  rounded-full flex items-center border-[1px] dark:border-gray-500 px-4 py-2">
-    
-    {selectedFile && (
-              <div className="relative ml-8">
-                <XIcon
-                  onClick={() => setSelectedFile(null)}
-                  className="border h-7 text-black absolute cursor-pointer shadow-md border-white m-1 rounded-full"
-                />
-                <img
-                  src={selectedFile}
-                  className={`${loading && "animate-pulse"} h-[100px] w-[200px] object-cover rounded-md `}
-                  alt="image"
-                />
-              </div>
-            )}
-      <div className='space-x-4 flex'>
-        <EmojiHappyIcon className='h-6 sm:h-8 text-gray-500 cursor-pointer hidden lg:inline' onClick={() => setShowEmojiPicker(!showEmojiPicker)} />
-        <PhotographIcon className='h-6 sm:h-8 text-gray-500 cursor-pointer' onClick={() => filePickerRef.current.click()}/>
-        <input
-          type="file"
-          hidden
-          accept="image/*"
-          ref={filePickerRef}
-          onChange={addImageToPost}
-        />
+    <form onSubmit={sendPost} className="relative bottom-0 flex items-center border-t dark:border-gray-700 px-4 py-2 bg-white dark:bg-gray-800 w-full">
+      {selectedFile && (
+        <div className="relative ml-4">
+          <XIcon
+            onClick={() => setSelectedFile(null)}
+            className="border h-6 text-black dark:text-white absolute cursor-pointer shadow-md border-white rounded-full"
+          />
+          <img
+            src={selectedFile}
+            className="h-[100px] w-[200px] object-cover rounded-md"
+            alt="image"
+          />
+        </div>
+      )}
+  
+      {/* Emoji & Image Upload Icons */}
+      <div className="space-x-4 flex">
+        <EmojiHappyIcon className="h-6 text-gray-500 cursor-pointer hidden lg:inline" onClick={() => setShowEmojiPicker(!showEmojiPicker)} />
+        <PhotographIcon className="h-6 text-gray-500 cursor-pointer" onClick={() => filePickerRef.current.click()} />
+        <input type="file" hidden accept="image/*" ref={filePickerRef} onChange={addImageToPost} />
       </div>
-      
+  
+      {/* Chat Input */}
       <input
         type="text"
         value={input}
         onChange={(e) => setInput(e.target.value)}
         onClick={() => setShowEmojiPicker(false)}
         placeholder={`Start a new chat with ${post.name}`}
-        className="dark:bg-gray-950 dark:text-gray-300 rounded-full text-gray-900 focus:ring-0 outline-none border-0 w-full"
+        className="flex-1 bg-transparent dark:bg-gray-900 text-gray-900 dark:text-gray-300 px-4 py-2 rounded-full focus:ring-0 outline-none border-0 w-full"
       />
-      <button>
-        <SendHorizonalIcon className={`${!input ? 'cursor-not-allowed' : 'text-gray-900 dark:text-gray-400' } text-gray-600 h-9`} />
+  
+      {/* Send Button */}
+      <button type="submit" disabled={!input}>
+        <SendHorizonalIcon className={`${!input ? "cursor-not-allowed opacity-50" : "text-gray-900 dark:text-gray-400"} h-8`} />
       </button>
     </form>
   
     {/* Emoji Picker */}
-    <div className='absolute bottom-16'>
-      {emoji.emoji}
-      {emoji && <a href={emoji.getImageUrl()}></a>}
-      {showEmojiPicker && (
+    {showEmojiPicker && (
+      <div className="absolute bottom-16 left-4 z-50 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-2">
         <EmojiPicker
-          className="dark:bg-gray-950"
           height={400}
           width={300}
           emojiStyle="twitter"
-          onEmojiClick={(e) => {
-            setInput(input + e.emoji)
-          }}
+          onEmojiClick={(e) => setInput(input + e.emoji)}
         />
-      )}
-    </div>
+      </div>
+    )}
   
-    {error && <p className="text-red-500">{error}</p>}
+    {/* Error Message */}
+    {error && <p className="text-red-500 text-center mt-2">{error}</p>}
   </div>
+  
   
   );
 }
