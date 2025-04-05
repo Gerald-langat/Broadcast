@@ -28,11 +28,9 @@ export default function Feed() {
 
 
   return (
-    <div className="dark:bg-gray-950 dark:border-gray-700 
-    border-gray-200 w-full sm:w-screen lg:min-w-[500px] 
-    lg:max-w-[620px] 2xl:min-w-[700px] sm:px-4 md:px-8 xl:px-0 min-h-screen 2xl:ml-20 ml-0 ">
 
-     <div className=" dark:border-gray-700 border-gray-200 w-full">
+
+     <div className="">
     {loading ? (
         <Button color="gray" className="border-0 items-center flex mt-4 sm:mt-0">
           <Spinner aria-label="Loading spinner" size="md" />
@@ -76,7 +74,6 @@ export default function Feed() {
       </>
       )}
     </div>
-  
-    </div>
+
   );
 }

@@ -37,7 +37,7 @@ export default function Input() {
   const [emoji, setEmoji] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
   const { user } = useUser()
-  const router = useRouter();
+
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -149,7 +149,7 @@ export default function Input() {
         }
 
         setInput("");
-        setSelectedFiles([]);
+        setSelectedFile(null);
         setSelectedVidFile(null);
         setLoading(false);
         setPostToWard(false); 
@@ -203,8 +203,8 @@ export default function Input() {
     }
   };
   
-  const removeSelectedFile = (index) => {
-    setSelectedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+  const removeSelectedFile = () => {
+    setSelectedFile(null);
   };
   
 

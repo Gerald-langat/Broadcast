@@ -290,7 +290,7 @@ const handleShare = async () => {
           nickname: userData.nickname,
           from: postData.name,
           fromNickname: postData.nickname,
-          citeUserImg: postData.userImg,
+          userImg: postData.ug,
           // Include image and video only if they are defined
          
           ...(postData.category && { category: postData.category }),
@@ -344,7 +344,7 @@ const handleShare = async () => {
             nickname: userData.nickname,
             fromNickname: postData.nickname,
             fromlastname: postData.lastname,
-            citeUserImg: postData.userImg,
+            userImg: postData.userImg,
             // Include image and video only if they are defined
           
             
@@ -534,7 +534,7 @@ const handleShare = async () => {
 
 <div className={`w-full ${isHidden ? 'inline text-2xl sm:text-xl cursor-pointer dark:hover:bg-gray-800 hover:bg-gray-200 rounded-md p-1' : 'hidden'}`} onClick={handleUndo}>{showUndo && 'undo'}</div>
     
-    <div className={`${isHidden ? 'hidden' : "flex cursor-pointer border-[1px] border-gray-200 dark:border-gray-900 bg-white dark:bg-gray-950 dark:text-gray-300 z-40 flex-grow h-full flex-1 p-2 rounded-md mt-1 sm:w-full"}`}>
+    <div className={`${isHidden ? 'hidden' : "flex border-[1px] rounded-md p-1"}`}>
   {loading ? (
         <Button color="gray" className="border-0 ">
           <Spinner aria-label="Loading spinner" size="sm" />

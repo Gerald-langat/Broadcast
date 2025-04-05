@@ -4,9 +4,9 @@ import { RecoilRoot } from "recoil";
 import { FollowProvider } from '../components/FollowContext';
 import { ClerkProvider, useUser } from '@clerk/nextjs';
 import { collection, getDocs, query, where } from 'firebase/firestore';
-import { db } from '@/firebase';
+import { db } from '../firebase';
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 function AuthGuard({ children }) {
     const { user } = useUser();

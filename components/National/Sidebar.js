@@ -70,8 +70,7 @@ export default function Sidebar() {
   
 
   return (
-    <div className="dark:bg-gray-950 xl:flex flex-col px-28 md:p-2 items-start 
-    fixed h-full lg:w-1/4 w-3/4 2xl:w-10 2xl:ml-48 ml-0">
+    <div className="bg-white dark:bg-gray-950 mr-1 top-0 sticky p-2">
     
       {loading ? (
         <Button color="gray" className="border-0 ml-20 items-center flex mt-4 sm:mt-0">
@@ -79,21 +78,16 @@ export default function Sidebar() {
           <span className="pl-3 animate-pulse sm:text-[16px] text-[28px]">Loading...</span>
         </Button>
       ) : (
-        <div className='md:-ml-[50px]'>
+        <>
           {userPosts && (
-            <div className="flex space-x-3 items-center w-[400px] sm:w-[300px] mb-1 p-2 -ml-20 md:ml-16 cursor-pointer">
-              <Tooltip content="logout" arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-                <SignedIn>
+            <div className="flex">
+              
                 <img
                   src={userPosts.userImg}
                   className="sm:h-11 sm:w-11 h-20 w-20 rounded-md cursor-pointer hover:brightness-95 shadow-gray-800 shadow-sm dark:shadow-gray-600"
       
                 />
-                </SignedIn>
-                <SignedOut>
-                  <SignInButton />
-                </SignedOut>
-              </Tooltip>
+               
               <div className="flex-1 flex-col">
                 <p className="font-bold text-lg sm:text-sm dark:text-gray-300">{userPosts.name}</p>
                 <p className="font-bold text-lg sm:text-sm text-gray-400">@{userPosts.nickname}</p>
@@ -113,7 +107,7 @@ export default function Sidebar() {
 
           )}
           
-          <div className='-ml-20 md:ml-16 w-[292px]'>
+          <div className=''>
           <Link href='/national'>
             <div className='flex cursor-pointer items-center space-x-4 dark:text-gray-200 dark:hover:bg-gray-900 hover:bg-gray-200 rounded-full w-full px-2 sm:py-2 py-4'>
               <HomeIcon className='h-9'/>
@@ -152,7 +146,7 @@ export default function Sidebar() {
             </Link>
           </div>
           
-          <div className="mt-2 mb-2.5 xl:items-start w-[320px] md:ml-14 -ml-20  h-[550px]">
+          <div className="">
          
          <div className='flex justify-between w-full'>
             <h2 className="font-bold ml-4 dark:text-gray-300 text-2xl sm:text-lg">Members</h2>
@@ -163,7 +157,7 @@ export default function Sidebar() {
 
         <div className="h-[500px] w-[300px] overflow-auto scrollbar-hide">
   {posts.map((post) => (
-    <div key={post.id} className="flex items-center dark:border-gray-900 p-1 w-full">
+    <div key={post.id} className="flex items-center bg-red-600 p-1 ">
       {/* Profile Image or Initials */}
       <div className="m-4">
         {post?.userImg ? (
@@ -221,7 +215,7 @@ export default function Sidebar() {
           </div>
 
          
-        </div>
+        </>
       )}
     </div>
   );
