@@ -54,7 +54,7 @@ function Home() {
     if (!userData?.uid) {
       router.push('/'); // Instead of using signout, you can push to the signout page
     }
-  }, [user, router]);
+  }, [userData?.uid, router]);
 
   return (
     <div className="flex flex-col min-h-screen w-full">

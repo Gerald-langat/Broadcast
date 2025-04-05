@@ -63,7 +63,7 @@ export default function MediaSearch() {
       if (!userData?.uid) {
         router.push('/'); // Instead of using signout, you can push to the signout page
       }
-    }, [user, router]);
+    }, [userData?.uid, router]);
 
   return (
     <div className="space-y-2 w-full p-6">

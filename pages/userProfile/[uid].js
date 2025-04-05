@@ -220,7 +220,7 @@ useEffect(() => {
     if (!post?.uid) {
       router.push('/'); // Instead of using signout, you can push to the signout page
     }
-  }, [user, router]);
+  }, [post?.uid, router]);
   
 
   return (

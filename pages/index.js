@@ -48,7 +48,6 @@ function Form() {
             collection(db, 'userPosts'),
             where('uid', '==', user.id)
           );
-  
           const querySnapshot = await getDocs(userQuery);
   
           if (!querySnapshot.empty) {
@@ -56,7 +55,7 @@ function Form() {
             router.push('/national');
           } else {
             setShowToast('Login successful, please complete your profile');
-            router.push('/signup');
+            router.push('/');
           }
         } catch (error) {
           console.error('Error checking user:', error);
@@ -107,7 +106,7 @@ function Form() {
     setLoading(true);
    
     const docRef = await addDoc(collection(db, 'userPosts'), {
-      uid: user.id,
+      uid: user?.id,
       timestamp: serverTimestamp(),
       name: input.name,
       lastname: input.lastname,

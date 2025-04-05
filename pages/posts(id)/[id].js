@@ -79,7 +79,7 @@ const toggleHome = () => {
     if (!post?.uid) {
       router.push('/'); // Instead of using signout, you can push to the signout page
     }
-  }, [post, router]);
+  }, [post?.uid, router]);
 
   return (
     <div className="flex flex-col min-h-screen w-full">

@@ -51,7 +51,7 @@ function ward() {
       if (!userData?.uid) {
         router.push('/'); // Instead of using signout, you can push to the signout page
       }
-    }, [user, router]);
+    }, [userData?.uid, router]);
 
   return (
     <div className='dark:bg-gray-950'>

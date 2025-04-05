@@ -28,7 +28,7 @@ function messages() {
       if (!userData?.uid) {
         router.push('/'); // Instead of using signout, you can push to the signout page
       }
-    }, [user, router]);
+    }, [userData?.uid, router]);
   return (
     
     <div className='flex min-h-screen w-4/4 dark:bg-gray-950'>
