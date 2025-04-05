@@ -18,7 +18,6 @@ function product() {
     const router = useRouter();
     const { id } = router.query;
     const [loading, setLoading] = useState(false);
-    const [userDetails, setUserDetails] = useState(null);
     const [hasLiked, setHasLiked] = useState(false);
     const [likes, setLikes] = useState([]);
     const [input, setInput] = useState('');
@@ -116,9 +115,7 @@ useEffect(() => {
           uid: userData?.uid,
         });
       }
-    } else {
-      router.replace('/');
-    }
+    } 
   }
 
   useEffect(() => {
@@ -283,11 +280,7 @@ useEffect(() => {
     }
   };
 
-    useEffect(() => {
-      if (!userData?.uid) {
-        router.push('/'); // Instead of using signout, you can push to the signout page
-      }
-    }, [userData?.uid, router]);
+
 
   return (
     <div>

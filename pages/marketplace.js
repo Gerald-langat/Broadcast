@@ -126,11 +126,7 @@ const removeSelectedFile = (index) => {
   setSelectedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
 };
 
-useEffect(() => {
-    if (!userData?.uid) {
-      router.push('/'); // Instead of using signout, you can push to the signout page
-    }
-  }, [userData?.uid, router]);
+
 
   return (
 <div>

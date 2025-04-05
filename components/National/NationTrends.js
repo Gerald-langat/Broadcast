@@ -175,8 +175,6 @@ const viewCount = Array.isArray(post?.data()?.views) ? post.data().views.length 
           uid: user?.id,
         });
       }
-    } else {
-      router.replace('/signup');
     }
   }
 
@@ -213,10 +211,7 @@ const viewCount = Array.isArray(post?.data()?.views) ? post.data().views.length 
 
   // repost
   const repost = async () => {
-    if(!user?.id) {
-      router.replace('/signup');
-      return;
-    }
+   
     if (post) {
       const postData = post.data();
       try {
@@ -246,6 +241,7 @@ const viewCount = Array.isArray(post?.data()?.views) ? post.data().views.length 
         }, 1000);
 
         setAlertMessage("Cast recasted successfully!");
+      setLoading(false);
         
       } catch (error) {
         console.error('Error recasting the cast:', error);
@@ -255,15 +251,13 @@ const viewCount = Array.isArray(post?.data()?.views) ? post.data().views.length 
     } else {
       console.log('No cast data available to recast.');
       setAlertMessage("Invalid input. Please check your text.");
+      setLoading(false);
 
     }
   };
 
   const cite = async () => {
-    if (!user?.id) { 
-      router.replace('/signup');
-      return;
-    }
+  
     setLoading(true);
   
     if (post) {
@@ -298,6 +292,8 @@ const viewCount = Array.isArray(post?.data()?.views) ? post.data().views.length 
         }, 1000);
 
         setAlertMessage("Cast cited successfully!");
+      setLoading(false);
+
         } catch (error) {
           console.error('Error reposting the post:', error);
           setAlertMessage("Failed to cite Cast. Please try again.");
@@ -306,6 +302,7 @@ const viewCount = Array.isArray(post?.data()?.views) ? post.data().views.length 
       } else {
         console.error('Invalid data detected. postData.text or citeInput is not a string.');
         setAlertMessage("Invalid input. Please check your text.");
+        setLoading(false);
 
       }
   
@@ -717,12 +714,10 @@ const viewCount = Array.isArray(post?.data()?.views) ? post.data().views.length 
            
             <ChatIcon
               onClick={() => {
-                if (!user.id) {
-                  router.push('/signup');
-                } else {
+                
                   setPostId(id);
                   setOpen(!open);
-                }
+                
               }}
               className="h-12 w-12 sm:h-10 sm:w-10 p-2 hover:text-sky-500 hover:bg-sky-100 rounded-full cursor-pointer dark:hover:bg-neutral-700"
             />

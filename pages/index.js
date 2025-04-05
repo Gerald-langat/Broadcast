@@ -4,7 +4,7 @@ import { addDoc, collection, doc, getDocs, query, serverTimestamp, updateDoc, wh
 import { getDownloadURL, ref, uploadString } from 'firebase/storage';
 import countyData from '../county.json';
 import { Cursor, useTypewriter } from 'react-simple-typewriter';
-import { Button,  Modal, Popover, Tooltip } from 'flowbite-react';
+import { Alert, Button,  Modal, Popover, Tooltip } from 'flowbite-react';
 import {  db, storage } from '../firebase';
 import Head from 'next/head';
 import BackgroundCircles from '../components/BackgroundCircles';
@@ -35,36 +35,41 @@ function Form() {
   const [isChecked, setIsChecked] = useState(false);
   const [userData, setUserData] = useState();
   const [open, setOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState(null);
+  const [showAlert, setShowAlert] = useState(false);
   const { user } = useUser()
 
   
   
-    useEffect(() => {
-      if (!user || !user?.id) return; // ✅ Prevent running if user is undefined
+  useEffect(() => {
+    if (!user || !user?.id) return;
   
-      const checkUserExists = async () => {
-        try {
-          const userQuery = query(
-            collection(db, 'userPosts'),
-            where('uid', '==', user.id)
-          );
-          const querySnapshot = await getDocs(userQuery);
+    const checkUserExists = async () => {
+      try {
+        const userQuery = query(
+          collection(db, 'userPosts'),
+          where('uid', '==', user.id)
+        );
+        const querySnapshot = await getDocs(userQuery);
   
-          if (!querySnapshot.empty) {
-            setShowToast('Login successful, redirecting to Home...');
-            router.push('/national');
-          } else {
-            setShowToast('Login successful, please complete your profile');
-            router.push('/');
-          }
-        } catch (error) {
-          console.error('Error checking user:', error);
+        if (!querySnapshot.empty) {
+          setAlertMessage("Welcome to broadcast!");
+          setShowAlert(true);
+          setTimeout(() => {
+            setShowAlert(false);
+            router.push('/national'); // ✅ Only push after alert is hidden
+          }, 1000);
+        } else {
+          return;
         }
-      };
+      } catch (error) {
+        console.error('Error checking user:', error);
+      }
+    };
   
-      checkUserExists();
-    }, [user?.id]);
-
+    checkUserExists();
+  }, [user?.id]);
+  
 
   useEffect(() => {
     if (countyData && countyData.counties) {
@@ -135,7 +140,7 @@ function Form() {
     setLoading(false);
 
     if (selectedWard !== 'Select Ward') {
-      router.push('national');
+      router.push('/national');
     }
 
     if (!selectedFile) {
@@ -220,13 +225,21 @@ function Form() {
   }
 
   return (
-    <div className=' h-screen min-w-screen flex justify-center'>
-    <Head>
+  <>
+  <Head>
         <title>Broadcast</title>
         <meta name="description" content="Generated and created by redAnttech" />
         <link rel="icon" href="../../images/Brodcast.jpg" />
-      </Head>
+      </Head> 
+      
+      {showAlert && (
+      <Alert color="success">
+        <span className="font-medium">{alertMessage}</span>
+      </Alert>
+    )}
+    <div className=' h-screen min-w-screen flex justify-center'>
     
+     
 
       <div className='w-full min-h-screen rounded-lg  dark:border-gray-700 xl:min-w-[576px]  
       flex-grow max-w-xl bg-white  sm:w-[600px] md:w-[700px] dark:bg-gray-950'>
@@ -501,6 +514,7 @@ function Form() {
         </form>
       </div>
     </div>
+    </>
   );
 }
 

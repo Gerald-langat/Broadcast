@@ -48,6 +48,7 @@ export default function Input() {
           setUserData(querySnapshot.docs[0].data());
         }
       }
+      setLoading(false); // 🔥 Important! Set loading to false after fetch finishes
     };
     fetchUserData();
   }, [user?.id]);

@@ -71,9 +71,7 @@ async function likePost() {
           uid: user?.id,
         });
       }
-    } else {
-      router.replace('/signup');
-    }
+    } 
   }
 
   useEffect(() => {
@@ -179,10 +177,7 @@ async function likePost() {
 
   // recast
   const repost = async () => {
-    if(!user?.id) {
-      router.replace('/signup');
-      return;
-    }
+   setLoading(true);
     if (post) {
       const postData = post.data();
       try {
@@ -213,24 +208,22 @@ async function likePost() {
           }, 1000);
   
           setAlertMessage("Cast recasted successfully!");
+          setLoading(false);
           
         } catch (error) {
           console.error('Error recastting the post:', error);
           setAlertMessage("Failed to cite Cast. Please try again.");
-  
+          setLoading(false);
         }
       } else {
         console.log('No post data available to repost.');
         setAlertMessage("Invalid input. Please check your text.");
-        
+        setLoading(false);
       }
   };
 
   const cite = async () => {
-    if (!user?.id) { 
-      router.replace('/signup');
-      return;
-    }
+   
     setLoading(true);
   
     if (post) {
@@ -265,6 +258,7 @@ async function likePost() {
         }, 1000);
 
         setAlertMessage("Cast cited successfully!");
+        setLoading(false);
         } catch (error) {
           console.error('Error reposting the post:', error);
           setAlertMessage("Failed to cite Cast. Please try again.");
@@ -276,7 +270,7 @@ async function likePost() {
       } else {
         console.error('Invalid data detected. postData.text or citeInput is not a string.');
         setAlertMessage("Invalid input. Please check your text.");
-
+        setLoading(false);
       }
       setLoading(false);
     } else {
@@ -715,12 +709,10 @@ async function likePost() {
            
             <ChatIcon
               onClick={() => {
-                if (!user?.id) {
-                  router.replace('/signup');
-                } else {
+               
                   setPostId(id);
                   setOpen(!open);
-                }
+            
               }}
               className="h-12 w-12 md:h-10 md:w-10 p-2 hover:text-sky-500 hover:bg-sky-100 rounded-full cursor-pointer dark:hover:bg-neutral-700"
             />

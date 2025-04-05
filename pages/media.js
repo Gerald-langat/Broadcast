@@ -3,33 +3,14 @@ import MediaFeed from '../components/Media/MediaFeed'
 import { HomeIcon, MenuAlt1Icon, SearchIcon } from '@heroicons/react/outline'
 import Widgets from '../components/National/Widgets';
 import Sidebar from '../components/National/Sidebar';
-import { useUser } from '@clerk/nextjs';
-import { useRouter } from 'next/router';
-import { collection, getDocs, query, where } from 'firebase/firestore';
-import { db } from '../firebase';
+
 
 
 function media() {
 
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [isWidgetsVisible, setIsWidgetsVisible] = useState(false);
-   const { user } = useUser();
-   const router = useRouter()
-     const [userData, setUserData] = useState(null);
-   
- 
-     useEffect(() => {
-       const fetchUserData = async () => {
-         if (user?.id) {
-           const q = query(collection(db, 'userPosts'), where('uid', '==', user.id));
-           const querySnapshot = await getDocs(q);
-           if (!querySnapshot.empty) {
-             setUserData(querySnapshot.docs[0].data());
-           }
-         }
-       };
-       fetchUserData();
-     }, [user?.id]);
+
 
   const toggleSidebar = () => {
     setIsSidebarVisible(!isSidebarVisible);
@@ -44,11 +25,6 @@ function media() {
     setIsSidebarVisible(false);
   }
 
-  useEffect(() => {
-      if (!userData?.uid) {
-        router.push('/'); 
-      }
-    }, [userData?.uid, router]);
 
   return (
     <div className="flex flex-col min-h-screen justify-between w-full">

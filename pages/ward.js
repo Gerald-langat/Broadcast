@@ -6,31 +6,11 @@ import Widgets from '../components/Ward/Widgets'
 import { HomeIcon, MenuAlt1Icon, SearchIcon } from '@heroicons/react/outline'
 import Head from 'next/head'
 import React, { useState } from 'react'
-import { useUser } from '@clerk/nextjs'
-import { useRouter } from 'next/router'
-import { db } from '../firebase'
-import { collection, query, where } from 'firebase/firestore'
 
 function ward() {
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [isWidgetsVisible, setIsWidgetsVisible] = useState(false);
-  const { user } = useUser();
-  const router = useRouter()
-    const [userData, setUserData] = useState(null);
-  
 
-    useEffect(() => {
-      const fetchUserData = async () => {
-        if (user?.id) {
-          const q = query(collection(db, 'userPosts'), where('uid', '==', user.id));
-          const querySnapshot = await getDocs(q);
-          if (!querySnapshot.empty) {
-            setUserData(querySnapshot.docs[0].data());
-          }
-        }
-      };
-      fetchUserData();
-    }, [user?.id]);
 
   const toggleSidebar = () => {
     setIsSidebarVisible(!isSidebarVisible);
@@ -47,11 +27,7 @@ function ward() {
     setIsSidebarVisible(false);
   }
 
-  useEffect(() => {
-      if (!userData?.uid) {
-        router.push('/'); // Instead of using signout, you can push to the signout page
-      }
-    }, [userData?.uid, router]);
+ 
 
   return (
     <div className='dark:bg-gray-950'>

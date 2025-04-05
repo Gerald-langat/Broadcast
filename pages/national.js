@@ -6,34 +6,14 @@ import Widgets from "../components/National/Widgets";
 import CommentModal from "../components/National/CommentModal";
 import StatusModal from "../components/National/StatusModal";
 import Feed from "../components/National/Feed";
-import { useUser } from "@clerk/nextjs";
-import { useEffect } from 'react';
-import { useRouter } from 'next/router';
-import { db } from "../firebase";
-import { collection, getDocs, query, where } from "firebase/firestore";
 
 
 
 function Home() {
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [isWidgetsVisible, setIsWidgetsVisible] = useState(false);
-  const { user } = useUser();
-  const router = useRouter()
-    const [userData, setUserData] = useState(null);
-  
 
-    useEffect(() => {
-      const fetchUserData = async () => {
-        if (user?.id) {
-          const q = query(collection(db, 'userPosts'), where('uid', '==', user.id));
-          const querySnapshot = await getDocs(q);
-          if (!querySnapshot.empty) {
-            setUserData(querySnapshot.docs[0].data());
-          }
-        }
-      };
-      fetchUserData();
-    }, [user?.id]);
+
 
   const toggleSidebar = () => {
     setIsSidebarVisible((prev) => !prev);
@@ -50,11 +30,7 @@ function Home() {
     setIsSidebarVisible(false);
   };
 
-  useEffect(() => {
-    if (!userData?.uid) {
-      router.push('/'); // Instead of using signout, you can push to the signout page
-    }
-  }, [userData?.uid, router]);
+
 
   return (
     <div className="flex flex-col min-h-screen w-full">

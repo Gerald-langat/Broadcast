@@ -97,22 +97,20 @@ export default function Post({ post, id }) {
   }, [id]);
   
   useEffect(() => {
-    if(user?.id){
+    if(userData?.uid){
     setHasLiked(
-      likes.findIndex((like) => like.id === user.id) !== -1
+      likes.findIndex((like) => like.id === userData.uid) !== -1
     );
-  } else {
-    router.replace('/signup')
-  }
+  } 
   }, [likes]);
 
   async function likePost() {
-    if (user.id) {
+    if (userData?.uid) {
       if (hasLiked) {
-        await deleteDoc(doc(db, "national", id, "likes", user.id));
+        await deleteDoc(doc(db, "national", id, "likes", userData.uid));
       } else {
-        await setDoc(doc(db, "national", id, "likes", user.id), {
-          uid: user.id,
+        await setDoc(doc(db, "national", id, "likes", userData.uid), {
+          uid: userData.uid,
         });
       }
     } else {
@@ -277,15 +275,13 @@ const handleShare = async () => {
 };
   // Repost the posts 
   const repost = async () => {
-    if(!user?.id) {
-      router.replace('/signup');
-    }
+   setLoading(true);
     if (post) {
       const postData = post.data();
       try {
         // Construct the new post data object
         const newPostData = {
-          uid: user?.id,
+          uid: userData?.uid,
           text: postData.text,
           userImg: userData.userImg,
           timestamp: serverTimestamp(),
@@ -309,6 +305,7 @@ const handleShare = async () => {
         }, 1000);
 
         setAlertMessage("Cast reposted successfully!");
+        setLoading(false);
         
       } catch (error) {
         console.error('Error reposting the post:', error);
@@ -318,16 +315,14 @@ const handleShare = async () => {
     } else {
       console.log('No post data available to repost.');
       setAlertMessage("Invalid input. Please check your text.");
-      
+      setLoading(false);
     }
   };
 
 
   // cite
   const cite = async () => {
-    if (!user?.id) { 
-      router.replace('/signup');
-    }
+    
     setLoading(true);
   
     if (post) {
@@ -337,7 +332,7 @@ const handleShare = async () => {
       if (postData && typeof postData.text === 'string' && typeof citeInput === 'string') {
         try {
           await addDoc(collection(db, 'national'), {
-            uid: user?.id,
+            uid: userData?.uid,
             text: postData.text,
             citeInput: citeInput,
             userImg: userData.userImg,
@@ -363,6 +358,7 @@ const handleShare = async () => {
         }, 1000);
 
         setAlertMessage("Cast cited successfully!");
+        setLoading(false);
 
         } catch (error) {
           console.error('Error reposting the cast:', error);
@@ -377,6 +373,7 @@ const handleShare = async () => {
       setCiteInput("");
     } else {
       console.log('No post data available to cast.');
+      setLoading(false);
     }
   };
   // numCount
@@ -801,12 +798,10 @@ const handleShare = async () => {
           <div className="flex items-center select-none z-50">
             <ChatIcon
               onClick={() => {
-                if (!user.id) {
-                  router.replace('/signup');
-                } else {
+               
                   setPostId(id);
                   setOpen(!open);
-                }
+                
               }}
               className="h-12 w-12 sm:h-10 sm:w-10 p-2 hover:text-sky-500 hover:bg-blue-100 rounded-full cursor-pointer  dark:hover:bg-gray-800"
             />
