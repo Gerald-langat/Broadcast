@@ -11,6 +11,7 @@ import { Button, Spinner, Tooltip } from 'flowbite-react';
 import NationTrends from '../../components/National/NationTrends';
 import StatusModal from '../../components/National/StatusModal';
 import Link from 'next/link';
+import { useUser } from '@clerk/nextjs';
 
 export default function TopicPostsPage() {
   const router = useRouter();
@@ -19,7 +20,30 @@ export default function TopicPostsPage() {
   const [loading, setLoading] = useState(true);
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [isWidgetsVisible, setIsWidgetsVisible] = useState(false);
-  
+  const [userData, setUserData] = useState(null);
+  const { user } = useUser()
+
+    useEffect(() => {
+      const fetchUserData = async () => {
+        setLoading(true); // Ensure loading is set to true at the start
+    
+        try {
+          if (user?.id) {
+            const q = query(collection(db, 'userPosts'), where('uid', '==', user?.id));
+            const querySnapshot = await getDocs(q);
+            if (!querySnapshot.empty) {
+              setUserData(querySnapshot.docs[0].data());
+            }
+          }
+        } catch (error) {
+          console.log(error);
+        } finally {
+          setLoading(false); // Ensure loading is set to false after fetching
+        }
+      };
+    
+      fetchUserData();
+    }, [user?.id]);
 
   useEffect(() => {
     if (!loading) {
@@ -57,7 +81,11 @@ export default function TopicPostsPage() {
     setIsSidebarVisible(false);
   }
   
-
+  useEffect(() => {
+    if (!userData?.uid) {
+      router.push('/'); // Instead of using signout, you can push to the signout page
+    }
+  }, [user, router]);
 
   return (
     <div>

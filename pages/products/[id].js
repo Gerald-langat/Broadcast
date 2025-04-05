@@ -108,16 +108,16 @@ useEffect(() => {
 }
 
   async function likeProduct() {
-    if (user?.id || id) {
+    if (userData?.uid || id) {
       if (hasLiked) {
-        await deleteDoc(doc(db, "marketplace", id, "likes", user?.id));
+        await deleteDoc(doc(db, "marketplace", id, "likes", userData?.uid));
       } else {
-        await setDoc(doc(db, "marketplace", id, "likes", user?.id), {
-          uid: user?.id,
+        await setDoc(doc(db, "marketplace", id, "likes", userData?.uid), {
+          uid: userData?.uid,
         });
       }
     } else {
-      router.replace('/signup');
+      router.replace('/');
     }
   }
 
@@ -282,6 +282,12 @@ useEffect(() => {
       return number; // below 1 thousand
     }
   };
+
+    useEffect(() => {
+      if (!userData?.uid) {
+        router.push('/'); // Instead of using signout, you can push to the signout page
+      }
+    }, [userData, router]);
 
   return (
     <div>

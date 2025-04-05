@@ -114,6 +114,8 @@ export default function StatusPage() {
     router.replace('/national')
   }
 
+  
+
   return (
     <div className="w-screen h-screen flex flex-col dark:bg-gray-950 relative">
       <Head>

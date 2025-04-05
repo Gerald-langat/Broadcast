@@ -6,11 +6,36 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../firebase";
+import { useUser } from "@clerk/nextjs";
 
 export default function MediaSearch() {
   const router = useRouter();
   const [posts, setPosts] = useState([]); // Changed from {} to []
   const { name } = router.query;
+  const [userData, setUserData] = useState(null);
+  const { user } = useUser()
+
+    useEffect(() => {
+      const fetchUserData = async () => {
+        setLoading(true); // Ensure loading is set to true at the start
+    
+        try {
+          if (user?.id) {
+            const q = query(collection(db, 'userPosts'), where('uid', '==', user?.id));
+            const querySnapshot = await getDocs(q);
+            if (!querySnapshot.empty) {
+              setUserData(querySnapshot.docs[0].data());
+            }
+          }
+        } catch (error) {
+          console.log(error);
+        } finally {
+          setLoading(false); // Ensure loading is set to false after fetching
+        }
+      };
+    
+      fetchUserData();
+    }, [user?.id]);
 
   useEffect(() => {
     if (!name) return; // Skip if name is not provided
@@ -33,6 +58,12 @@ export default function MediaSearch() {
 
     fetchPostsByName();
   }, [name]);
+
+   useEffect(() => {
+      if (!userData?.uid) {
+        router.push('/'); // Instead of using signout, you can push to the signout page
+      }
+    }, [user, router]);
 
   return (
     <div className="space-y-2 w-full p-6">

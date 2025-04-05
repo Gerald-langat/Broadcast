@@ -75,6 +75,12 @@ export default function TopicPostsPage() {
     setIsSidebarVisible(false);
   }
 
+    useEffect(() => {
+      if (!userData?.uid) {
+        router.push('/'); // Instead of using signout, you can push to the signout page
+      }
+    }, [userData, router]);
+
   return (
     <div>
       <Head>
