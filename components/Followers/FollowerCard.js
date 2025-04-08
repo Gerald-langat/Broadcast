@@ -24,13 +24,13 @@ function FollowerCard({follower}) {
                }`}
                onClick={() => {
                
-                 followMember(follower?.id);
+                 followMember(follower?.uid);
                  
                }}
              >
-              {followloading[follower?.id] ? (
+              {followloading[follower?.uid] ? (
                  <Spinner aria-label="Loading spinner" size="sm" />
-               ) : hasFollowed[follower?.id] ? (
+               ) : hasFollowed[follower?.uid] ? (
                  <p>Unfollow</p>
                ) : (
                  "Follow"
