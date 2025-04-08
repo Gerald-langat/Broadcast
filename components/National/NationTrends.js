@@ -465,7 +465,7 @@ const viewCount = Array.isArray(post?.data()?.views) ? post.data().views.length 
           </Alert>
         )}
 <div className={`w-full ${isHidden ? 'inline text-2xl sm:text-xl cursor-pointer dark:hover:bg-gray-900 hover:bg-gray-200 rounded-md p-1' : 'hidden'}`} onClick={handleUndo}>{showUndo && 'undo'}</div>
-    <div className={`${isHidden ? 'hidden' : 'border-[1px] dark:border-gray-900 border-gray-200 px-4 sm:min-w-full rounded-md mt-1'}`}>
+    <div className={`${isHidden ? 'hidden' : ' border-[1px] dark:border-gray-900 border-gray-200 px-4  rounded-md mt-1'}`}>
       {loading ? (
         <Button color="gray" className="border-0">
           <Spinner aria-label="Loading spinner" size="sm" />

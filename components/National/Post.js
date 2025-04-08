@@ -114,7 +114,7 @@ export default function Post({ post, id }) {
         });
       }
     } else {
-      router.replace('/signup');
+      router.replace('/');
     }
   }
 

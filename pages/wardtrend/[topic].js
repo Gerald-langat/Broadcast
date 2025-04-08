@@ -84,7 +84,7 @@ export default function TopicPostsPage() {
         <meta name="description" content="Generated and created by redAndttech" />
         <link rel="icon" href="../../images/Brodcast.jpg" />
       </Head>
-      <main className="flex min-h-screen mx-auto dark:bg-gray-950 sm:w-screen min-w-[580px] flex-grow sm:px-10 md:px-24 xl:px-0">
+      <main className="flex max-w-7xl mx-auto">
         {/* Sidebar */}
         {isSidebarVisible && (
               <div
@@ -102,7 +102,7 @@ export default function TopicPostsPage() {
           <Sidebar />
         </div>
         {/* Feed */}
-        <div className="xl:ml-[350px] 2xl:ml-[560px] xl:min-w-[576px] 2xl:min-w-[700px]  sm:min-w-full flex-grow max-w-xl">
+        <div className="flex-grow max-w-full xl:max-w-2xl 2xl:max-w-3xl">
           <div className="flex items-center space-x-2  py-2 px-3 sticky top-0 bg-white border-[1px] rounded-md border-gray-300 dark:border-gray-900 dark:bg-gray-950">
             <Link href={`/ward`}>
           <Tooltip content='back' arrow={false} placement="bottom" className="p-1 flex text-xs bg-gray-500 -mt-1">

@@ -91,7 +91,7 @@ const WardPost = () => {
         <meta name="description" content="Generated and created by redAndtech" />
         <link rel="icon" href="../../images/Brodcast.jpg" />
       </Head>
-      <main className="flex min-h-screen mx-auto dark:bg-gray-950 sm:w-screen min-w-[580px] flex-grow sm:px-10 md:px-24 xl:px-0 flex-1">
+      <main className="flex max-w-7xl mx-auto">
         {/* Sidebar */}
         {isSidebarVisible && (
               <div
@@ -109,7 +109,7 @@ const WardPost = () => {
         <Sidebar />
         </div>
         {/* Feed */}
-        <div className="xl:ml-[350px] 2xl:mr-[150px] 2xl:ml-[560px] xl:min-w-[576px] 2xl:min-w-[700px]  sm:min-w-full flex-grow max-w-xl">
+        <div className="flex-grow max-w-full xl:max-w-2xl 2xl:max-w-3xl">
           <div className="flex items-center space-x-2  py-2 px-3 sticky top-0 dark:bg-gray-950 bg-white border-[1px] rounded-md dark:border-gray-900
      border-gray-200">
           <Tooltip content='back' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
@@ -152,7 +152,7 @@ const WardPost = () => {
             </div>
           </div>
         )}
-    <div className='hidden xl:inline ml-6'>
+    <div className='hidden xl:inline '>
           <Widgets />
        </div>
         <CommentModal />

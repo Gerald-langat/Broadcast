@@ -79,105 +79,103 @@ const toggleHome = () => {
 
   return (
     <div className="flex flex-col min-h-screen w-full">
-      <Head>
-        <title>{post?.data()?.text ? post?.data()?.text : 'loading...'}</title>
-        <meta name="description" content="Generated and created by redAnttech" />
-        <link rel="icon" href="../../images/Brodcast.jpg" />
-      </Head>
-        <div className="flex min-h-screen min-w-[560px] flex-1 ">
-              {/* Sidebar */}
-              {isSidebarVisible && (
-                <div
-                  className="fixed inset-0 z-30 xl:hidden w-full"
-                  onClick={() => setIsSidebarVisible(false)}
-                >
-                  <div
-                    onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the sidebar
-                    className="relative"
-                  >
-                    <Sidebar />
-                  </div>
-                </div>
-              )}
-              <div className="hidden xl:block w-1/4 ">
-                <Sidebar />
-              </div>
+  <Head>
+    <title>{post?.data()?.text || 'loading...'}</title>
+    <meta name="description" content="Generated and created by redAnttech" />
+    <link rel="icon" href="../../images/Brodcast.jpg" />
+  </Head>
 
-        {/* Post content */}
-        <div className="xl:ml-[10px] 2xl:mr-[120px] 2xl:ml-[80px] xl:min-w-[576px] 2xl:min-w-[700px]  sm:min-w-full flex-grow max-w-xl">
-                  <div className="flex items-center space-x-2  py-2 px-3 sticky top-0 dark:bg-gray-950 bg-white border-[1px] rounded-md dark:border-gray-900
-                     border-gray-200">
-                  <Tooltip content='back' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-                  <Link href={`/national`}>
-                    <div className="animate-pulse">
-                      <ArrowLeftIcon className="h-10 sm:h-8 cursor-pointer animate-pulse" />
-                    </div>
-                    </Link>
-                  </Tooltip>
-                    <h2 className="text-lg sm:text-xl font-bold cursor-pointer">
-                    {post?.data()?.text && (
-                      <span className='text-2xl sm:text-lg'>{post?.data()?.text}</span>
-                      )}
-                    </h2>
-                  </div>
+  <div className="flex flex-1 w-full max-w-7xl mx-auto px-2 sm:px-4">
 
-           {loading ? (<Button color="gray" className="border-0">
-                      <Spinner aria-label="Alternate spinner button example" size="sm" />
-                      <span className="pl-3">Loading...</span>
-                    </Button>):(
-                      <Post id={id} post={post} />
-                    )}
-
-        {/*comment content*/}
-          {comments.length > 0 && (
-            <div>
-              {comments.map((comment) => (
-                <Comment
-                  key={comment.id}
-                  commentId={comment.id}
-                  originalPostId={id}
-                  comment={comment.data()}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Widgets */}
-        {isWidgetsVisible && (
-                 <div
-                   className="fixed inset-0 z-30 bg-white dark:bg-gray-950 xl:hidden"
-                   onClick={() => setIsWidgetsVisible(false)}
-                 >
-                   <div
-                     onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the widgets
-                     className="relative"
-                   >
-                     <Widgets />
-                   </div>
-                 </div>
-               )}
-               
- 
-              <div className="xl:ml-16">
-                 <Widgets />
-               </div>
-</div>
-        {/* Modal */}
-        <CommentModal />
-        <StatusModal />
-     
-
-      {/* Bottom navigation for mobile */}
+    {/* Sidebar */}
+    {isSidebarVisible && (
       <div
-        className="xl:hidden justify-between bottom-0 z-40 fixed bg-slate-50
-        dark:bg-gray-900 w-full flex py-4 sm:px-10 md:px-24 px-4"
+        className="fixed inset-0 z-30 xl:hidden bg-black/50"
+        onClick={() => setIsSidebarVisible(false)}
       >
-        <MenuAlt1Icon className="pl-4 h-10 cursor-pointer" onClick={toggleSidebar}/>
-        <HomeIcon className="h-10 cursor-pointer" onClick={toggleHome}/>
-        <SearchIcon className="pr-6 h-10 cursor-pointer" onClick={toggleWidgets}/>
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className="relative bg-white dark:bg-gray-950 w-64 h-full"
+        >
+          <Sidebar />
+        </div>
       </div>
+    )}
+    <div className="hidden xl:block xl:w-1/4">
+      <Sidebar />
     </div>
+
+    {/* Post content */}
+    <div className="flex flex-col flex-grow max-w-full xl:max-w-2xl 2xl:max-w-3xl px-2">
+      <div className="flex items-center space-x-2 py-2 px-3 sticky top-0 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 rounded-md z-20">
+        <Tooltip content="Back" arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500">
+          <Link href={`/national`}>
+            <ArrowLeftIcon className="h-8 sm:h-6 cursor-pointer" />
+          </Link>
+        </Tooltip>
+        <h2 className="text-lg sm:text-xl font-bold truncate">
+          {post?.data()?.text && (
+            <span className="text-2xl sm:text-lg">{post?.data()?.text}</span>
+          )}
+        </h2>
+      </div>
+
+      {loading ? (
+        <Button color="gray" className="border-0 mt-4">
+          <Spinner aria-label="Loading" size="sm" />
+          <span className="pl-3">Loading...</span>
+        </Button>
+      ) : (
+        <Post id={id} post={post} />
+      )}
+
+      {/* Comments */}
+      {comments.length > 0 && (
+        <div className="mt-4 space-y-4">
+          {comments.map((comment) => (
+            <Comment
+              key={comment.id}
+              commentId={comment.id}
+              originalPostId={id}
+              comment={comment.data()}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+
+    {/* Widgets */}
+    {isWidgetsVisible && (
+      <div
+        className="fixed inset-0 z-30 bg-white dark:bg-gray-950 xl:hidden"
+        onClick={() => setIsWidgetsVisible(false)}
+      >
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className="relative w-64 h-full"
+        >
+          <Widgets />
+        </div>
+      </div>
+    )}
+    <div className="hidden xl:block xl:w-1/4">
+      <Widgets />
+    </div>
+
+  </div>
+
+  {/* Modals */}
+  <CommentModal />
+  <StatusModal />
+
+  {/* Bottom Navigation for Mobile */}
+  <div className="xl:hidden fixed bottom-0 left-0 w-full z-40 bg-slate-50 dark:bg-gray-900 flex justify-around items-center py-3 border-t border-gray-200 dark:border-gray-800">
+    <MenuAlt1Icon className="h-8 w-8 cursor-pointer" onClick={toggleSidebar} />
+    <HomeIcon className="h-8 w-8 cursor-pointer" onClick={toggleHome} />
+    <SearchIcon className="h-8 w-8 cursor-pointer" onClick={toggleWidgets} />
+  </div>
+</div>
+
   );
 }
 
