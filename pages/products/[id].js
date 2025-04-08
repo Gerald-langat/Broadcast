@@ -1,15 +1,10 @@
 import Head from 'next/head'
 import React, { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/router';
-import { addDoc, and, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, or, orderBy, query, serverTimestamp, setDoc, where } from 'firebase/firestore';
-import { auth, db, storage } from '../../firebase';
+import { collection, deleteDoc, doc, getDoc, getDocs, onSnapshot,  query, setDoc, where } from 'firebase/firestore';
+import {  db, storage } from '../../firebase';
 import { ArrowLeftIcon, HeartIcon, HomeIcon, OfficeBuildingIcon, TrashIcon } from '@heroicons/react/outline';
 import { deleteObject, ref } from 'firebase/storage';
-import { AnimatePresence, motion } from 'framer-motion';
-import { SendHorizonalIcon } from 'lucide-react';
-import MessageContainer from './MessageContainer';
-import Messages from './Messages';
-import Message from './Message';
 import { Carousel, Tooltip } from 'flowbite-react';
 import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';
@@ -20,22 +15,11 @@ function product() {
     const [loading, setLoading] = useState(false);
     const [hasLiked, setHasLiked] = useState(false);
     const [likes, setLikes] = useState([]);
-    const [input, setInput] = useState('');
-    const endOfMessagesRef = useRef();
-    const [error, setError] = useState('');
-    const [messages, setMessages] = useState([]);
-    const [isContactVisible, setIsContactVisible] = useState(false);
     const [posts, setPosts] = useState();
-    const [userPosts, setUserPosts] = useState([]);
-    const [isMessagesVisible, setIsMessagesVisible] = useState(false);
     const [userData, setUserData] = useState(null);
-    const [selectedMessage, setSelectedMessage] = useState(null);
     const [isReserved, setIsReserved] = useState(false);
     const { user } = useUser()
-    const handleMessageClick = (userPost) => {
-      setSelectedMessage(userPost); // Set the clicked post to display chat
-     
-    };
+  
   
     useEffect(() => {
       const fetchUserData = async () => {
@@ -49,15 +33,6 @@ function product() {
       };
       fetchUserData();
     }, [user?.id]);
-
-    const handleToggle = () => {
-      setIsContactVisible(!isContactVisible); // Toggle visibility
-    };
-
-    const handleMessageToggle = () => {
-      setIsMessagesVisible(!isMessagesVisible); // Toggle visibility
-      setIsContactVisible(false);
-    };
 
 
 
@@ -175,63 +150,9 @@ useEffect(() => {
   }, [likes]);
 
 
-  const sendPost = async (e) => {
-    e.preventDefault();
-    if (!input) return;
-    setLoading(true);
-  
-    try {
-      // Ensure that userDetails and id (post or product ID) are defined before proceeding
-      if (!user?.id || !id ) {
-        throw new Error("Missing required data (userDetails, post ID, or recipient ID).");
-      }
-  
-      await addDoc(collection(db, "marketplace", id, "messages"), {
-        uid: user?.id,   // The ID of the user sending the message           // The product or post ID
-        name: userData.name,
-        productId: id,
-        lastname: userData.lastname,
-        userImg:userData.userImg,
-        nickname: userData.nickname,
-        recipientId: posts.data().uid, // The ID of the recipient (seller)
-        messagetext: input,
-        timestamp: serverTimestamp(),
-      });
-  
-      setInput(''); // Reset the input field
-      setLoading(false);
-      ScrollToBottom();
-    } catch (error) {
-      console.error("Error sending message: ", error.message);
-      setError("Error sending message: " + error.message);
-      setLoading(false);
-    }
-  };
-  
-
-  const ScrollToBottom = () => {
-    endOfMessagesRef.current.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
-  }
 
 
-  useEffect(() => {
-  
-    if(!id) return;
-      const q = query(
-        collection(db, "marketplace", id, "messages")
-      );
-  
-      const unsub = onSnapshot(q, (snapshot) => {
-        const allMessages = snapshot.docs.map((doc) => doc.data());
-        const sortedMessages = allMessages.sort((a, b) => a.timestamp?.seconds - b.timestamp?.seconds);
-        setMessages(sortedMessages);
-      });
-  
-      return () => unsub();
-    });
+
 
 
     useEffect(() => {
@@ -244,31 +165,7 @@ useEffect(() => {
     return () => unsubscribe();
   },  [db, id]) 
   
-  useEffect(() => {
-    const fetchPost = async () => {
-      if (!id) return;
-      const q = query(collection(db, "marketplace", id, "messages"));
-      const unsubscribe = onSnapshot(q, (snapshot) => {
-        const posts = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-  
-        const userId = user?.id;
-        // Remove duplicates based on 'id'
-        const uniquePosts = posts.filter((post, index, self) =>
-          index === self.findIndex((p) => p.uid === post.uid) && post.uid !== userId
-        );
-  
-        setUserPosts(uniquePosts);
-        setLoading(false);
-      });
-  
-      return () => unsubscribe();
-    };
-  
-    fetchPost();
-  }, [id, user?.id]);
+
   
   const formatNumber = (number) => {
     if (number >= 1000000) {
@@ -378,74 +275,23 @@ useEffect(() => {
     </div>
 
     {/* Contact and View Message buttons */}
-    <div className={`${user?.id === posts?.data()?.uid ? 'hidden' : 'bg-green-600 text-white p-1 rounded-md cursor-pointer'}`} onClick={handleToggle}>
+    <div className={`${user?.id === posts?.data()?.uid ? 'hidden' : 'bg-green-600 text-white p-1 rounded-md cursor-pointer'}`} >
       Contact seller
     </div>
 
-    <div className={`${user?.id !== posts?.data()?.uid ? 'hidden' : 'bg-green-600 text-white p-1 rounded-md cursor-pointer'}`} onClick={handleMessageToggle}>
+    <div className={`${user?.id !== posts?.data()?.uid ? 'hidden' : 'bg-green-600 text-white p-1 rounded-md cursor-pointer'}`} >
       View message
     </div>
 
     {/* Delete or Reserve button */}
     {user?.id === posts?.data()?.uid ? (
-      <TrashIcon className='h-10 p-2 hover:text-red-600 hover:bg-red-300 rounded-full dark:hover:bg-red-900 cursor-pointer' onClick={deleteProduct} />
+      <TrashIcon className='h-10 p-2 hover:text-red-600 hover:bg-red-300 rounded-full dark:hover:bg-red-900 cursor-pointer'  />
     ) : (
       <div className={`bg-${isReserved ? 'gray' : 'red'}-600 p-1 rounded-md font-bold text-white mr-3 cursor-pointer`}
           onClick={reserve}>{isReserved ? 'Reserved' : 'Reserve'}</div>
     )}
   </div>
 </div>
-
-{/* Messages Section */}
-{isMessagesVisible && (
-  <>
-    <div className='w-full lg:w-full border h-96 overflow-y-scroll scrollbar-hide p-2 rounded-md flex flex-col border-l-[1px] border-r-[1px] border-b-[1px] sm:border-t-[1px] border-t-0 sm:border-l-0 dark:border-gray-600'>
-      {userPosts.map((messagePost) => (
-        <div key={messagePost.id} onClick={() => handleMessageClick(messagePost)}>
-          <Messages id={messagePost.id} post={messagePost} />
-        </div>
-      ))}
-    </div>
-
-    {selectedMessage && (
-      <Message post={selectedMessage} id={selectedMessage.id} originalId={id} />
-    )}
-  </>
-)}
-
-{/* Contact Visible Section */}
-{isContactVisible && (
-  <div className={`${user?.id === posts?.data()?.id ? 'hidden' : 'w-full border h-96 p-2 rounded-md flex flex-col border-l-[1px] border-r-[1px] border-b-[1px] sm:border-t-[1px] border-t-0 sm:border-l-0 dark:border-gray-600'}`}>
-    <div className='flex-grow overflow-y-auto scrollbar-hide'>
-      {messages.map((messageDoc) => (
-        <motion.div
-          key={messageDoc.id}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 1 }}
-        >
-          <MessageContainer id={messageDoc.id} message={messageDoc} originalId={id}/>
-        </motion.div>
-      ))}
-      <div ref={endOfMessagesRef} />
-    </div>
-
-    {/* Message Input Form */}
-    <form onSubmit={sendPost} className="rounded-full sticky bottom-0 flex items-center border-[1px] dark:border-gray-500 px-4 py-2 bg-white dark:bg-gray-950">
-      <input
-        type="text"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        placeholder="Type a message"
-        className="dark:bg-gray-950 dark:text-gray-300 rounded-full text-gray-900 focus:ring-0 outline-none border-0 w-full"
-      />
-      <button>
-        <SendHorizonalIcon className={`${!input ? 'cursor-not-allowed' : 'text-gray-900 dark:text-gray-400'} text-gray-600 h-9`} />
-      </button>
-    </form>
-  </div>
-)}
       </div>
 </div>
      
