@@ -1,5 +1,4 @@
 import StatusModal from '../components/National/StatusModal'
-import CommentWardModal from '../components/Ward/CommentModal'
 import Feed from '../components/Ward/Feed'
 import Sidebar from '../components/National/Sidebar'
 import Widgets from '../components/Ward/Widgets'
