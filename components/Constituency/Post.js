@@ -513,7 +513,7 @@ useEffect(() => {
           {/* post user info */}
           <div className="sm:flex sm:space-x-8">
           <div className="flex items-center space-x-2 whitespace-nowrap dark:text-gray-300 ">
-            <HiCheck className="sm:h-4 h-6 sm:w-4 w-6 bg-green-800 rounded-full text-white"/>
+
             <h4 className=" dark:text-gray-300 font-bold text-xl sm:text-[15px] max-w-20 hover:underline truncate">
               {post?.data()?.name}
             </h4>

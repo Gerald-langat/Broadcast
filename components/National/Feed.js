@@ -30,7 +30,7 @@ export default function Feed() {
   return (
 
 
-     <div className="">
+     <div>
     {loading ? (
         <Button color="gray" className="border-0 items-center flex mt-4 sm:mt-0">
           <Spinner aria-label="Loading spinner" size="md" />

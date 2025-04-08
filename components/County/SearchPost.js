@@ -476,7 +476,7 @@ useEffect(
       <div className='flex items-center flex-1 space-x-2'>
       <Link href={`/userProfile/${uid}`}>
       <img
-        className="h-11 w-11 rounded-full"
+        className="h-11 w-11 rounded-md"
         src={post?.data()?.userImg}
         alt="user-img"
       />

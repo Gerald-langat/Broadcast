@@ -282,15 +282,14 @@ const handleShare = async () => {
         // Construct the new post data object
         const newPostData = {
           uid: userData?.uid,
-          text: postData.text,
-          userImg: userData.userImg,
+          text: postData?.text,
+          userImg: userData?.userImg,
           timestamp: serverTimestamp(),
-          lastname: userData.lastname,
-          name: userData.name,
-          nickname: userData.nickname,
-          from: postData.name,
-          fromNickname: postData.nickname,
-          userImg: postData.ug,
+          lastname: userData?.lastname,
+          name: userData?.name,
+          nickname: userData?.nickname,
+          from: postData?.name,
+          fromNickname: postData?.nickname,
           // Include image and video only if they are defined
          
           ...(postData.category && { category: postData.category }),
@@ -344,7 +343,7 @@ const handleShare = async () => {
             nickname: userData.nickname,
             fromNickname: postData.nickname,
             fromlastname: postData.lastname,
-            userImg: postData.userImg,
+            citeUserImg: postData.userImg,
             // Include image and video only if they are defined
           
             
@@ -545,7 +544,7 @@ const handleShare = async () => {
       {post?.data()?.userImg && (
 <Link href={`/userProfile/${uid}`}>
              <img
-        className="sm:h-12 sm:w-12 h-14 w-14 rounded-md mr-4 object-fit shadow-gray-800 shadow-sm dark:shadow-gray-600"
+        className="sm:h-12 sm:w-12 h-14 w-14 rounded-md cursor-pointer mr-4 object-fit shadow-gray-800 shadow-sm dark:shadow-gray-600"
         src={post?.data()?.userImg}
         alt="user-img"
        
@@ -559,7 +558,6 @@ const handleShare = async () => {
           {/* post user info */}
           <div className="sm:flex sm:space-x-8">
           <div className="flex items-center space-x-2 whitespace-nowrap dark:text-gray-300 ">
-            <HiCheck className="sm:h-4 h-6 sm:w-4 w-6 bg-green-800 rounded-full text-white"/>
             <h4 className=" dark:text-gray-300 font-bold max-w-20 truncate text-xl sm:text-[15px] hover:underline ">
               {post?.data()?.name}
             </h4>
@@ -694,11 +692,14 @@ const handleShare = async () => {
         <div className="flex p-1">
         {post?.data()?.citeUserImg && (
           <>
+          <Link href={`/userProfile/${uid}`}>
         <img
-        className="h-8 w-8 rounded-md mr-4"
+        className="h-8 w-8 rounded-md mr-4 cursor-pointer"
         src={post?.data()?.citeUserImg}
         alt="user-img"
       />
+
+      </Link>
       <p className="flex space-x-2 items-center">{post?.data()?.fromUser}{" "}{post?.data()?.fromlastname}{" "}@{post?.data()?.fromNickname}{" "} 
       <Badge className="py-0" color="gray" icon={HiClock}>
           <Moment fromNow>{post?.data()?.citetimestamp?.toDate().toLocaleString()}</Moment>

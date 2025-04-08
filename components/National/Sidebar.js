@@ -1,16 +1,14 @@
 import { useEffect, useState } from 'react';
 import { collection, getDocs, onSnapshot, query, where } from 'firebase/firestore';
-import { auth, db } from '../../firebase';
+import { db } from '../../firebase';
 import { useRecoilState } from 'recoil';
 import { useRouter } from 'next/router';
-import { modalStatus } from '../../atoms/modalAtom';
-import { Avatar, Button, Spinner, Tooltip } from 'flowbite-react';
+import { Members, modalStatus } from '../../atoms/modalAtom';
+import {  Button, Spinner } from 'flowbite-react';
 import { HomeIcon, InboxInIcon, NewspaperIcon, OfficeBuildingIcon, PauseIcon, PlusIcon, UserIcon } from '@heroicons/react/outline';
-import { useFollow } from '../FollowContext';
 import Link from 'next/link';
-import { signOut } from 'next-auth/react';
-import { SignedIn, SignedOut, SignInButton, useUser } from '@clerk/nextjs';
-import Image from 'next/image';
+import {  useUser } from '@clerk/nextjs';
+
 
 
 export default function Sidebar() {
@@ -19,9 +17,11 @@ export default function Sidebar() {
   const router = useRouter();
   const [open, setOpen] = useRecoilState(modalStatus);
   const [posts, setPosts] = useState([]);
-  const { hasFollowed, followMember, followloading } = useFollow();
+  // const { hasFollowed, followMember, followloading } = useFollow();
   const [userPosts, setUserPosts] = useState(null);
   const { user } = useUser();
+  const [openModal, setOpenModal] = useRecoilState(Members);
+
 
   // Fetch user posts
   useEffect(() => {
@@ -73,7 +73,7 @@ export default function Sidebar() {
     <div className="dark:bg-gray-950 mr-1 top-0 sticky p-2">
     
       {loading ? (
-        <Button color="gray" className="border-0 ml-20 items-center flex mt-4 sm:mt-0">
+        <Button color="gray" className="border-0  items-center flex mt-4 sm:mt-0">
           <Spinner aria-label="Loading spinner" size="md" />
           <span className="pl-3 animate-pulse sm:text-[16px] text-[28px]">Loading...</span>
         </Button>
@@ -146,22 +146,24 @@ export default function Sidebar() {
             </Link>
           </div>
           
-          <div className="">
+          <div>
          
-         <div className='flex justify-between w-full'>
+         <div className='flex justify-between w-full items-center'>
             <h2 className="font-bold ml-4 dark:text-gray-300 text-2xl sm:text-lg">Members</h2>
-            <Link href={`/members`}>
-            <p className='text-xs text-blue-500'>View all Members</p>
-            </Link>
+           
+            <p className='text-xs text-blue-500 cursor-pointer' onClick={() => setOpenModal(true)}>View all Members</p>
+          
         </div>
 
         <div className="h-[500px] w-[300px] overflow-auto scrollbar-hide">
   {posts.map((post) => (
+     <Link href={`/userProfile/${post?.uid}`}>
     <div key={post.id} className="flex items-center w-fit p-1 ">
+   
       {/* Profile Image or Initials */}
       <div className="m-4">
         {post?.userImg ? (
-          <Image
+          <img
             className="h-14 w-14 sm:h-10 sm:w-10 rounded-md shadow-gray-800 shadow-sm dark:shadow-gray-600"
             src={post.userImg} 
             alt="User Profile"
@@ -205,8 +207,9 @@ export default function Sidebar() {
             "Follow"
           )}
         </p>
-      </div> */}
+      </div> */}  
     </div>
+    </Link>
   ))}
 </div>
 

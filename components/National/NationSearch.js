@@ -602,11 +602,14 @@ async function likePost() {
         <div className="flex p-1">
         {post?.data()?.citeUserImg && (
           <>
+          <Link href={`/userProfile/${uid}`}>
         <img
-        className="sm:h-8 sm:w-8 h-9 w-9 rounded-md mr-4"
+        className="sm:h-8 sm:w-8 h-9 w-9 rounded-md mr-4 cursor-pointer"
         src={post?.data()?.citeUserImg}
         alt="user-img"
       />
+
+      </Link>
       <p className="flex space-x-2">{post?.data()?.fromUser}{" "}{post?.data()?.fromNickname}{" "}@{post?.data()?.fromNickname}{" "} 
       <Badge color="gray" icon={HiClock}>
           <Moment fromNow>{post?.data()?.citetimestamp?.toDate().toLocaleString()}</Moment>
