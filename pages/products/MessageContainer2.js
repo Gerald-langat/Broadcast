@@ -22,7 +22,7 @@ function MessageContainer2({ message, originalId }) {
   const handleReactionSelect = async (reaction) => {
     try {
       // Query for the document with the matching message text
-      const q = query(collection(db, 'marketplace', originalId, "messages"), where('messagetext', '==', message.messagetext));
+      const q = query(collection(db, 'marketplace', originalId, "messages"), where('messagetext', '==', message?.messagetext));
       
       const querySnapshot = await getDocs(q);
       
@@ -71,28 +71,28 @@ const userId = user?.id;
  
   return (
 <div className='relative flex flex-col pt-2'>
-  {message.recipientId === userId ? (
+  {message?.recipientId === userId ? (
     <div className='flex items-center w-full'>
       {/* Message bubble */}
       <div className='bg-slate-800 p-2 rounded-md mb-8 w-fit relative text-white'>
-        <p className='break-words line-clamp-6 max-w-[300px] md:max-w-[250px]'>{message.messagetext}</p>
+        <p className='break-words line-clamp-6 max-w-[300px] md:max-w-[250px]'>{message?.messagetext}</p>
         <p className="text-xs">
-          <Moment fromNow>{message.timestamp?.toDate()}</Moment>
+          <Moment fromNow>{message?.timestamp?.toDate()}</Moment>
         </p>
 
         {/* Other user's avatar */}
         <img
-          src={message.userImg}
+          src={message?.userImg}
           alt="User avatar"
           className="h-6 w-6 rounded-full absolute left-0"
         />
         
           <div className="absolute right-0 w-full flex justify-end  p-1">
-          {message.buyerEmoji && (
-            <span className="text-lg">{message.buyerEmoji} </span>
+          {message?.buyerEmoji && (
+            <span className="text-lg">{message?.buyerEmoji} </span>
           )}
-          {message.emoji && (
-            <span className="text-lg">{message.emoji} </span>
+          {message?.emoji && (
+            <span className="text-lg">{message?.emoji} </span>
           )}
           </div>
         
@@ -130,24 +130,24 @@ const userId = user?.id;
 
       {/* Message bubble */}
       <div className='bg-slate-600 pt-1 p-2 mb-8 rounded-md w-fit relative text-white'>
-        <p className='break-words line-clamp-6 max-w-[300px] md:max-w-[250px]'>{message.messagetext}</p>
+        <p className='break-words line-clamp-6 max-w-[300px] md:max-w-[250px]'>{message?.messagetext}</p>
         <p className="text-xs">
-          <Moment fromNow>{message.timestamp?.toDate()}</Moment>
+          <Moment fromNow>{message?.timestamp?.toDate()}</Moment>
         </p>
 
         
           <div className="absolute  left-0 w-full flex justify-start p-1">
-          {message.buyerEmoji && (
-            <span className="text-lg">{message.buyerEmoji} </span>
+          {message?.buyerEmoji && (
+            <span className="text-lg">{message?.buyerEmoji} </span>
           )}
-          {message.emoji && (
-            <span className="text-lg">{message.emoji} </span>
+          {message?.emoji && (
+            <span className="text-lg">{message?.emoji} </span>
           )}
           </div>
       
         {/* User avatar */}
         <img
-          src={message.userImg}
+          src={message?.userImg}
           alt="User avatar"
           className="h-6 w-6 rounded-full absolute right-0"
         />
