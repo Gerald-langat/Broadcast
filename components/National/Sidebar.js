@@ -4,7 +4,6 @@ import { db } from '../../firebase';
 import { useRecoilState } from 'recoil';
 import { useRouter } from 'next/router';
 import { Members, modalStatus } from '../../atoms/modalAtom';
-import {  Button, Spinner } from 'flowbite-react';
 import { HomeIcon, InboxInIcon, NewspaperIcon, OfficeBuildingIcon, PauseIcon, PlusIcon, UserIcon } from '@heroicons/react/outline';
 import Link from 'next/link';
 import {  useUser } from '@clerk/nextjs';

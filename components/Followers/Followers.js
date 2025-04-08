@@ -1,43 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { auth, db } from '../../firebase';
+import {  db } from '../../firebase';
 import { collection, query, onSnapshot, where } from 'firebase/firestore';
 import { Spinner } from 'flowbite-react';
 import FollowerCard from './FollowerCard';
 import Head from 'next/head';
+import { useUser } from '@clerk/nextjs';
 
 function Followers() {
   const [followers, setFollowers] = useState([]);
   const [following, setFollowing] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [userDetails, setUserDetails] = useState(null);
-
-  // Fetch user details
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        setUserDetails(user);
-      } else {
-        setUserDetails(null);
-      }
-    });
-
-    return () => unsubscribe();
-  }, []);
+  const [activeTab, setActiveTab] = useState('followers'); 
+  const { user } = useUser()
 
   // Fetch followers & following
   useEffect(() => {
-    if (!userDetails || !userDetails.uid) return;
+    if (!user?.id) return;
 
     setLoading(true);
 
     const followersQuery = query(
       collection(db, "following"), 
-      where("followerId", "==", userDetails.uid) // Followers: Users who follow the user
+      where("followerId", "==", user.id) // Followers: Users who follow the user
     );
 
     const followingQuery = query(
       collection(db, "following"),
-      where("followingId", "==", userDetails.uid) // Following: Users the user follows
+      where("followingId", "==", user.id) // Following: Users the user follows
     );
 
     const unsubscribeFollowers = onSnapshot(followersQuery, (snapshot) => {
@@ -56,36 +45,54 @@ function Followers() {
       unsubscribeFollowers();
       unsubscribeFollowing();
     };
-  }, [userDetails]);
+  }, [user?.id]);
 
   return (
     <div className="relative min-w-screen min-h-screen flex flex-col justify-center items-center">
-      <Head>
-        <title>Followers</title>
-        <meta name="description" content="Generated and created by redAnttech" />
-        <link rel="icon" href="../../images/Brod.png" />
-      </Head>
+    <Head>
+      <title>Followers</title>
+      <meta name="description" content="Generated and created by redAnttech" />
+      <link rel="icon" href="../../images/Brod.png" />
+    </Head>
 
-      {/* Followers Section */}
-      <h2 className="text-xl font-bold mt-4">Followers</h2>
-      {loading ? (<Spinner className='h-6' />) : (
-        <div className='grid grid-cols-2 gap-4 sm:grid-cols-4 xl:grid-cols-6 w-full min-h-screen p-10'>
-          {followers.map(follower => (
-            <FollowerCard key={follower.id} id={follower.id} follower={follower} />
-          ))}
-        </div>
-      )}
-
-   
-      <h2 className="text-xl font-bold mt-4">Following</h2>
-      {loading ? (<Spinner className='h-6' />) : (
-        <div className='grid grid-cols-2 gap-4 sm:grid-cols-4 xl:grid-cols-6 w-full min-h-screen p-10'>
-          {following.map(follower => (
-            <FollowerCard key={follower.id} id={follower.id} follower={follower} />
-          ))}
-        </div>
-      )}
+    {/* Tabs for Followers and Following */}
+    <div className="flex space-x-6 mt-6">
+      <h2
+        className={`text-xl font-bold cursor-pointer ${
+          activeTab === 'followers' ? 'border-b-2 border-blue-500 text-blue-500' : ''
+        }`}
+        onClick={() => setActiveTab('followers')}
+      >
+        Followers
+      </h2>
+      <h2
+        className={`text-xl font-bold cursor-pointer ${
+          activeTab === 'following' ? 'border-b-2 border-blue-500 text-blue-500' : ''
+        }`}
+        onClick={() => setActiveTab('following')}
+      >
+        Following
+      </h2>
     </div>
+
+    {/* Content */}
+    {loading ? (
+      <div className="mt-10">
+        <Spinner className="h-6" />
+      </div>
+    ) : (
+      <div className="p-4 min-h-screen max-w-6xl mx-auto">
+        {activeTab === 'followers' &&
+          followers.map((follower) => (
+            <FollowerCard key={follower.id} id={follower.id} follower={follower} />
+          ))}
+        {activeTab === 'following' &&
+          following.map((follower) => (
+            <FollowerCard key={follower.id} id={follower.id} follower={follower} />
+          ))}
+      </div>
+    )}
+  </div>
   );
 }
 
