@@ -5,6 +5,7 @@ import { DotsHorizontalIcon, TrashIcon } from '@heroicons/react/outline';
 import { Popover } from 'flowbite-react';
 import { collection, deleteDoc, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import { ReactionBarSelector } from '@charkour/react-reactions';
+import { useUser } from '@clerk/nextjs';
 
 const emojiMap = {
   happy: "😊",
@@ -16,19 +17,7 @@ const emojiMap = {
 };
 
 function MessageContainer({ message, originalId }) {
-  const [userDetails, setUserDetails] = useState(null);
-  
-
-  // Fetch user data on component mount
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        setUserDetails(user);
-      }
-    });
-
-    return () => unsubscribe();
-  }, []);
+  const { user } = useUser()
 
   const handleReactionSelect = async (reaction) => {
     try {
@@ -77,7 +66,7 @@ function MessageContainer({ message, originalId }) {
     }
   }
 
-  const userId = userDetails?.uid;
+  const userId = user?.id;
 
 
  
