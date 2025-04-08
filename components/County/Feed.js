@@ -51,9 +51,7 @@ const { user } = useUser()
 
 
   return (
-    <div className="dark:bg-gray-950 dark:border-gray-700 
-    border-gray-200 w-full sm:w-screen lg:min-w-[576px] 
-    lg:max-w-[620px] 2xl:min-w-[700px] sm:px-4 md:px-8 xl:px-0 min-h-screen 2xl:ml-[560px] ml-0 2xl:mr-16">
+    <div className="">
      <div className="xl:border-0 sm:border-x-[1px] dark:border-gray-700 border-gray-200">
      {loading ? (
         <Button color="gray" className="border-0 items-center flex mt-4 sm:mt-0">

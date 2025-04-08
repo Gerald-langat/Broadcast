@@ -80,7 +80,7 @@ export default function Sidebar() {
       ) : (
         <>
           {userPosts && (
-            <div className="flex">
+            <div className="flex space-x-2">
               
                 <img
                   src={userPosts.userImg}
@@ -157,7 +157,7 @@ export default function Sidebar() {
 
         <div className="h-[500px] w-[300px] overflow-auto scrollbar-hide">
   {posts.map((post) => (
-    <div key={post.id} className="flex items-center bg-red-600 p-1 ">
+    <div key={post.id} className="flex items-center w-fit p-1 ">
       {/* Profile Image or Initials */}
       <div className="m-4">
         {post?.userImg ? (
@@ -190,7 +190,7 @@ export default function Sidebar() {
       </div>
 
       {/* Follow Button */}
-      <div className="ml-auto">
+      {/* <div className="ml-auto">
         <p
           className={`${
             userPosts?.name === post?.name ? 'hidden' : 'font-bold text-blue-500 sm:text-sm text-lg cursor-pointer'
@@ -205,7 +205,7 @@ export default function Sidebar() {
             "Follow"
           )}
         </p>
-      </div>
+      </div> */}
     </div>
   ))}
 </div>
