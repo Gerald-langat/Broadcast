@@ -141,15 +141,9 @@ export default function Widgets() {
     setQuery("");
   }
   return (
-    <>
-     {loading ? (
-        <Button color="gray" className="border-0 items-center flex mt-4 sm:mt-0">
-          <Spinner aria-label="Loading spinner" size="md" />
-          <span className="pl-3 animate-pulse sm:text-[16px] text-[28px]">Loading...</span>
-        </Button>
-      ) : (
+  
       <div className='dark:bg-gray-950 top-0 sticky  h-screen p-2'>
-        <form className='flex items-center bg-gray-200 rounded-full mb-2'>
+        <form className='flex items-center bg-gray-200 px-3 rounded-full mb-2'>
           <SearchIcon className='sm:h-6 h-8 w-8 text-gray-500 z-40 dark:text-gray-300' />
         <input
           className="border-0 dark:bg-gray-950 bg-gray-200 w-full text-2xl sm:text-lg placeholder:text-2xl  sm:placeholder:text-lg 
@@ -208,7 +202,7 @@ export default function Widgets() {
       </div>
       <br></br>
       <div className="">
-      <h4 className="font-bold text-3xl sm:text-xl px-4 text-black dark:text-gray-300">Trends for you</h4>
+      <h4 className="font-bold text-3xl sm:text-xl px-4 text-black dark:text-gray-300">Trends</h4>
       {loading ? (
             <Button color="gray" className="border-0">
               <Spinner aria-label="Loading spinner" size="sm" />
@@ -233,10 +227,5 @@ export default function Widgets() {
     </div>
     </div>
  
-      )}
-          
-      {/* <div className=" z-50 right-0 bottom-6 fixed">
-        <LiveStream />
-      </div> */}
-    </>
+  
 )}

@@ -72,13 +72,7 @@ export default function Sidebar() {
   return (
     <div className="dark:bg-gray-950 mr-1 top-0 sticky p-2">
     
-      {loading ? (
-        <Button color="gray" className="border-0  items-center flex mt-4 sm:mt-0">
-          <Spinner aria-label="Loading spinner" size="md" />
-          <span className="pl-3 animate-pulse sm:text-[16px] text-[28px]">Loading...</span>
-        </Button>
-      ) : (
-        <>
+
           {userPosts && (
             <div className="flex space-x-2">
               
@@ -212,14 +206,7 @@ export default function Sidebar() {
     </Link>
   ))}
 </div>
-
-
-
           </div>
-
-         
-        </>
-      )}
     </div>
   );
 }

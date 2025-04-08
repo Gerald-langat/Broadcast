@@ -13,7 +13,7 @@ function MembersModal() {
           onRequestClose={() => setOpen(false)}
           className="max-w-lg w-[90%]  absolute top-62 left-[50%] translate-x-[-50%] bg-white rounded-md shadow-md border-none"
         >
-         
+         <div>Members</div>
         </Modal>
       )}
     </div>

@@ -654,11 +654,12 @@ useEffect(() => {
        <div className="flex p-1">
        {post?.data()?.citeUserImg && (
          <>
+         <Link href={`/userProfile/${uid}`}>
        <img
-       className="h-8 w-8 rounded-md mr-4"
+       className="h-8 w-8 rounded-md mr-4 cursor-pointer"
        src={post?.data()?.citeUserImg}
        alt="user-img"
-     />
+     /></Link>
      <p className="flex space-x-2 items-center">{post?.data()?.fromUser}{" "}{post?.data()?.fromlastname}{" "}@{post?.data()?.fromNickname}{" "} 
      <Badge className="py-0" color="gray" icon={HiClock}>
          <Moment fromNow>{post?.data()?.citetimestamp?.toDate().toLocaleString()}</Moment>
