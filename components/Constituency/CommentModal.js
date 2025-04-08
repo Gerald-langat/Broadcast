@@ -3,11 +3,10 @@ import { modalConstituencyState, postIdConstituency } from "../../atoms/modalAto
 import Modal from "react-modal";
 import {
   EmojiHappyIcon,
-  PhotographIcon,
   XIcon,
 } from "@heroicons/react/outline";
-import { useEffect, useRef, useState } from "react";
-import { auth, db, storage } from "../../firebase";
+import { useEffect, useState } from "react";
+import {  db } from "../../firebase";
 import {
   addDoc,
   collection,
@@ -16,7 +15,6 @@ import {
   onSnapshot,
   query,
   serverTimestamp,
-  updateDoc,
   where,
 } from "firebase/firestore";
 import Moment from "react-moment";
