@@ -104,12 +104,20 @@ export default function CommentModal() {
               </div>
             </div>
             <div className="p-2 flex items-center space-x-1 relative">
-            
+            {post?.data()?.userImg ? (
               <img
                 className="sm:h-10 h-16 sm:w-10 w-16 rounded-md mr-4"
                 src={post?.data()?.userImg}
                 alt="user-img"
               />
+            ):(
+              <img
+                className="sm:h-10 h-16 sm:w-10 w-16 rounded-md mr-4"
+                src={post?.data()?.imageUrl}
+                alt="user-img"
+              />
+            )}
+              
               <h4 className="font-bold text-[20px] sm:text-[16px] hover:underline">
                 {post?.data()?.name}
               </h4>

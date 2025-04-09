@@ -474,14 +474,25 @@ useEffect(
         <>
       <div className='flex items-center w-full'>
       <div className='flex items-center flex-1 space-x-2'>
-      <Link href={`/userProfile/${uid}`}>
+      {post?.data()?.userImg ? (
+        <Link href={`/userProfile/${uid}`}>
       <img
         className="h-11 w-11 rounded-md"
         src={post?.data()?.userImg}
         alt="user-img"
-      />
-
+      /> 
       </Link>
+      ) : (
+        <Link href={`/userProfile/${uid}`}>
+      <img
+        className="h-11 w-11 rounded-md"
+        src={post?.data()?.imageUrl}
+        alt="user-img"
+      />
+        </Link>
+      )}
+
+
        <h4 className=" dark:text-gray-300 font-bold text-xl sm:text-[15px] max-w-20 hover:underline truncate">
               {post?.data()?.name}
             </h4>

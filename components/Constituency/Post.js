@@ -185,8 +185,9 @@ const { user } = useUser()
         await addDoc(collection(db, 'constituency', userpost?.constituency, "posts"), {
           uid: user?.id,
             text: postData.text,
-            userImg: userpost.userImg,
+            userImg: userpost.userImg || "",
             timestamp: serverTimestamp(),
+            imageUrl:userpost?.imageUrl,
             lastname: userpost.lastname,
             name:userpost.name,
             nickname:userpost.nickname,
@@ -286,7 +287,7 @@ const { user } = useUser()
 // recite post
 const cite = async () => {
   if (!user?.id) { 
-    router.replace('/signup');
+    router.replace('/');
   }
   setLoading(true);
 
@@ -300,7 +301,8 @@ const cite = async () => {
           uid: user?.id,
           text: postData.text,
           citeInput: citeInput,
-          userImg: userpost.userImg,
+          userImg: userpost.userImg || "",
+          imageUrl:userpost.imageUrl,
           lastname: userpost.lastname,
           timestamp:serverTimestamp(),
           citetimestamp: postData.timestamp.toDate(),
@@ -309,6 +311,7 @@ const cite = async () => {
           fromNickname: postData.nickname,
           fromlastname: postData.lastname,
           citeUserImg: postData.userImg,
+          citeImageUrl:postData.imageUrl,
           // Include image and video only if they are defined
         
           ...(postData.name && { fromUser:postData.name,}),
@@ -498,11 +501,19 @@ useEffect(() => {
         </Button>
       ) : (
         <>
-      {post?.data()?.userImg && (
+      {post?.data()?.userImg ? (
         <Link href={`/userProfile/${uid}`}>
         <img
         className="sm:h-12 sm:w-12 h-14 w-14 rounded-md mr-4 object-fit shadow-gray-800 shadow-sm dark:shadow-gray-600"
         src={post?.data()?.userImg}
+        alt="user-img"
+      />
+      </Link>
+      ):(
+        <Link href={`/userProfile/${uid}`}>
+        <img
+        className="sm:h-12 sm:w-12 h-14 w-14 rounded-md mr-4 object-fit shadow-gray-800 shadow-sm dark:shadow-gray-600"
+        src={post?.data()?.imageUrl}
         alt="user-img"
       />
       </Link>
@@ -643,13 +654,20 @@ useEffect(() => {
         {post?.data()?.citeInput ? (<div><p onClick={() => router.push(`/constituencyposts(id)/${id}`)}>{post?.data()?.citeInput}</p>
         <div className="border-[1px] rounded-md dark:border-gray-900 dark:hover:bg-gray-900 border-gray-200 hover:bg-neutral-300"  onClick={() => router.push(`/constituencyposts(id)/${id}`)}>
         <div className="flex p-1 space-x-2 items-center">
-        {post?.data()?.citeUserImg && (
-          <>
+        {post?.data()?.citeUserImg ? (
+       
         <img
         className="h-8 w-8 rounded-md"
         src={post?.data()?.citeUserImg}
         alt="user-img"
       />
+        ):(
+          <img
+        className="h-8 w-8 rounded-md"
+        src={post?.data()?.citeImageUrl}
+        alt="user-img"
+      />
+        )}
 
        <h4 className=" dark:text-gray-300 max-w-20 font-bold text-xl sm:text-[15px] truncate">
           {post?.data()?.name}
@@ -662,8 +680,8 @@ useEffect(() => {
           <Moment fromNow>{post?.data()?.citetimestamp?.toDate().toLocaleString()}</Moment>
         </Badge>
       
-      </>
-      )}
+     
+    
         </div>
         <p className="ml-14" onClick={() => router.push(`/constituencyposts(id)/${id}`)}>{post?.data()?.text}</p>
 

@@ -11,11 +11,20 @@ function SearchComponent({ post }) {
 <Link href={`/posts/${uid}`}>
         <div className="flex cursor-pointer items-center dark:hover:bg-gray-900 py-5 sm:py-2 hover:bg-slate-100 w-full">          
           <div className="flex items-center">
+          {post?.data()?.userImg ? (
             <img
               className="sm:h-9 sm:w-9 h-12 w-12 rounded-full mb-1 ml-1 mt-1 mr-1"
               src={post.data().userImg}
               alt="user-img"
             />
+          ): (
+            <img
+              className="sm:h-9 sm:w-9 h-12 w-12 rounded-full mb-1 ml-1 mt-1 mr-1"
+              src={post?.data()?.imageUrl}
+              alt="user-img"
+            />
+          )}
+            
           </div>
             <div className='flex space-x-2 text-2xl sm:text-sm'>
               <p>{post.data().name}</p>

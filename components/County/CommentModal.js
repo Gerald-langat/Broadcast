@@ -107,11 +107,20 @@ export default function CommentModal() {
             </div>
             <div className="p-2 flex items-center space-x-1 relative">
               <span className="w-0.5 h-full z-[-1] absolute left-8 top-11 bg-gray-300" />
-              <img
+              {post?.data()?.userImg ? (
+                <img
                 className="h-11 w-11 rounded-full mr-4"
                 src={post?.data()?.userImg}
                 alt="user-img"
               />
+              ):(
+                <img
+                className="h-11 w-11 rounded-full mr-4"
+                src={post?.data()?.imageUrl}
+                alt="user-img"
+              />
+              )}
+              
               <h4 className="font-bold text-[15px] sm:text-[16px] hover:underline">
                 {post?.data()?.name}
               </h4>

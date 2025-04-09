@@ -447,9 +447,14 @@ useEffect(() => {
         <div className="ml-2">
           <div className=" w-full items-center justify-center flex">
             <input type="file" accept="image/*" hidden ref={filePickerRef} onChange={addImageToPost} />
-            {userImg && (
+            {userImg ? (
               <img
                 src={userImg}
+                className={`${loading && "animate-pulse"} sm:h-[200px] sm:w-[200px] h-[150px] w-[150px] -mt-20 sm:-mt-40 sm:-ml-[300px] md:-ml-[400px] lg:-ml-[500px] xl:-ml-[500px] rounded-3xl object-cover`}
+              />
+            ):(
+              <img
+                src={post?.imageUrl}
                 className={`${loading && "animate-pulse"} sm:h-[200px] sm:w-[200px] h-[150px] w-[150px] -mt-20 sm:-mt-40 sm:-ml-[300px] md:-ml-[400px] lg:-ml-[500px] xl:-ml-[500px] rounded-3xl object-cover`}
               />
             )}

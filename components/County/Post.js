@@ -157,7 +157,7 @@ const { user } = useUser()
         await addDoc(collection(db, 'county', userpost?.county, "posts"), {
           uid: user?.id,
             text: postData.text,
-            userImg: userpost.userImg,
+            userImg: userpost.userImg || "",
             timestamp: serverTimestamp(),
             lastname: userpost.lastname,
             name:userpost.name,
@@ -274,7 +274,7 @@ const cite = async () => {
           uid: user?.id,
           text: postData.text,
           citeInput: citeInput,
-          userImg: userpost.userImg,
+          userImg: userpost.userImg || "",
           lastname: userpost.lastname,
           timestamp:serverTimestamp(),
           citetimestamp: postData.timestamp.toDate(),
@@ -507,11 +507,19 @@ useEffect(() => {
        </Button>
      ) : (
        <>
-     {post?.data()?.userImg && (
+     {post?.data()?.userImg ? (
       <Link href={`/userProfile/${uid}`}>
        <img
        className="sm:h-12 sm:w-12 h-14 w-14 rounded-md mr-4 object-fit shadow-gray-800 shadow-sm dark:shadow-gray-600"
        src={post?.data()?.userImg}
+       alt="user-img"
+     />
+     </Link>
+     ):(
+      <Link href={`/userProfile/${uid}`}>
+       <img
+       className="sm:h-12 sm:w-12 h-14 w-14 rounded-md mr-4 object-fit shadow-gray-800 shadow-sm dark:shadow-gray-600"
+       src={post?.data()?.imageUrl}
        alt="user-img"
      />
      </Link>
@@ -762,7 +770,7 @@ useEffect(() => {
            <ChatIcon
              onClick={() => {
                if (!user?.id) {
-                 router.replace('/signup');
+                 router.replace('/');
                } else {
                  setPostId(id);
                  setOpen(!open);

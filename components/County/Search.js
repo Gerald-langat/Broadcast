@@ -10,11 +10,18 @@ const uid = post?.data()?.uid
         <Link href={`/countyposts/${uid}`}>
         <div className="flex cursor-pointer items-center dark:hover:bg-neutral-700 hover:bg-slate-100 w-full">
           <div className="flex items-center">
-            <img
+          {post?.data()?.userImg ? (<img
               className="h-9 w-9 rounded-full mb-1 ml-1 mt-1 mr-1"
               src={post?.data()?.userImg}
               alt="user-img"
+            />) :(
+              <img
+              className="h-9 w-9 rounded-full mb-1 ml-1 mt-1 mr-1"
+              src={post?.data()?.imageUrl}
+              alt="user-img"
             />
+            )}
+            
           </div>
 
             <div className='flex space-x-2 text-sm'>

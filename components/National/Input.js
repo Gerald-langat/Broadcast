@@ -62,7 +62,7 @@ export default function Input() {
         const docRef = await addDoc(collection(db, 'national'), {
           uid: userData.uid,
           text: input,
-          userImg: userData.userImg,
+          userImg: userData.userImg || "",
           timestamp: serverTimestamp(),
           lastname: userData.lastname,
           name: userData.name,
@@ -71,6 +71,7 @@ export default function Input() {
           constituency: userData.constituency,
           ward: userData.ward,
           category:userData.category,
+          imageUrl: userData?.imageUrl,
           views: []
         });
 
@@ -108,6 +109,7 @@ export default function Input() {
             constituency: userData.constituency,
             ward: userData.ward,
             category:userData.category,
+            imageUrl: userData?.imageUrl,
             views: [],
           });
         }
@@ -126,6 +128,7 @@ export default function Input() {
             constituency: userData.constituency,
             ward: userData.ward,
             category:userData.category,
+            imageUrl: userData?.imageUrl,
             views: []
           });
         }
@@ -144,6 +147,7 @@ export default function Input() {
             constituency: userData.constituency,
             ward: userData.ward,
             category:userData.category,
+            imageUrl: userData?.imageUrl,
             views: []
           });
         }
@@ -213,13 +217,19 @@ export default function Input() {
       {userData && (
         <div className="flex xl:p-3 space-x-3 z-40 top-0
         pb-2 dark:border-gray-900 border-[1px] rounded-md my-1">
-        {userData.userImg && (
+        {userData.userImg ? (
             <img
             className="h-11 w-11 md:h-11 md:w-11 rounded-md lg:mr-4 object-fit  cursor-pointer  shadow-gray-800 shadow-sm dark:shadow-gray-600"
             src={userData.userImg}
             alt="user-img"
           />
 
+      ):(
+        <img
+            className="h-11 w-11 md:h-11 md:w-11 rounded-md lg:mr-4 object-fit  cursor-pointer  shadow-gray-800 shadow-sm dark:shadow-gray-600"
+            src={userData.imageUrl}
+            alt="user-img"
+          />
       )}
     
           <div className="w-full border-none">

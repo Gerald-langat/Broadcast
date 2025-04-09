@@ -11,6 +11,7 @@ import { useRecoilState } from 'recoil';
 import { useFollow } from '../FollowContext';
 import { FlagIcon } from '@heroicons/react/solid';
 import { useUser } from '@clerk/nextjs';
+import Link from 'next/link';
 
 function NationTrends({post, id}) {
 
@@ -456,7 +457,7 @@ const viewCount = Array.isArray(post?.data()?.views) ? post.data().views.length 
   const handleCancel = () => {
     setShowModal(false);
   };
-
+const uid = post?.data()?.uid
   return (
     <div className='w-full'>
      {showAlert && (
@@ -475,11 +476,24 @@ const viewCount = Array.isArray(post?.data()?.views) ? post.data().views.length 
         <>
       <div className='flex items-center mt-2'>
       <div className='flex space-x-2 flex-1 items-center'>
-      <img
-        className="h-11 w-11 rounded-md"
-        src={post?.data()?.userImg}
-        alt="user-img"
-      />
+      {post?.data()?.userImg ? (
+  <Link href={`/userProfile/${uid}`}>
+    <img
+      className="sm:h-12 sm:w-12 h-14 w-14 rounded-md cursor-pointer mr-4 object-fit shadow-gray-800 shadow-sm dark:shadow-gray-600"
+      src={post?.data()?.userImg}
+      alt="user-img"
+    />
+  </Link>
+) : (
+  <Link href={`/userProfile/${uid}`}>
+    <img
+      className="sm:h-12 sm:w-12 h-14 w-14 rounded-md cursor-pointer mr-4 object-fit shadow-gray-800 shadow-sm dark:shadow-gray-600"
+      src={post?.data()?.imageUrl}
+      alt="user-img"
+    />
+  </Link>
+)}
+
         <h4 className=" dark:text-gray-300 font-bold max-w-20 truncate text-xl sm:text-[15px] hover:underline ">
               {post?.data()?.name}
             </h4>

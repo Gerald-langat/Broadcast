@@ -60,13 +60,14 @@ export default function Input() {
         const docRef = await addDoc(collection(db, "ward", collectionName, "posts"), {
           uid: user?.id,
           text: input,
-          userImg: userData.userImg,
+          userImg: userData.userImg || "",
           timestamp: serverTimestamp(),
           lastname: userData.lastname,
           name: userData.name,
           nickname: userData.nickname,
           ward:userData.ward,
           category:userData.category,
+          imageUrl:userData?.imageUrl,
           views: []
         });
 
@@ -156,11 +157,20 @@ export default function Input() {
     <>
       {userData && (
         <div className="flex border-[1px] rounded-md bg-white dark:bg-gray-950 border-gray-200 dark:border-gray-900 p-3 space-x-3 z-10 top-0 mt-1">
-          <img
+          {userData?.userImg ? (
+            <img
             src={userData.userImg}
             alt="user-img"
             className="h-11 w-11 rounded-md cursor-pointer hover:brightness-95 shadow-gray-800 shadow-sm dark:shadow-gray-600"
           />
+          ):(
+            <img
+            src={userData.imageUrl}
+            alt="user-img"
+            className="h-11 w-11 rounded-md cursor-pointer hover:brightness-95 shadow-gray-800 shadow-sm dark:shadow-gray-600"
+          />
+          )}
+          
           <div className="w-full divide-y divide-gray-200 dark:divide-gray-900">
             <div className="">
               <textarea

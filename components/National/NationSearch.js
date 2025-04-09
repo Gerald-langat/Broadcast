@@ -476,11 +476,24 @@ async function likePost() {
         <>
       <div className='flex items-center mt-2'>
       <div className='flex space-x-2 flex-1 items-center'>
-      <img
-        className="h-11 w-11 rounded-md mr-1"
-        src={post?.data()?.userImg}
-        alt="user-img"
-      />
+      {post?.data()?.userImg ? (
+  <Link href={`/userProfile/${uid}`}>
+    <img
+      className="sm:h-12 sm:w-12 h-14 w-14 rounded-md cursor-pointer mr-4 object-fit shadow-gray-800 shadow-sm dark:shadow-gray-600"
+      src={post?.data()?.userImg}
+      alt="user-img"
+    />
+  </Link>
+) : (
+  <Link href={`/userProfile/${uid}`}>
+    <img
+      className="sm:h-12 sm:w-12 h-14 w-14 rounded-md cursor-pointer mr-4 object-fit shadow-gray-800 shadow-sm dark:shadow-gray-600"
+      src={post?.data()?.imageUrl}
+      alt="user-img"
+    />
+  </Link>
+)}
+
       
         <p className='dark:text-gray-300 font-bold max-w-20 truncate text-xl sm:text-[15px] hover:underline'>{post?.data()?.name}</p>
         <p className='font-bold text-xl sm:text-[15px] max-w-20 truncate'>{post?.data()?.lastname}</p>

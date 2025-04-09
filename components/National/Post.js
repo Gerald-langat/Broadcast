@@ -283,7 +283,7 @@ const handleShare = async () => {
         const newPostData = {
           uid: userData?.uid,
           text: postData?.text,
-          userImg: userData?.userImg,
+          userImg: userData?.userImg || "",
           timestamp: serverTimestamp(),
           lastname: userData?.lastname,
           name: userData?.name,
@@ -334,7 +334,7 @@ const handleShare = async () => {
             uid: userData?.uid,
             text: postData.text,
             citeInput: citeInput,
-            userImg: userData.userImg,
+            userImg: userData.userImg || "",
             lastname: userData.lastname,
             timestamp:serverTimestamp(),
             citetimestamp: postData.timestamp.toDate(),
@@ -344,6 +344,7 @@ const handleShare = async () => {
             fromNickname: postData.nickname,
             fromlastname: postData.lastname,
             citeUserImg: postData.userImg,
+            citeImageUrl: postData.imageUrl,
             // Include image and video only if they are defined
           
             
@@ -533,7 +534,7 @@ const handleShare = async () => {
 
 <div className={`w-full ${isHidden ? 'inline text-2xl sm:text-xl cursor-pointer dark:hover:bg-gray-800 hover:bg-gray-200 rounded-md p-1' : 'hidden'}`} onClick={handleUndo}>{showUndo && 'undo'}</div>
     
-    <div className={`${isHidden ? 'hidden' : "flex border-[1px] dark:border-gray-800 rounded-md p-1"}`}>
+    <div className={`${isHidden ? 'hidden' : "flex border-[1px] dark:border-gray-900 rounded-md p-1 mt-1"}`}>
   {loading ? (
         <Button color="gray" className="border-0 ">
           <Spinner aria-label="Loading spinner" size="sm" />
@@ -541,17 +542,25 @@ const handleShare = async () => {
         </Button>
       ) : (
         <>
-      {post?.data()?.userImg && (
-<Link href={`/userProfile/${uid}`}>
-             <img
-        className="sm:h-12 sm:w-12 h-14 w-14 rounded-md cursor-pointer mr-4 object-fit shadow-gray-800 shadow-sm dark:shadow-gray-600"
-        src={post?.data()?.userImg}
-        alt="user-img"
-       
-      />
-   </Link>
-     
-      )}
+        {post?.data()?.userImg ? (
+  <Link href={`/userProfile/${uid}`}>
+    <img
+      className="sm:h-12 sm:w-12 h-14 w-14 rounded-md cursor-pointer mr-4 object-fit shadow-gray-800 shadow-sm dark:shadow-gray-600"
+      src={post?.data()?.userImg}
+      alt="user-img"
+    />
+  </Link>
+) : (
+  <Link href={`/userProfile/${uid}`}>
+    <img
+      className="sm:h-12 sm:w-12 h-14 w-14 rounded-md cursor-pointer mr-4 object-fit shadow-gray-800 shadow-sm dark:shadow-gray-600"
+      src={post?.data()?.imageUrl}
+      alt="user-img"
+    />
+  </Link>
+)}
+
+ 
 
       <div className="flex-1">
         <div className="flex items-center justify-between">
@@ -690,8 +699,8 @@ const handleShare = async () => {
         <p onClick={() => router.push(`/posts(id)/${id}`)} className="text-[20px] sm:text-[16px]">{post?.data()?.citeInput}</p>
         <div className="border-[1px] rounded-md dark:border-gray-900 dark:hover:bg-gray-800 border-gray-200 hover:bg-neutral-300"  onClick={() => router.push(`/posts(id)/${id}`)}>
         <div className="flex p-1">
-        {post?.data()?.citeUserImg && (
-          <>
+        {post?.data()?.citeUserImg ? (
+        
           <Link href={`/userProfile/${uid}`}>
         <img
         className="h-8 w-8 rounded-md mr-4 cursor-pointer"
@@ -700,14 +709,23 @@ const handleShare = async () => {
       />
 
       </Link>
+        ):(
+          <Link href={`/userProfile/${uid}`}>
+        <img
+        className="h-8 w-8 rounded-md mr-4 cursor-pointer"
+        src={post?.data()?.citeImageUrl}
+        alt="user-img"
+      />
+
+      </Link>
+        )}
       <p className="flex space-x-2 items-center">{post?.data()?.fromUser}{" "}{post?.data()?.fromlastname}{" "}@{post?.data()?.fromNickname}{" "} 
       <Badge className="py-0" color="gray" icon={HiClock}>
           <Moment fromNow>{post?.data()?.citetimestamp?.toDate().toLocaleString()}</Moment>
         </Badge>
       </p>     
 
-      </>
-      )}
+     
         </div>
         <p className="ml-14 text-[20px] sm:text-[16px]" onClick={() => router.push(`/posts(id)/${id}`)}>{post?.data()?.text}</p>
 

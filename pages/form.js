@@ -126,6 +126,7 @@ function Form() {
       ward: selectedWard,
       county: selectedCounty,
       category: selectedCategory,
+      imageUrl:user?.imageUrl
     });
 
     const imageRef = ref(storage, `userPosts/${docRef.id}/userImg`);
@@ -149,10 +150,7 @@ function Form() {
       router.push('/national');
     }
 
-    if (!selectedFile) {
-      alert('Please select your profile');
-      return;
-    }
+  
     if (!selectedCategory) {
       alert('Please select category');
       return;
@@ -310,7 +308,7 @@ function Form() {
               <label className='mr-4'>Profile:</label>
               <input
                 type='file'
-                required
+      
                 accept='image/*'
                 ref={filePickerRef}
                 onChange={addImageUserImg}

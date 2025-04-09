@@ -67,6 +67,16 @@ export default function Sidebar() {
     fetchPosts();
   }, [db]);
   
+  const formatNumber = (number) => {
+    if (number >= 1000000) {
+      return (number / 1000000).toFixed(1) + 'M'; // 1 million and above
+    } else if (number >= 1000) {
+      return (number / 1000).toFixed(1) + 'k'; // 1 thousand and above
+    } else {
+      return number; // below 1 thousand
+    }
+  };
+  
 
   return (
     <div className="dark:bg-gray-950 mr-1 top-0 sticky  p-2 ">  
@@ -74,11 +84,18 @@ export default function Sidebar() {
           {userPosts && (
             <div className="flex space-x-2">
               
+              {userPosts?.userImg ? (
                 <img
                   src={userPosts.userImg}
                   className="sm:h-11 sm:w-11 h-20 w-20 rounded-md cursor-pointer hover:brightness-95 shadow-gray-800 shadow-sm dark:shadow-gray-600"
-      
                 />
+              ): (
+                <img
+                  src={userPosts.imageUrl}
+                  className="sm:h-11 sm:w-11 h-20 w-20 rounded-md cursor-pointer hover:brightness-95 shadow-gray-800 shadow-sm dark:shadow-gray-600"
+                />
+              )}
+                
                
               <div className="flex-1 flex-col">
                 <p className="font-bold text-lg sm:text-sm dark:text-gray-300">{userPosts.name}</p>
@@ -142,8 +159,8 @@ export default function Sidebar() {
          
          <div className='flex justify-between w-full items-center'>
             <h2 className="font-bold ml-4 dark:text-gray-300 text-2xl sm:text-lg">Members</h2>
-           
-            <p className='text-xs text-blue-500 cursor-pointer' onClick={() => setOpenModal(true)}>View all Members</p>
+    
+            <p className='text-xs text-blue-500 cursor-pointer' onClick={() => setOpenModal(true)}>View all Members(<span>{formatNumber(posts.length)}00</span>)</p>
           
         </div>
 
@@ -156,7 +173,7 @@ export default function Sidebar() {
       <div className="m-4">
         {post?.userImg ? (
           <img
-            className="h-14 w-14 sm:h-10 sm:w-10 rounded-md shadow-gray-800 shadow-sm dark:shadow-gray-600"
+            className="h-14 w-14 sm:h-10 object-cover sm:w-10 rounded-md shadow-gray-800 shadow-sm dark:shadow-gray-600"
             src={post.userImg} 
             alt="User Profile"
             width={400}
@@ -164,9 +181,14 @@ export default function Sidebar() {
             layout="intrinsic"
           />
         ) : (
-          <p className="w-10 h-10 rounded-md bg-green-500 flex justify-center items-center text-white font-bold">
-            {post?.name?.charAt(0)}{post?.lastname?.charAt(0)}
-          </p>
+          <img
+            className="h-14 w-14 sm:h-10 sm:w-10 rounded-md shadow-gray-800 shadow-sm dark:shadow-gray-600"
+            src={post?.imageUrl} 
+            alt="User Profile"
+            width={400}
+            height={400}
+            layout="intrinsic"
+          />
         )}
       </div>
 

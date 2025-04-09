@@ -61,13 +61,14 @@ const { user } = useUser()
         const docRef = await addDoc(collection(db, "constituency", collectionName, "posts"), {
           uid: user?.id,
           text: input,
-          userImg: userData.userImg,
+          userImg: userData.userImg || "",
           timestamp: serverTimestamp(),
           lastname: userData.lastname,
           name: userData.name,
           nickname: userData.nickname,
           constituency:userData.constituency,
           category:userData.category,
+          imageUrl:userData?.imageUrl,
           views: []
         });
 
@@ -153,11 +154,20 @@ const { user } = useUser()
     <>
       {userData && (
         <div className="flex border-[1px] bg-white dark:bg-gray-950 border-gray-200 p-3 space-x-3 z-10 top-0 sticky-top dark:border-gray-900 rounded-md mt-1">
-          <img
+          {userData?.userImg ? (
+            <img
             src={userData?.userImg}
             alt="user-img"
             className="h-11 w-11 rounded-md cursor-pointer hover:brightness-95"
           />
+          ):(
+            <img
+            src={userData?.imageUrl}
+            alt="user-img"
+            className="h-11 w-11 rounded-md cursor-pointer hover:brightness-95"
+          />
+          )}
+          
           <div className="w-full divide-y divide-gray-200 dark:divide-gray-900">
             <div className="" >
               <textarea
