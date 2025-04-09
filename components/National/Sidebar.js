@@ -69,8 +69,7 @@ export default function Sidebar() {
   
 
   return (
-    <div className="dark:bg-gray-950 mr-1 top-0 sticky p-2">
-    
+    <div className="dark:bg-gray-950 mr-1 top-0 sticky  p-2 ">  
 
           {userPosts && (
             <div className="flex space-x-2">

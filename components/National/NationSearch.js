@@ -12,6 +12,7 @@ import { deleteObject, ref } from 'firebase/storage';
 import { useFollow } from '../FollowContext';
 import { FlagIcon } from '@heroicons/react/solid';
 import { useUser } from '@clerk/nextjs';
+import Link from 'next/link';
 
 function SearchPost({post, id}) {
 
@@ -456,6 +457,7 @@ async function likePost() {
     
   const viewCount = Array.isArray(post?.data()?.views) ? post.data().views.length : 0;
 
+  const  uid = post?.data()?.uid
   return (
     <div className='w-full'>
     {showAlert && (

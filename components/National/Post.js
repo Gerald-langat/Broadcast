@@ -264,7 +264,7 @@ const handleShare = async () => {
       await navigator.share({
         title: 'Check this out!',
         text: 'Sharing this amazing content.',
-        url: `https://broadcast.com/posts/${id}`
+        url: `https://broadcast-gwly.vercel.app/${id}`
       });
     } catch (error) {
       console.error('Error sharing content:', error);
@@ -533,7 +533,7 @@ const handleShare = async () => {
 
 <div className={`w-full ${isHidden ? 'inline text-2xl sm:text-xl cursor-pointer dark:hover:bg-gray-800 hover:bg-gray-200 rounded-md p-1' : 'hidden'}`} onClick={handleUndo}>{showUndo && 'undo'}</div>
     
-    <div className={`${isHidden ? 'hidden' : "flex border-[1px] rounded-md p-1"}`}>
+    <div className={`${isHidden ? 'hidden' : "flex border-[1px] dark:border-gray-800 rounded-md p-1"}`}>
   {loading ? (
         <Button color="gray" className="border-0 ">
           <Spinner aria-label="Loading spinner" size="sm" />

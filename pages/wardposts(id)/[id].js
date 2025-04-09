@@ -109,7 +109,7 @@ const toggleHome = () => {
     <div className="hidden xl:inline">
       <Sidebar />
     </div>
-        <div className="flex flex-col flex-grow max-w-full xl:max-w-2xl 2xl:max-w-3xl px-2">
+        <div className="flex flex-col flex-grow max-w-full xl:max-w-2xl 2xl:max-w-6xl px-2">
           <div className="flex items-center space-x-2  py-2 px-3 sticky top-0 bg-white dark:bg-gray-950 border-[1px] rounded-md border-gray-300 dark:border-gray-900">
           <Tooltip content='back' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
             <div className="animate-pulse" onClick={() => router.push("/ward")}>

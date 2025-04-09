@@ -144,7 +144,7 @@ export default function Widgets() {
   return (
   
      <div className='dark:bg-gray-950 top-0 sticky h-screen p-2'>
-       <form className='flex items-center bg-gray-200 rounded-full mb-2'>
+       <form className='flex items-center  rounded-full mb-2'>
          <SearchIcon className='sm:h-6 h-8 w-8 text-gray-500 z-40 dark:text-gray-300' />
        <input
          className="border-0 dark:bg-gray-950 bg-gray-200 w-full text-2xl sm:text-lg placeholder:text-2xl  sm:placeholder:text-lg 
