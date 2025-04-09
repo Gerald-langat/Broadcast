@@ -109,9 +109,15 @@ function Form() {
     e.preventDefault();
     if (loading) return;
     setLoading(true);
+
+    if (!user?.id) {
+      console.error('User UID is missing!');
+      setLoading(false);
+      return;
+    }
    
     const docRef = await addDoc(collection(db, 'userPosts'), {
-      uid: user?.id,
+      uid: user.id,
       timestamp: serverTimestamp(),
       name: input.name,
       lastname: input.lastname,
