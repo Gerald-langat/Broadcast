@@ -154,13 +154,12 @@ export default function Sidebar() {
             </div>
             </Link>
           </div>
-          
           <div>
          
          <div className='flex justify-between w-full items-center'>
             <h2 className="font-bold ml-4 dark:text-gray-300 text-2xl sm:text-lg">Members</h2>
     
-            <p className='text-xs text-blue-500 cursor-pointer' onClick={() => setOpenModal(true)}>View all Members(<span>{formatNumber(posts.length)}00</span>)</p>
+            <p className='text-xs text-blue-500 cursor-pointer' onClick={() => setOpenModal(true)}>View all Members(<span>{formatNumber(posts.length)}</span>)</p>
           
         </div>
 

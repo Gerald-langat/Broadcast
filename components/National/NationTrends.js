@@ -220,14 +220,15 @@ const viewCount = Array.isArray(post?.data()?.views) ? post.data().views.length 
         const newPostData = {
           uid: user?.id,
           text: postData.text,
-          userImg: userData.userImg,
+          userImg: userData.userImg || "",
+          imageUrl:userData?.imageUrl,
           timestamp: serverTimestamp(),
           lastname: userData.lastname,
           name: userData.name,
           nickname: userData.nickname,
           from: postData.name,
           fromNickname: postData.nickname,
-          citeUserImg: postData.userImg,
+        
           // Include image and video only if they are defined
          
           ...(postData.category && { fromCategory: postData.category }),
@@ -278,8 +279,8 @@ const viewCount = Array.isArray(post?.data()?.views) ? post.data().views.length 
             nickname: userData.nickname,
             fromNickname: postData.nickname,
             lastname: postData.lastname,
-
             citeUserImg: postData.userImg,
+            citeImageUrl: postData.imageUrl,
             // Include image and video only if they are defined
           
             

@@ -290,6 +290,7 @@ const handleShare = async () => {
           nickname: userData?.nickname,
           from: postData?.name,
           fromNickname: postData?.nickname,
+          imageUrl: userData?.imageUrl,
           // Include image and video only if they are defined
          
           ...(postData.category && { category: postData.category }),
@@ -335,6 +336,7 @@ const handleShare = async () => {
             text: postData.text,
             citeInput: citeInput,
             userImg: userData.userImg || "",
+            imageUrl:userData?.imageUrl,
             lastname: userData.lastname,
             timestamp:serverTimestamp(),
             citetimestamp: postData.timestamp.toDate(),
@@ -344,10 +346,9 @@ const handleShare = async () => {
             fromNickname: postData.nickname,
             fromlastname: postData.lastname,
             citeUserImg: postData.userImg,
-            citeImageUrl: postData.imageUrl,
             // Include image and video only if they are defined
           
-            
+            ...(postData.imageUrl && { citeImageUrl: postData.imageUrl }),
             ...(postData.category && { category: postData.category }),
             ...(postData.Images && { Images: postData.Images }),
             ...(postData.videos && { videos: postData.videos }),
