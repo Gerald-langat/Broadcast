@@ -24,7 +24,7 @@
     "**/*.ts",
     "**/*.tsx",
     "middleware.ts",
-    "pages/index.js"
+    "pages/form.js"
   ],
   "exclude": [
     "node_modules"
