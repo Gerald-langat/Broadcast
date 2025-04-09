@@ -176,7 +176,7 @@ async function likePost() {
     fetchUserData();
   }, [user?.id]);
 
-  // recast
+  // Repost the posts 
   const repost = async () => {
    setLoading(true);
     if (post) {
@@ -184,74 +184,77 @@ async function likePost() {
       try {
         // Construct the new post data object
         const newPostData = {
-          uid: user?.id,
-          text: postData.text,
-          userImg: userData.userImg,
+          uid: userData?.uid,
+          text: postData?.text,
+          userImg: userData?.userImg || "",
           timestamp: serverTimestamp(),
-          lastname: userData.lastname,
-          name: userData.name,
-          nickname: userData.nickname,
-          from: postData.name,
-          fromNickname: postData.nickname,
-          citeUserImg: postData.userImg,
+          lastname: userData?.lastname,
+          name: userData?.name,
+          nickname: userData?.nickname,
+          from: postData?.name,
+          fromNickname: postData?.nickname,
+          imageUrl: userData?.imageUrl,
           // Include image and video only if they are defined
          
-          ...(postData.category && { fromCategory: postData.category }),
-          ...(postData.image && { image: postData.image }),
-          ...(postData.video && { video: postData.video }),
+          ...(postData.category && { category: postData.category }),
+          ...(postData.images && { images: postData.images }),
+          ...(postData.videos && { videos: postData.videos }),
         };
   
-         await addDoc(collection(db, 'national'), newPostData);
-       
-         setShowAlert(true);
-          setTimeout(() => {
-            setShowAlert(false);
-          }, 1000);
-  
-          setAlertMessage("Cast recasted successfully!");
-          setLoading(false);
-          
-        } catch (error) {
-          console.error('Error recastting the post:', error);
-          setAlertMessage("Failed to cite Cast. Please try again.");
-          setLoading(false);
-        }
-      } else {
-        console.log('No post data available to repost.');
-        setAlertMessage("Invalid input. Please check your text.");
+       await addDoc(collection(db, 'national'), newPostData);
+       setShowAlert(true);
+        setTimeout(() => {
+          setShowAlert(false);
+        }, 1000);
+
+        setAlertMessage("Cast reposted successfully!");
         setLoading(false);
+        
+      } catch (error) {
+        console.error('Error reposting the post:', error);
+        setAlertMessage("Failed to cite Cast. Please try again.");
+
       }
+    } else {
+      console.log('No post data available to repost.');
+      setAlertMessage("Invalid input. Please check your text.");
+      setLoading(false);
+    }
   };
 
+
+  // cite
   const cite = async () => {
-   
+    
     setLoading(true);
   
     if (post) {
       const postData = post.data();
-  
+        
       // Check if postData and properties are defined and of correct type
       if (postData && typeof postData.text === 'string' && typeof citeInput === 'string') {
         try {
           await addDoc(collection(db, 'national'), {
-            uid: user?.id,
+            uid: userData?.uid,
             text: postData.text,
             citeInput: citeInput,
-            userImg: userData.userImg,
-            timestamp:serverTimestamp(),
+            userImg: userData.userImg || "",
+            imageUrl:userData?.imageUrl,
             lastname: userData.lastname,
+            timestamp:serverTimestamp(),
             citetimestamp: postData.timestamp.toDate(),
             name: userData.name,
             fromUser:postData.name,
             nickname: userData.nickname,
             fromNickname: postData.nickname,
-            lastname: postData.lastname,
+            fromlastname: postData.lastname,
             citeUserImg: postData.userImg,
             // Include image and video only if they are defined
-                      
-            ...(postData.category && { fromCategory: postData.category }),
-            ...(postData.image && { image: postData.image }),
-            ...(postData.video && { video: postData.video }),
+          
+            ...(postData.imageUrl && { citeImageUrl: postData.imageUrl }),
+            ...(postData.category && { category: postData.category }),
+            ...(postData.Images && { Images: postData.Images }),
+            ...(postData.videos && { videos: postData.videos }),
         });
         setShowAlert(true);
         setTimeout(() => {
@@ -260,22 +263,21 @@ async function likePost() {
 
         setAlertMessage("Cast cited successfully!");
         setLoading(false);
-        } catch (error) {
-          console.error('Error reposting the post:', error);
-          setAlertMessage("Failed to cite Cast. Please try again.");
 
-         } finally {
-          setLoading(false); // Ensure loading is false after try/catch
-          setCiteInput(""); // Reset the input
+        } catch (error) {
+          console.error('Error reposting the cast:', error);
+          setAlertMessage("Failed to cite Cast. Please try again.");
         }
       } else {
         console.error('Invalid data detected. postData.text or citeInput is not a string.');
         setAlertMessage("Invalid input. Please check your text.");
-        setLoading(false);
       }
+  
       setLoading(false);
+      setCiteInput("");
     } else {
-      console.log('No post data available to repost.');
+      console.log('No post data available to cast.');
+      setLoading(false);
     }
   };
 
@@ -615,23 +617,32 @@ async function likePost() {
         <div className="border rounded-md dark:border-gray-900
      border-gray-200 dark:hover:bg-gray-900 hover:bg-neutral-300"  onClick={() => router.push(`/posts(id)/${id}`)}>
         <div className="flex p-1">
-        {post?.data()?.citeUserImg && (
-          <>
+        {post?.data()?.citeUserImg ? (
+  
           <Link href={`/userProfile/${uid}`}>
         <img
         className="sm:h-8 sm:w-8 h-9 w-9 rounded-md mr-4 cursor-pointer"
         src={post?.data()?.citeUserImg}
         alt="user-img"
       />
+      </Link>
+    ):(
+      <Link href={`/userProfile/${uid}`}>
+        <img
+        className="sm:h-8 sm:w-8 h-9 w-9 rounded-md mr-4 cursor-pointer"
+        src={post?.data()?.citeImageUrl}
+        alt="user-img"
+      />
 
       </Link>
+    )}
       <p className="flex space-x-2">{post?.data()?.fromUser}{" "}{post?.data()?.fromNickname}{" "}@{post?.data()?.fromNickname}{" "} 
       <Badge color="gray" icon={HiClock}>
           <Moment fromNow>{post?.data()?.citetimestamp?.toDate().toLocaleString()}</Moment>
         </Badge>
       </p>
-      </>
-      )}
+    
+    
         </div>
         <p onClick={() => router.push(`/posts(id)/${id}`)} className='ml-14'>{post?.data()?.text}</p>
         {post?.data()?.images?.length > 1 ? (
