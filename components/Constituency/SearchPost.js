@@ -1,10 +1,8 @@
-import { auth, db, storage } from '../../firebase';
+import { db, storage } from '../../firebase';
 import { ChatIcon, DotsHorizontalIcon, EyeIcon, EyeOffIcon, HeartIcon, PencilAltIcon, ReplyIcon, ShareIcon, TrashIcon, UserAddIcon, UserRemoveIcon } from '@heroicons/react/outline';
 import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, query, serverTimestamp, setDoc, updateDoc, where } from 'firebase/firestore';
-import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react'
-import Comment from './Comment';
 import { modalConstituencyState, postIdConstituency } from '../../atoms/modalAtom';
 import { useRecoilState } from 'recoil';
 import Moment from 'react-moment';
@@ -154,7 +152,7 @@ const deleteRepost = async () => {
         });
       }
     } else {
-      router.replace('/signup');
+      router.replace('/');
     }
   }
 
@@ -184,13 +182,14 @@ const deleteRepost = async () => {
         await addDoc(collection(db, 'constituency', userpost?.constituency, "posts"), {
           uid: user?.id,
             text: postData.text,
-            userImg: userpost.userImg,
+            userImg: userpost.userImg || "",
             timestamp: serverTimestamp(),
             lastname: userpost.lastname,
             name:userpost.name,
             nickname:userpost.nickname,
             from: postData.name,
             fromNickname: postData.nickname,
+            imageUrl: userpost.imageUrl,
 
 
             ...(postData.category && {category:postData.category}),
@@ -223,17 +222,12 @@ const deleteRepost = async () => {
 
 const cite = async () => {
   if (!user?.id) { 
-    router.replace('/signup');
+    router.replace('/');
   }
   setLoading(true);
 
   if (post) {
     const postData = post.data();
-    
-    // Debugging: Log postData and its properties
-    console.log('postData:', postData);
-    console.log('postData.text:', postData.text);
-    console.log('citeInput:', citeInput);
 
     // Check if postData and properties are defined and of correct type
      if (postData && typeof postData.text === 'string' && typeof citeInput === 'string' ) {
@@ -243,7 +237,7 @@ const cite = async () => {
           uid: user?.id,
           text: postData.text,
           citeInput: citeInput,
-          userImg: userpost.userImg,
+          userImg: userpost.userImg || "",
           lastname: userpost.lastname,
           timestamp:serverTimestamp(),
           citetimestamp: postData.timestamp.toDate(),
@@ -252,6 +246,7 @@ const cite = async () => {
           fromNickname: postData.nickname,
           fromlastname: postData.lastname,
           citeUserImg: postData.userImg,
+          citeImageUrl:postData.imageUrl,
           // Include image and video only if they are defined
         
           ...(postData.name && { fromUser:postData.name,}),

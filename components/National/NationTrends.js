@@ -271,7 +271,7 @@ const viewCount = Array.isArray(post?.data()?.views) ? post.data().views.length 
             uid: user?.id,
             text: postData.text,
             citeInput: citeInput,
-            userImg: userData.userImg,
+            userImg: userData.userImg || "",
             lastname: userData.lastname,
             citetimestamp: postData.timestamp.toDate(),
             name: userData.name,
@@ -617,20 +617,32 @@ const uid = post?.data()?.uid
         <div className="border rounded-md dark:border-gray-900
      border-gray-200 dark:hover:bg-gray-900 hover:bg-neutral-300"  onClick={() => router.push(`/posts(id)/${id}`)}>
         <div className="flex p-1">
-        {post?.data()?.citeUserImg && (
-          <>
-        <img
-        className="sm:h-8 sm:w-8 h-9 w-9 rounded-md mr-4"
-        src={post?.data()?.citeUserImg}
-        alt="user-img"
-      />
+         {post?.data()?.citeUserImg ? (
+                
+                  <Link href={`/userProfile/${uid}`}>
+                <img
+                className="h-8 w-8 rounded-md mr-4 cursor-pointer"
+                src={post?.data()?.citeUserImg}
+                alt="user-img"
+              />
+        
+              </Link>
+                ):(
+                  <Link href={`/userProfile/${uid}`}>
+                <img
+                className="h-8 w-8 rounded-md mr-4 cursor-pointer"
+                src={post?.data()?.citeImageUrl}
+                alt="user-img"
+              />
+        
+              </Link>
+                )}
       <p className="flex space-x-2">{post?.data()?.fromUser}{" "}{post?.data()?.fromNickname}{" "}@{post?.data()?.fromNickname}{" "} 
       <Badge color="gray" icon={HiClock}>
           <Moment fromNow>{post?.data()?.citetimestamp?.toDate().toLocaleString()}</Moment>
         </Badge>
       </p>
-      </>
-      )}
+     
         </div>
         <p className='ml-14' onClick={() => router.push(`/posts(id)/${id}`)}>{post?.data()?.text}</p>
 

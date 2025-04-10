@@ -164,7 +164,7 @@ const { user } = useUser()
             nickname:userpost.nickname,
             from: postData.name,
             fromNickname: postData.nickname,
-
+            imageUrl: userpost?.imageUrl,
 
             ...(postData.category && {category:postData.category}),
             ...(postData.images && {images:postData.images}),
@@ -259,7 +259,7 @@ const { user } = useUser()
 
 const cite = async () => {
   if (!user?.id) { 
-    router.replace('/signup');
+    router.replace('/');
   }
   setLoading(true);
 
@@ -283,6 +283,8 @@ const cite = async () => {
           fromNickname: postData.nickname,
           fromlastname: postData.lastname,
           citeUserImg: postData.userImg,
+          imageUrl: userpost?.imageUrl,
+          citeImageUrl: postData.imageUrl,
           // Include image and video only if they are defined
         
           ...(postData.name && { fromUser:postData.name,}),
@@ -660,21 +662,32 @@ useEffect(() => {
        {post?.data()?.citeInput ? (<div><p onClick={() => router.push(`/countyposts(id)/${id}`)} className="text-[20px] sm:text-[16px]">{post?.data()?.citeInput}</p>
        <div className="border-[1px] rounded-md dark:border-gray-900 dark:hover:bg-gray-900 border-gray-200 "  onClick={() => router.push(`/countyposts(id)/${id}`)}>
        <div className="flex p-1">
-       {post?.data()?.citeUserImg && (
-         <>
-         <Link href={`/userProfile/${uid}`}>
-       <img
-       className="h-8 w-8 rounded-md mr-4 cursor-pointer"
-       src={post?.data()?.citeUserImg}
-       alt="user-img"
-     /></Link>
+       {post?.data()?.citeUserImg ? (
+               
+                 <Link href={`/userProfile/${uid}`}>
+               <img
+               className="h-8 w-8 rounded-md mr-4 cursor-pointer"
+               src={post?.data()?.citeUserImg}
+               alt="user-img"
+             />
+       
+             </Link>
+               ):(
+                 <Link href={`/userProfile/${uid}`}>
+               <img
+               className="h-8 w-8 rounded-md mr-4 cursor-pointer"
+               src={post?.data()?.citeImageUrl}
+               alt="user-img"
+             />
+       
+             </Link>
+               )}
      <p className="flex space-x-2 items-center">{post?.data()?.fromUser}{" "}{post?.data()?.fromlastname}{" "}@{post?.data()?.fromNickname}{" "} 
      <Badge className="py-0" color="gray" icon={HiClock}>
          <Moment fromNow>{post?.data()?.citetimestamp?.toDate().toLocaleString()}</Moment>
        </Badge>
      </p>
-     </>
-     )}
+     
 
        </div>
        <p className="ml-14" onClick={() => router.push(`/countyposts(id)/${id}`)}>{post?.data()?.text}</p>

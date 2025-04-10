@@ -4,13 +4,12 @@ import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAmI3uZKu0oqJ90xsX-3BLsYNLno3rz3rI",
-  authDomain: "deep-state-dce44.firebaseapp.com",
-  databaseURL: "https://deep-state-dce44-default-rtdb.firebaseio.com",
-  projectId: "deep-state-dce44",
-  storageBucket: "deep-state-dce44.appspot.com",
-  messagingSenderId: "36467854328",
-  appId: "1:36467854328:web:bb49838d3beb41be77240d"
+  apiKey: "AIzaSyBEDaxI1FDo4cyq9zLNZ6RL1YcdYjNSLZA",
+  authDomain: "instagram-2d742.firebaseapp.com",
+  projectId: "instagram-2d742",
+  storageBucket: "instagram-2d742.appspot.com",
+  messagingSenderId: "969604915107",
+  appId: "1:969604915107:web:14ef43be541df46d6e4416"
 };
 
 

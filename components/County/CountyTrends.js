@@ -195,13 +195,14 @@ useEffect(
         await addDoc(collection(db, 'county', userpost.county, "posts"), {
             uid: user?.id,
             text: postData.text,
-            userImg: userpost.userImg,
+            userImg: userpost.userImg || "",
             timestamp: serverTimestamp(),
             lastname: userpost.lastname,
             name:userpost.name,
             nickname:userpost.nickname,
             from: postData.name,
             fromNickname: postData.nickname,
+            imageUrl:userpost?.imageUrl,
 
             ...(postData.category && {category:postData.category,}),
             ...(postData.images && {images:postData.images,}),
@@ -231,7 +232,7 @@ useEffect(
   // cite
   const cite = async () => {
     if (!user?.id) { 
-      router.push('/signup');
+      router.push('/');
     }
     setLoading(true);
   
@@ -254,6 +255,7 @@ useEffect(
             fromNickname: postData.nickname,
             fromlastname: postData.lastname,
             citeUserImg: postData.userImg,
+              citeImageUrl: postData.imageUrl,
             // Include image and video only if they are defined
           
             ...(postData.name && { fromUser:postData.name,}),
@@ -616,20 +618,32 @@ useEffect(
       {post?.data()?.citeInput ? (<div><p onClick={() => router.push(`/countyposts(id)/${id}`)}></p>{post?.data()?.citeInput}
         <div className="border rounded-md dark:border-gray-900 border-gray-300 hover:bg-gray-300 dark:hover:bg-gray-900 cursor-pointer"  onClick={() => router.push(`/countyposts(id)/${id}`)}>
         <div className="flex p-1">
-        {post?.data()?.citeUserImg && (
-          <>
-        <img
-        className="h-8 w-8  rounded-md mr-4"
-        src={post?.data()?.citeUserImg}
-        alt="user-img"
-      />
+        {post?.data()?.citeUserImg ? (
+        
+        <Link href={`/userProfile/${uid}`}>
+      <img
+      className="h-8 w-8 rounded-md mr-4 cursor-pointer"
+      src={post?.data()?.citeUserImg}
+      alt="user-img"
+    />
+
+    </Link>
+      ):(
+        <Link href={`/userProfile/${uid}`}>
+      <img
+      className="h-8 w-8 rounded-md mr-4 cursor-pointer"
+      src={post?.data()?.citeImageUrl}
+      alt="user-img"
+    />
+
+    </Link>
+      )}
       <p className="flex space-x-2 mr-4">{post?.data()?.fromUser}{" "}{post?.data()?.fromlastname}{" "}@{post?.data()?.fromNickname}{" "} 
       <Badge color="gray" icon={HiClock}>
           <Moment fromNow>{post?.data()?.citetimestamp?.toDate().toLocaleString()}</Moment>
         </Badge>
       </p>
-      </>
-      )}
+   
         </div>
         <p className="ml-14" onClick={() => router.push(`/countyposts(id)/${id}`)}>{post?.data()?.text}</p>
         {post?.data()?.images?.length  > 1 ? (
@@ -727,7 +741,7 @@ useEffect(
             <ChatIcon
               onClick={() => {
                 if (!user?.id) {
-                  router.push('/signup');
+                  router.push('/');
                 } else {
                   setPostId(id);
                   setOpen(!open);

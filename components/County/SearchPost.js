@@ -1,6 +1,6 @@
 import { db, storage } from '../../firebase';
 import { BookmarkIcon, ChatIcon, DotsHorizontalIcon, EyeIcon, EyeOffIcon, HeartIcon, PencilAltIcon, ReplyIcon, ShareIcon, TrashIcon, UserAddIcon, UserRemoveIcon } from '@heroicons/react/outline';
-import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, query, serverTimestamp, setDoc, where } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, query, serverTimestamp, setDoc, updateDoc, where } from 'firebase/firestore';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react'
 import Moment from 'react-moment';
@@ -190,13 +190,15 @@ useEffect(
         await addDoc(collection(db, 'county', userpost.county, "posts"), {
             uid: user?.id,
             text: postData.text,
-            userImg: userpost.userImg,
+            userImg: userpost.userImg || "",
             timestamp: serverTimestamp(),
             lastname: userpost.lastname,
             name:userpost.name,
             nickname:userpost.nickname,
             from: postData.name,
             fromNickname: postData.nickname,
+            imageUrl:userpost.imageUrl,
+
 
             ...(postData.category && {category:postData.category,}),
             ...(postData.images && {image:postData.images,}),
@@ -226,7 +228,7 @@ useEffect(
   // cite
   const cite = async () => {
     if (!user?.id) { 
-      router.replace('/signup');
+      router.replace('/');
     }
     setLoading(true);
   
@@ -240,7 +242,7 @@ useEffect(
             uid: user?.id,
             text: postData.text,
             citeInput: citeInput,
-            userImg: userpost.userImg,
+            userImg: userpost.userImg || "",
             lastname: userpost.lastname,
             timestamp:serverTimestamp(),
             citetimestamp: postData.timestamp.toDate(),
@@ -249,6 +251,7 @@ useEffect(
             fromNickname: postData.nickname,
             fromlastname: postData.lastname,
             citeUserImg: postData.userImg,
+            citeImageUrl: postData.imageUrl,
             // Include image and video only if they are defined
           
             ...(postData.name && { fromUser:postData.name,}),
@@ -618,20 +621,31 @@ useEffect(
         <div><p onClick={() => router.push(`/countyposts(id)/${id}`)}>{post?.data()?.citeInput}</p>
         <div className="border rounded-md border-gray-200 dark:border-gray-900 hover:bg-gray-300 dark:hover:bg-gray-900 cursor-pointer"  onClick={() => router.push(`/countyposts(id)/${id}`)}>
         <div className="flex p-1">
-        {post?.data()?.citeUserImg && (
-          <>
-        <img
-        className="sm:h-8 sm:w-8 h-20 w-20 rounded-md mr-4"
-        src={post?.data()?.citeUserImg}
-        alt="user-img"
-      />
+               {post?.data()?.citeUserImg ? (
+          
+                  <Link href={`/userProfile/${uid}`}>
+                <img
+                className="sm:h-8 sm:w-8 h-9 w-9 rounded-md mr-4 cursor-pointer"
+                src={post?.data()?.citeUserImg}
+                alt="user-img"
+              />
+              </Link>
+            ):(
+              <Link href={`/userProfile/${uid}`}>
+                <img
+                className="sm:h-8 sm:w-8 h-9 w-9 rounded-md mr-4 cursor-pointer"
+                src={post?.data()?.citeImageUrl}
+                alt="user-img"
+              />
+        
+              </Link>
+            )}
       <p className="flex space-x-2 mr-4">{post?.data()?.fromUser}{" "}{post?.data()?.fromlastname}{" "}@{post?.data()?.fromNickname}{" "} 
       <Badge color="gray" icon={HiClock}>
           <Moment fromNow>{post?.data()?.citetimestamp?.toDate().toLocaleString()}</Moment>
         </Badge>
       </p>
-      </>
-      )}
+     
         </div>
         <p className="ml-14" onClick={() => router.push(`/countyposts(id)/${id}`)}>{post?.data()?.text}</p>
         {post?.data()?.images?.length  > 1 ? (
