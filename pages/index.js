@@ -10,16 +10,18 @@ function Index() {
   useEffect(() => {
     // Redirect to '/form' if the user is logged in
     if (user?.id) {
-      router.push('/form');
+      // router.push('/form');
     }
   }, [user, router]); // Dependency array to avoid infinite loop
 
   return (
     <div className="flex flex-col w-full justify-center items-center h-screen ">
+    <div className="mb-60 flex-col space-y-4 items-center">
     <Image 
       src='../../images/Brodcast.jpg'
-      width={600}
-      height={600}
+      width={100}
+      height={100}
+      className='rounded-md'
     />
       <SignedOut>
         <button
@@ -31,9 +33,15 @@ function Index() {
       </SignedOut>
 
       <SignedIn>
-        {/* If the user is signed in, you could display a user button or something else */}
-        <UserButton />
-      </SignedIn>
+  <div className="flex flex-row items-center space-x-2">
+  <UserButton className="rounded-md"/>
+    <p>{user?.firstName}</p>
+    <p>{user?.lastName}</p>
+    
+  </div>
+</SignedIn>
+
+    </div>
     </div>
   );
 }
