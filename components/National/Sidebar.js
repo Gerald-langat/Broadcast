@@ -3,7 +3,7 @@ import { collection, getDocs, onSnapshot, query, where } from 'firebase/firestor
 import { db } from '../../firebase';
 import { useRecoilState } from 'recoil';
 import { useRouter } from 'next/router';
-import { Members, modalStatus } from '../../atoms/modalAtom';
+import { postIdMembers, modalStatus } from '../../atoms/modalAtom';
 import { HomeIcon, InboxInIcon, NewspaperIcon, OfficeBuildingIcon, PauseIcon, PlusIcon, UserIcon } from '@heroicons/react/outline';
 import Link from 'next/link';
 import {  useUser } from '@clerk/nextjs';
@@ -15,12 +15,11 @@ export default function Sidebar() {
   
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const [open, setOpen] = useRecoilState(modalStatus);
+   const [open, setOpen] = useRecoilState(modalStatus);
   const [posts, setPosts] = useState([]);
   // const { hasFollowed, followMember, followloading } = useFollow();
   const [userPosts, setUserPosts] = useState(null);
   const { user } = useUser();
-  const [openModal, setOpenModal] = useRecoilState(Members);
 
 
   // Fetch user posts
@@ -162,9 +161,9 @@ export default function Sidebar() {
          
          <div className='flex justify-between w-full items-center'>
             <h2 className="font-bold ml-4 dark:text-gray-300 text-2xl sm:text-lg">Members</h2>
-    
-            <p className='text-xs text-blue-500 cursor-pointer ' onClick={() => setOpenModal(true)}>View all Members(<span>{formatNumber(posts.length)}</span>)</p>
-          
+    <Link href={'/members'}>
+            <p className='text-xs text-blue-500 cursor-pointer ' >View all Members(<span>{formatNumber(posts.length)}</span>)</p>
+          </Link>
         </div>
 
         <div className="h-[500px] w-[300px] overflow-auto scrollbar-hide">

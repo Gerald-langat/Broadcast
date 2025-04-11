@@ -11,7 +11,7 @@ import { Button, Spinner, Tooltip } from 'flowbite-react';
 import SearchPost from '../../components/Ward/SearchPost';
 import Link from 'next/link';
 import StatusModal from '../../components/National/StatusModal';
-import MembersModal from '../../components/MembersModal';
+import MembersModal from '../../components/Members';
 
 
 const WardPost = () => {
