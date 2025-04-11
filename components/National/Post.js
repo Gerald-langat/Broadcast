@@ -755,6 +755,7 @@ const handleShare = async () => {
         
         {post?.data()?.videos && (
           <video autoPlay
+          muted
           onClick={(e) => { 
             e.stopPropagation(); // Prevent the click event from bubbling up
             e.preventDefault(); // Prevent the default action (navigation)

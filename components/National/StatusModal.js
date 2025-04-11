@@ -72,22 +72,22 @@ export default function StatusModal() {
           views: []
         });
 
-        const imageRef = ref(storage, `status/${docRef.id}/statusImg`);
+        const imageRef = ref(storage, `status/${docRef.id}/Images`);
     if (selectedFile) {
       await uploadString(imageRef, selectedFile, 'data_url').then(async () => {
         const downloadURL = await getDownloadURL(imageRef);
         await updateDoc(doc(db, 'status', docRef.id), {
-          statusImg: downloadURL,
+          images: downloadURL,
         });
       });
     }
 
-        const vidRef = ref(storage, `status/${docRef.id}/video`);
+        const vidRef = ref(storage, `status/${docRef.id}/Videos`);
        if (selectedVidFile) {
           await uploadString(vidRef, selectedVidFile, "data_url").then(async () => {
             const downloadURL = await getDownloadURL(vidRef);
             await updateDoc(doc(db,'status', docRef.id), {
-              video: downloadURL,
+              videos: downloadURL,
             });
           });
         }

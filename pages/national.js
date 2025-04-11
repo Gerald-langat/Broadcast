@@ -35,7 +35,7 @@ function Home() {
 
 
   return (
-    <div className="flex flex-col min-h-screen w-full">
+    <div className="flex flex-col min-h-screen w-full ">
   <Head>
     <title>Home</title>
     <meta name="description" content="Generated and created by redAnttech" />
@@ -43,7 +43,7 @@ function Home() {
   </Head>
 
   {/* Main Content */}
-  <div className="flex flex-1 min-h-screen min-w-[560px] xl:max-w-7xl mx-auto">
+  <div className="flex flex-1 min-h-screen min-w-[560px] xl:max-w-7xl mx-auto ">
     {/* Sidebar */}
     {isSidebarVisible && (
       <div className="fixed inset-0 z-30 xl:hidden w-full" onClick={() => setIsSidebarVisible(false)}>
