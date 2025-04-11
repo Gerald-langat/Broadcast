@@ -11,6 +11,7 @@ import { Button, Spinner, Tooltip } from 'flowbite-react';
 import SearchPost from '../../components/Ward/SearchPost';
 import Link from 'next/link';
 import StatusModal from '../../components/National/StatusModal';
+import MembersModal from '../../components/MembersModal';
 
 
 const WardPost = () => {
@@ -152,6 +153,7 @@ const toggleHome = () => {
                   
                       <CommentModal />
                       <StatusModal />
+                      <MembersModal />
                     </main>
       <div
         className="xl:hidden justify-between bottom-0 z-40 fixed bg-slate-50

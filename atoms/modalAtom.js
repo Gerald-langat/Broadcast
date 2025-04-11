@@ -68,7 +68,7 @@ export const postIdMessage = atom({
 
 export const Members = atom({
   key: "Members", // unique ID (with respect to other atoms/selectors)
-  default: "members", // default value (aka initial value)
+  default: false, // default value (aka initial value)
 });
 
 

@@ -82,10 +82,7 @@ export default function Sidebar() {
   return (
     <div className="dark:bg-gray-950 mr-1 top-0 sticky  p-2 ">  
 {loading ? (
-     
           <Spinner aria-label="Loading spinner" size="sm" />
-        
-     
       ) : (
         <>
           {userPosts && (
@@ -166,7 +163,7 @@ export default function Sidebar() {
          <div className='flex justify-between w-full items-center'>
             <h2 className="font-bold ml-4 dark:text-gray-300 text-2xl sm:text-lg">Members</h2>
     
-            <p className='text-xs text-blue-500 cursor-pointer' onClick={() => setOpenModal(true)}>View all Members(<span>{formatNumber(posts.length)}</span>)</p>
+            <p className='text-xs text-blue-500 cursor-pointer ' onClick={() => setOpenModal(true)}>View all Members(<span>{formatNumber(posts.length)}</span>)</p>
           
         </div>
 

@@ -1,6 +1,5 @@
 import { Modal } from 'flowbite-react';
 import { Members } from '../atoms/modalAtom';
-import React from 'react'
 import { useRecoilState } from 'recoil';
 
 function MembersModal() {
