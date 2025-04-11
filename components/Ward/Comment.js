@@ -159,7 +159,7 @@ export default function Comment({ comment, commentId, originalPostId }) {
   // repost
        const repost = async () => {
           if(!user?.id) {
-            router.replace('/signup');
+            router.replace('/');
           }
           if (comment) {
             const postData = comment;
@@ -342,12 +342,21 @@ const uid = comment?.uid
     <div className={`${isHidden ? 'hidden' : "flex p-3 cursor-pointer pl-20"}`}>
       {/* user image */}
       <Link href={`/userProfile/${uid}`}>
-      <img
-        className="h-11 w-11 rounded-md mr-4"
-        src={comment?.userImg}
-        alt="user-img"
-      />
-      </Link>
+           {comment?.userImg ? (
+             <img
+             className="h-11 w-11 rounded-full mr-4"
+             src={comment?.userImg}
+             alt="user-img"
+           /> 
+           ):(
+             <img
+             className="h-11 w-11 rounded-full mr-4"
+             src={comment?.imageUrl}
+             alt="user-img"
+           />
+           )}
+             
+           </Link>
       {/* right side */}
       <div className="flex-1">
         {/* Header */}

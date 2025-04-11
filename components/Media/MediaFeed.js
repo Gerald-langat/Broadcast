@@ -107,16 +107,12 @@ function MediaFeed() {
   return (
     <div className="min-h-screen">
       {loading ? (
-        <Button color="gray" className="border-0">
+      
           <Spinner aria-label="Loading spinner" size="sm" />
-          <span className="pl-3 animate-pulse">Loading...</span>
-        </Button>
+
       ) : (
-        <div className="flex w-4/4 ">
-          {/* Sidebar */}
-          <div className='hidden w-2/4 lg:inline '>
-         <Sidebar />
-        </div>
+        <div className="flex w-full ">
+          
           {/* Center Section */}
           <div className="flex flex-col justify-center w-full relative">
             <div className=" flex flex-col justify-center items-center space-x-4 w-full top-0 z-10  sticky space-y-2">

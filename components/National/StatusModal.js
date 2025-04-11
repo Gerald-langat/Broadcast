@@ -62,13 +62,14 @@ export default function StatusModal() {
         const docRef = await addDoc(collection(db, 'status'), {
           uid: user?.id,
           text: input,
-          userImg: userData.userImg,
+          userImg: userData.userImg || "",
+          imageUrl: userData.imageUrl,
           timestamp: serverTimestamp(),
           lastname: userData.lastname,
           name: userData.name,
           nickname: userData.nickname,
           category:userData.category,
-          views: 0
+          views: []
         });
 
         const imageRef = ref(storage, `status/${docRef.id}/statusImg`);
@@ -171,11 +172,20 @@ export default function StatusModal() {
           
             <div className="p-2 flex items-center space-x-1 relative text-2xl sm:text-lg">
               <span className="w-0.5 h-full z-[-1] absolute left-8 top-11 bg-gray-300" />
-              <img
+              {userData?.userImg ? (
+                <img
                 className="sm:h-11 sm:w-11 h-16 w-16 rounded-md mr-4"
                 src={userData?.userImg}
                 alt="user-img"
               />
+              ):(
+                <img
+                className="sm:h-11 sm:w-11 h-16 w-16 rounded-md mr-4"
+                src={userData?.imageUrl}
+                alt="user-img"
+              />
+              )}
+              
               <h4 className="font-bold hover:underline">
                 {userData?.name}
               </h4>

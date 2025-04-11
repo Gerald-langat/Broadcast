@@ -90,7 +90,7 @@ export default function Comment({ comment, commentId, originalPostId }) {
         );
       }
     } else {
-      router.replace('/signup')
+      router.replace('/')
     }
   }
 
@@ -161,24 +161,24 @@ export default function Comment({ comment, commentId, originalPostId }) {
     // repost
      const repost = async () => {
         if(!user?.id) {
-          router.replace('/signup');
+          router.replace('/');
         }
         if (comment) {
           const postData = comment;
-          console.log('Post data:', postData);
           try {
             // Construct the new post data object
             const newPostData = {
               uid: user?.id,
               comment: postData.comment,
-              userImg: userData.userImg,
+              userImg: userData.userImg || "",
+              imageUrl: userData.imageUrl,
               timestamp: serverTimestamp(),
               lastname: userData.lastname,
               name: userData.name,
               nickname: userData.nickname,
               from: postData.name,
               fromNickname: postData.nickname,
-              citeUserImg: postData.userImg,
+             
               // Include image  only if they are defined
              
               ...(postData.category && { fromCategory: postData.category }),
@@ -343,13 +343,22 @@ export default function Comment({ comment, commentId, originalPostId }) {
     <div className={`w-full ${isHidden ? 'inline text-2xl sm:text-xl cursor-pointer dark:hover:bg-gray-900 hover:bg-gray-200 rounded-md p-1' : 'hidden'}`} onClick={handleUndo}>{showUndo && 'undo'}</div>
     <div className={`${isHidden ? 'hidden' : "flex p-3 cursor-pointer pl-20"}`}>
       {/* user image */}
-      <Link href={`/userProfile/${uid}`}>
-      <img
-        className="h-11 w-11 rounded-md mr-4"
-        src={comment?.userImg}
-        alt="user-img"
-      />
-      </Link>
+       <Link href={`/userProfile/${uid}`}>
+            {comment?.userImg ? (
+              <img
+              className="h-11 w-11 rounded-full mr-4"
+              src={comment?.userImg}
+              alt="user-img"
+            /> 
+            ):(
+              <img
+              className="h-11 w-11 rounded-full mr-4"
+              src={comment?.imageUrl}
+              alt="user-img"
+            />
+            )}
+              
+            </Link>
       {/* right side */}
       <div className="flex-1">
         {/* Header */}
@@ -367,7 +376,14 @@ export default function Comment({ comment, commentId, originalPostId }) {
               <Moment fromNow>{comment?.timestamp?.toDate()}</Moment>
             </span>
           </div>
-
+<div className="flex">{user?.id === comment?.uid && (
+           
+           <TrashIcon
+              onClick={user?.id === comment?.uid ? deleteRepost : deleteComment}
+             className="h-12 w-12 md:h-9 md:w-9 p-2 hover:text-red-600 hover:bg-red-100 rounded-full dark:hover:bg-gray-800"
+           />
+                     
+         )}
           {/* dot icon */}
           <Popover
                 aria-labelledby="profile-popover"
@@ -464,7 +480,8 @@ export default function Comment({ comment, commentId, originalPostId }) {
               >
                 <DotsHorizontalIcon className="dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-gray-900 rounded-full h-10 hover:text-sky-500 p-1 sm:p-2"/>
               
-             </Popover>
+             </Popover></div>
+          
         </div>
 
               {/* image */}
@@ -514,14 +531,7 @@ export default function Comment({ comment, commentId, originalPostId }) {
             )}
           </div>
           {/* delete comment */}
-          {user?.id === comment?.uid && (
-           
-           <TrashIcon
-              onClick={user?.id === comment?.uid ? deleteRepost : deleteComment}
-             className="h-12 w-12 md:h-10 md:w-10 p-2 hover:text-red-600 hover:bg-red-100 rounded-full dark:hover:bg-gray-800"
-           />
-                     
-         )}
+         
           <Tooltip content='share' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
           <ShareIcon className="h-9 w-9 rounded-full p-2 hover:text-sky-500 hover:bg-sky-100 dark:hover:bg-neutral-700" onClick={handleShare}/>
           </Tooltip>

@@ -7,6 +7,7 @@ import { Members, modalStatus } from '../../atoms/modalAtom';
 import { HomeIcon, InboxInIcon, NewspaperIcon, OfficeBuildingIcon, PauseIcon, PlusIcon, UserIcon } from '@heroicons/react/outline';
 import Link from 'next/link';
 import {  useUser } from '@clerk/nextjs';
+import { Spinner } from 'flowbite-react';
 
 
 
@@ -80,7 +81,13 @@ export default function Sidebar() {
 
   return (
     <div className="dark:bg-gray-950 mr-1 top-0 sticky  p-2 ">  
-
+{loading ? (
+     
+          <Spinner aria-label="Loading spinner" size="sm" />
+        
+     
+      ) : (
+        <>
           {userPosts && (
             <div className="flex space-x-2">
               
@@ -119,37 +126,37 @@ export default function Sidebar() {
           <div className=''>
           <Link href='/national'>
             <div className='flex cursor-pointer items-center space-x-4 dark:text-gray-200 dark:hover:bg-gray-900 hover:bg-gray-200 rounded-full w-full px-2 sm:py-2 py-4'>
-              <HomeIcon className='h-9'/>
+              <HomeIcon className='h-6'/>
               <span className='text-2xl sm:text-lg'>Home</span>
             </div>
             </Link>
             <Link href='/media'>
             <div className='flex  items-center space-x-4 dark:text-gray-200 cursor-pointer dark:hover:bg-gray-900 hover:bg-gray-200 rounded-full w-full px-2 sm:py-2 py-4'>
-              <PauseIcon className='h-9'/>
+              <PauseIcon className='h-6'/>
               <span className='text-2xl sm:text-lg'>Media</span>
             </div>
             </Link>
             <Link href='/news'>
             <div className='flex  items-center space-x-4 dark:text-gray-200 cursor-pointer dark:hover:bg-gray-900 hover:bg-gray-200 rounded-full w-full px-2 sm:py-2 py-4'>
-              <NewspaperIcon className='h-9'/>
+              <NewspaperIcon className='h-6'/>
               <span className='text-2xl sm:text-lg'>News</span>
             </div>
             </Link>
             <Link href='/marketplace'>
             <div className='flex  items-center space-x-4 dark:text-gray-200 dark:hover:bg-gray-900 hover:bg-gray-200 rounded-full w-full px-2 sm:py-2 py-4 cursor-pointer'>
-              <OfficeBuildingIcon className='h-9'/>
+              <OfficeBuildingIcon className='h-6'/>
               <span className='text-2xl sm:text-lg'>MarketPlace</span>
             </div>
             </Link>
             <Link href={'/messages'}>
             <div className='flex  items-center space-x-4 dark:text-gray-200 dark:hover:bg-gray-900 hover:bg-gray-200 rounded-full w-full px-2 sm:py-2 py-4 cursor-pointer' onClick={() => router.push('/messages')}>
-              <InboxInIcon className='h-9'/>
+              <InboxInIcon className='h-6'/>
               <span className='text-2xl sm:text-lg'>Message</span>
             </div>
             </Link>
             <Link href={'/profile'}>
             <div className='flex items-center space-x-4 dark:text-gray-200 dark:hover:bg-gray-900 hover:bg-gray-200 rounded-full w-full px-2 sm:py-2 py-4 cursor-pointer' onClick={() => router.push('/profile')}>
-              <UserIcon className='h-9'/>
+              <UserIcon className='h-6'/>
               <span className='text-2xl sm:text-lg'>Profile</span>
             </div>
             </Link>
@@ -226,6 +233,8 @@ export default function Sidebar() {
   ))}
 </div>
           </div>
+          </>
+      )}
     </div>
   );
 }

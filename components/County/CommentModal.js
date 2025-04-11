@@ -64,7 +64,8 @@ export default function CommentModal() {
     }
     await addDoc(collection(db, "county",  postId, "comments"), {
       comment: input,
-      userImg: userData.userImg,
+      userImg: userData.userImg || "",
+      imageUrl: userData.imageUrl,
       name: userData.name,
       nickname:userData.nickname,
       timestamp: serverTimestamp(),

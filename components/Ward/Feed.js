@@ -54,7 +54,7 @@ export default function Feed() {
 
   return (
     <div>
-     <div className="xl:border-0 sm:border-x-[1px] dark:border-gray-700 border-gray-200">
+     <div className="xl:border-0 sm:border-x-[1px] w-full dark:border-gray-700 border-gray-200">
      {loading ? (
         <Button color="gray" className="border-0 items-center flex mt-4 sm:mt-0">
           <Spinner aria-label="Loading spinner" size="md" />
@@ -68,7 +68,7 @@ export default function Feed() {
           <SparklesIcon className="h-5" />
         </div>
       </div>
-      <div className="top-8 sticky dark:bg-gray-950 bg-white">
+      <div className="top-8 sticky dark:bg-gray-950 bg-white w-full">
         <Input />
       </div>
       

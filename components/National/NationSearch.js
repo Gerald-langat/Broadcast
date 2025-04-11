@@ -13,6 +13,7 @@ import { useFollow } from '../FollowContext';
 import { FlagIcon } from '@heroicons/react/solid';
 import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';
+import Image from 'next/image';
 
 function SearchPost({post, id}) {
 
@@ -253,7 +254,7 @@ async function likePost() {
           
             ...(postData.imageUrl && { citeImageUrl: postData.imageUrl }),
             ...(postData.category && { category: postData.category }),
-            ...(postData.Images && { Images: postData.Images }),
+            ...(postData.images && { images: postData.images }),
             ...(postData.videos && { videos: postData.videos }),
         });
         setShowAlert(true);
@@ -325,7 +326,7 @@ async function likePost() {
         }));
       } else {
         // Add bookmark
-        const images = post?.data()?.images || [];
+        const images = post?.data()?.images || null;
         const video = post?.data()?.video || null;
 
         // Add new document to the collection
@@ -461,372 +462,389 @@ async function likePost() {
 
   const  uid = post?.data()?.uid
   return (
-    <div className='w-full'>
-    {showAlert && (
+     <div className='flex-col'>
+       {showAlert && (
           <Alert color="success">
             <span className="font-medium">{alertMessage}</span>
           </Alert>
         )}
-<div className={`w-full ${isHidden ? 'inline text-2xl sm:text-xl cursor-pointer dark:hover:bg-gray-900 hover:bg-gray-200 rounded-md p-1' : 'hidden'}`} onClick={handleUndo}>{showUndo && 'undo'}</div>
-    <div className={`${isHidden ? 'hidden' : 'border-[1px] dark:border-gray-900 border-gray-200 px-4 min-w-full rounded-md mt-1'}`}>
+    
+    <div className={`w-full ${isHidden ? 'inline text-2xl sm:text-xl cursor-pointer dark:hover:bg-gray-800 hover:bg-gray-200 rounded-md p-1' : 'hidden'}`} onClick={handleUndo}>{showUndo && 'undo'}</div>
+        
+        <div className={`${isHidden ? 'hidden' : "flex border-[1px] dark:border-gray-900 rounded-md p-1 mt-1"}`}>
       {loading ? (
-        <Button color="gray" className="border-0">
-          <Spinner aria-label="Loading spinner" size="sm" />
-          <span className="pl-3 animate-pulse">Loading...</span>
-        </Button>
-      ) : (
-        <>
-      <div className='flex items-center mt-2'>
-      <div className='flex space-x-2 flex-1 items-center'>
-      {post?.data()?.userImg ? (
-  <Link href={`/userProfile/${uid}`}>
-    <img
-      className="sm:h-12 sm:w-12 h-14 w-14 rounded-md cursor-pointer mr-4 object-fit shadow-gray-800 shadow-sm dark:shadow-gray-600"
-      src={post?.data()?.userImg}
-      alt="user-img"
-    />
-  </Link>
-) : (
-  <Link href={`/userProfile/${uid}`}>
-    <img
-      className="sm:h-12 sm:w-12 h-14 w-14 rounded-md cursor-pointer mr-4 object-fit shadow-gray-800 shadow-sm dark:shadow-gray-600"
-      src={post?.data()?.imageUrl}
-      alt="user-img"
-    />
-  </Link>
-)}
-
-      
-        <p className='dark:text-gray-300 font-bold max-w-20 truncate text-xl sm:text-[15px] hover:underline'>{post?.data()?.name}</p>
-        <p className='font-bold text-xl sm:text-[15px] max-w-20 truncate'>{post?.data()?.lastname}</p>
-        <p className="max-w-20 truncate flex-1 text-xl sm:text-[15px] dark:text-gray-300">@{post?.data()?.nickname}</p>
-        <Badge className="text-sm sm:text-[15px] hover:underline -ml-28 dark:text-gray-300" color="gray"  icon={HiClock}>
-              <Moment fromNow>{post?.data()?.timestamp?.toDate()}</Moment>
-            </Badge>
-      </div>
-      <div className='flex'>
-      {user?.id === post?.data()?.uid && (
-          <Tooltip content='delete' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-
-            <TrashIcon
-              onClick={user?.id === post?.data()?.uid ? deleteRepost : deletePost}
-              className="h-12 w-12 md:h-10 md:w-10 p-2 hover:text-red-600 hover:bg-red-100 rounded-full cursor-pointer dark:hover:bg-neutral-700"
-            />
-            </Tooltip>
-          )}
-          <Popover
-                aria-labelledby="profile-popover"
-                className="md:-ml-28 -ml-8 z-20 shadow-md rounded-lg dark:shadow-gray-400 shadow-gray-500"
-                content={
-                  <div className="w-64 text-xl sm:text-sm text-gray-500 dark:text-gray-300 bg-gray-300 dark:bg-neutral-800 
-                     py-2 space-y-3 border-none">
-                     { post?.data()?.uid !== user?.id ? 
-                        (
-                          <>
-                          <div className="flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900" onClick={handleNotInterested}>
-                    <EyeOffIcon className="h-6"/>
-                      <p>Not interested</p>
-                    </div>
-                    
-
-                    <div className={`${userData?.name == post?.data()?.name ? 'hidden' : 'flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900 '}`} >
-                    {hasFollowed[post?.data()?.uid] ? (
-                      <UserRemoveIcon className="h-6" />
-
-                    ) : (
-                      <UserAddIcon className="h-6" />
-
-                    )}
-                   
-                      <p onClick={() => followMember(post?.data()?.uid)}>{hasFollowed[post?.data()?.uid] ? 'Unfollow' : 'Follow'} @{post?.data()?.nickname}</p>
-                    
-                    </div>
-                   
-                    <div className="flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900"  onClick={() => setShowModal(true)}>
-                     
-                     {isReported[pstId] ? (
-                              <FlagIcon className="h-6 w-6 text-blue-700" />
-                            ) : (
-                              <FlagIcon className="h-6 w-6 text-gray-500" />
-                            )}
-                    
-                      <p> {isReported[pstId]  ? "Reported" : "Report Post"}</p>
-                    </div>
-                    {showModal && (
-                      <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
-                          <div className="bg-white dark:bg-gray-900 p-6 rounded shadow-md w-80">
-                            <h2 className="text-lg font-semibold mb-4">Report Post</h2>
-                            <p className="text-sm mb-4">Why are you reporting this post?</p>
-
-                            {/* Dropdown for report reasons */}
-                            <select
-                              value={reportReason}
-                              onChange={(e) => setReportReason(e.target.value)}
-                              className="w-full p-2 rounded mb-4 dark:bg-gray-900 border-none"
-                            >
-                              <option>Select a reason</option>
-                              <option value="Spam">Spam</option>
-                              <option value="Inappropriate Content">Inappropriate Content</option>
-                              <option value="Hate Speech">Hate Speech</option>
-                              <option value="Other">Other</option>
-                            </select>
-
-                            {/* Buttons */}
-                            <div className="flex justify-between w-full">
-                            <button
-                                onClick={handleCancel}
-                                className="px-4 py-2 bg-gray-300 rounded dark:bg-gray-800 dark:hover:bg-gray-700 hover:bg-gray-400"
-                              >
-                                Cancel
-                              </button>
-                              
-                              <button
-                                onClick={submitReport}
-                                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded"
-                              >
-                               {isReported[pstId]  ? "unSubmit" : "Submit"} 
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                    )}
-               
-                      </>
-                        ):(
-                          <div className="flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900" onClick={toggleBookmark}>
-                          {isBookmarked[pstId] ? (
-                              <BookmarkIcon fill="blue" className="h-6 w-6 text-blue-700" />
-                            ) : (
-                              <BookmarkIcon className="h-6 w-6 text-gray-500" />
-                            )}
-                      <p>{isBookmarked[pstId] ? "Remove Bookmark" : "Add Bookmark"}</p>
-                      </div>
-      )}
-                    
-                  </div>
-                }
-                arrow={false}
-              >
-                <DotsHorizontalIcon className="cursor-pointer dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-gray-900 rounded-full h-10 hover:text-sky-500 p-1 sm:p-2"/>
-              
-             </Popover>
-          </div>
-      </div>
-      <div className='ml-14'>
-      {post?.data()?.citeInput ? (<div><p onClick={() => router.push(`/posts(id)/${id}`)}>{post?.data()?.citeInput}</p>
-        <div className="border rounded-md dark:border-gray-900
-     border-gray-200 dark:hover:bg-gray-900 hover:bg-neutral-300"  onClick={() => router.push(`/posts(id)/${id}`)}>
-        <div className="flex p-1">
-        {post?.data()?.citeUserImg ? (
-  
-          <Link href={`/userProfile/${uid}`}>
-        <img
-        className="sm:h-8 sm:w-8 h-9 w-9 rounded-md mr-4 cursor-pointer"
-        src={post?.data()?.citeUserImg}
-        alt="user-img"
-      />
-      </Link>
-    ):(
+            <Button color="gray" className="border-0 ">
+              <Spinner aria-label="Loading spinner" size="sm" />
+            
+            </Button>
+          ) : (
+            <>
+            {post?.data()?.userImg ? (
       <Link href={`/userProfile/${uid}`}>
         <img
-        className="sm:h-8 sm:w-8 h-9 w-9 rounded-md mr-4 cursor-pointer"
-        src={post?.data()?.citeImageUrl}
-        alt="user-img"
-      />
-
+          className="sm:h-12 sm:w-12 h-14 w-14 rounded-md cursor-pointer mr-4 object-fit shadow-gray-800 shadow-sm dark:shadow-gray-600"
+          src={post?.data()?.userImg}
+          alt="user-img"
+        />
+      </Link>
+    ) : (
+      <Link href={`/userProfile/${uid}`}>
+        <img
+          className="sm:h-12 sm:w-12 h-14 w-14 rounded-md cursor-pointer mr-4 object-fit shadow-gray-800 shadow-sm dark:shadow-gray-600"
+          src={post?.data()?.imageUrl}
+          alt="user-img"
+        />
       </Link>
     )}
-      <p className="flex space-x-2">{post?.data()?.fromUser}{" "}{post?.data()?.fromNickname}{" "}@{post?.data()?.fromNickname}{" "} 
-      <Badge color="gray" icon={HiClock}>
-          <Moment fromNow>{post?.data()?.citetimestamp?.toDate().toLocaleString()}</Moment>
-        </Badge>
-      </p>
     
+     
     
-        </div>
-        <p onClick={() => router.push(`/posts(id)/${id}`)} className='ml-14'>{post?.data()?.text}</p>
-        {post?.data()?.images?.length > 1 ? (
-            <Carousel className={`${!post?.data()?.images ? 'hidden' : "rounded-2xl mr-2 h-[300px] w-[500px] sm:w-full xl:h-[250px] sm:h-[600px]"}`}>
-              {post?.data()?.images.map((imageUrl, index) => (
-                <img
-                  key={index}
-                  className="object-cover"
-                  src={imageUrl}
-                  alt={`image-${index}`}
-                />
-              ))}
-            </Carousel>
-          ) : (
-            <img
-                  className={`${!post?.data()?.images ? 'hidden' : "rounded-md h-[300px] w-[500px] sm:w-full sm:h-[600px] xl:h-[250px] mr-2 object-cover"}`}
-                  src={post?.data()?.images}
-                  alt=''
-                />
-          )}
-        
-        {post?.data()?.video && (
-          <video autoPlay
-          onClick={(e) => { 
-            e.stopPropagation(); // Prevent the click event from bubbling up
-            e.preventDefault(); // Prevent the default action (navigation)
-            e.currentTarget.pause();
-          }}
-          className="rounded-md h-[600px] w-[500px] sm:h-[300px] mr-2 object-cover"
-          src={post?.data()?.video}
-          alt=""
-          controls
-        />
-        )}
-        </div>
-        </div>
-        ):(
-          <div >
-          <p
-            onClick={() => router.push(`/posts(id)/${id}`)}
-            className="text-gray-800 w-96 sm:w-[490px] text-[20px] sm:text-[16px] mb-2 dark:text-gray-300 line-clamp-3 break-words cursor-pointer"
-
-          >
-            {post?.data()?.text}
-        </p>
-
-        
-        {post?.data()?.images?.length > 1 ? (
-            <Carousel className={`${!post?.data()?.images ? 'hidden' : "rounded-2xl mr-2 h-[300px] w-[500px] sm:w-full xl:h-[250px] sm:h-[600px]"}`}>
-              {post?.data()?.images.map((imageUrl, index) => {
-              console.log(imageUrl, index); // Check what images are being loaded
-                return(
-                <img
-                  key={index}
-                  className="object-cover"
-                  src={imageUrl}
-                  alt={`image-${index}`}
-                />
-              );
-              })}
-            </Carousel>
-          ) : (
-            <img
-                  className={` ${!post?.data()?.images ? 'hidden' :"rounded-md h-[300px] w-[500px] sm:w-full sm:h-[600px] xl:h-[250px] mr-2 object-cover"}`}
-                  src={post?.data()?.images}
-                  alt=''
-                />
-          )}
-
-         {post?.data()?.video && (
-          <video autoPlay
-          onClick={(e) => { 
-            e.stopPropagation(); // Prevent the click event from bubbling up
-            e.preventDefault(); // Prevent the default action (navigation)
-            e.currentTarget.pause();
-         
-          }}
-          className="rounded-2xl h-[600px] w-[500px] sm:h-[300px] mr-2 object-cover"
-          src={post?.data()?.video}
-          alt=""
-          controls
-        />
-        )}
-        </div>
-      )}
- 
-      {post?.data()?.from && <p>Recast from <span className="font-bold">{post?.data()?.from}</span>{" "}<span className="text-gray-400 font-bold">@{post?.data()?.fromNickname}</span></p>}
-        </div>
-        <div className="flex justify-between text-gray-500 p-2 dark:text-gray-300 ml-16">
-         
-          <div className="flex items-center select-none">
-          <Tooltip content='reply' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-           
-            <ChatIcon
-              onClick={() => {
+          <div className="flex-1">
+            <div className="flex items-center justify-between">
+              {/* post user info */}
+              <div className="sm:flex sm:space-x-8">
+              <div className="flex items-center space-x-2 whitespace-nowrap dark:text-gray-300 ">
+                <h4 className=" dark:text-gray-300 font-bold max-w-20 truncate text-xl sm:text-[15px] hover:underline ">
+                  {post?.data()?.name}
+                </h4>
+                <h4 className="font-bold text-xl sm:text-[15px] max-w-20 truncate dark:text-gray-300"> {post?.data()?.lastname}</h4>
+             <h4 className="max-w-20 truncate flex-1 text-xl sm:text-[15px] dark:text-gray-300">@{post?.data()?.nickname}</h4>
+               <Badge className="text-[16px] hover:underline sm:-ml-28 dark:text-gray-300 md:text-sm py-0" color="gray"  icon={HiClock}>
+                  <Moment fromNow>{post?.data()?.timestamp?.toDate()}</Moment>
+                </Badge>
                
-                  setPostId(id);
-                  setOpen(!open);
+              </div>
+              
+              </div>
+              <div className="flex">
+              <Tooltip content='Delete' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
+              
+              {user?.id === post?.data()?.uid && (
+               
+                <TrashIcon
+                   onClick={user?.id === post?.data()?.uid ? deleteRepost : deletePost}
+                  className="h-12 w-12 md:h-10 md:w-10 p-2 hover:text-red-600 hover:bg-red-100 rounded-full dark:hover:bg-gray-800"
+                />
+                          
+              )}
+              
+              </Tooltip>
+              {/* dot icon */}
+             
+                 <Popover
+                    aria-labelledby="profile-popover"
+                    className="md:-ml-28 -ml-8 z-20 shadow-md rounded-lg dark:shadow-gray-400 shadow-gray-500"
+                    content={
+                      <div className="w-64 text-xl sm:text-sm text-gray-500 dark:text-gray-300 bg-gray-300 dark:bg-gray-900
+                         py-2 space-y-3 border-none">
+                         { post?.data()?.uid !== user?.id ? 
+                            (
+                              <>
+                              <div className="flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-800" onClick={handleNotInterested}>
+                        <EyeOffIcon className="h-6"/>
+                          <p>Not interested</p>
+                        </div>
+                        
+    
+                        <div className={`${userData?.name == post?.data()?.name ? 'hidden' : 'flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-800 '}`} >
+                        {hasFollowed[post?.data()?.uid] ? (
+                          <UserRemoveIcon className="h-6" />
+    
+                        ) : (
+                          <UserAddIcon className="h-6" />
+    
+                        )}
+                       
+                          <p onClick={() => followMember(post?.data()?.uid)}>{hasFollowed[post?.data()?.uid] ? 'Unfollow' : 'Follow'} @{post?.data()?.nickname}</p>
+                        
+                        </div>
+                       
+                        <div className="flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-800"  onClick={() => setShowModal(true)}>
+                         
+                         {isReported[pstId] ? (
+                                  <FlagIcon className="h-6 w-6 text-blue-700" />
+                                ) : (
+                                  <FlagIcon className="h-6 w-6 text-gray-500" />
+                                )}
+                        
+                          <p> {isReported[pstId]  ? "Reported" : "Report Post"}</p>
+                        </div>
+                        {showModal && (
+                          <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+                              <div className="bg-white dark:bg-gray-900 p-6 rounded shadow-md w-80">
+                                <h2 className="text-lg font-semibold mb-4">Report Post</h2>
+                                <p className="text-sm mb-4">Why are you reporting this post?</p>
+    
+                                {/* Dropdown for report reasons */}
+                                <select
+                                  value={reportReason}
+                                  onChange={(e) => setReportReason(e.target.value)}
+                                  className="w-full p-2 rounded mb-4 dark:bg-gray-900 border-none"
+                                >
+                                  <option>Select a reason</option>
+                                  <option value="Spam">Spam</option>
+                                  <option value="Inappropriate Content">Inappropriate Content</option>
+                                  <option value="Hate Speech">Hate Speech</option>
+                                  <option value="Other">Other</option>
+                                </select>
+    
+                                {/* Buttons */}
+                                <div className="flex justify-between w-full">
+                                <button
+                                    onClick={handleCancel}
+                                    className="px-4 py-2 bg-gray-300 rounded dark:bg-gray-800 dark:hover:bg-gray-700 hover:bg-gray-400"
+                                  >
+                                    Cancel
+                                  </button>
+                                  
+                                  <button
+                                    onClick={submitReport}
+                                    className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded"
+                                  >
+                                   {isReported[pstId]  ? "unSubmit" : "Submit"} 
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                        )}
+                   
+                          </>
+                            ):(
+                              <div className="flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-800" onClick={toggleBookmark}>
+                              {isBookmarked[pstId] ? (
+                                  <BookmarkIcon fill="blue" className="h-6 w-6 text-blue-700" />
+                                ) : (
+                                  <BookmarkIcon className="h-6 w-6 text-gray-500" />
+                                )}
+                          <p>{isBookmarked[pstId] ? "Remove Bookmark" : "Add Bookmark"}</p>
+                          </div>
+          )}                  
+                      </div>
+                    }
+                    arrow={false}
+                  >
+                    <DotsHorizontalIcon className="dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-gray-800 rounded-full h-10 hover:text-sky-500 p-1 sm:p-2"/>
+                  
+                 </Popover>
+               
+                 </div>
+            </div>
             
-              }}
-              className="h-12 w-12 md:h-10 md:w-10 p-2 hover:text-sky-500 hover:bg-sky-100 rounded-full cursor-pointer dark:hover:bg-neutral-700"
-            />
-          </Tooltip>
-            {comments.length > 0 && (
-              <span className="text-[20px] sm:text-sm select-none">{formatNumber(comments.length)}</span>
+            {/* display cite */}
+            {post?.data()?.citeInput ? (
+              <div>
+            <p onClick={() => router.push(`/posts(id)/${id}`)} className="text-[20px] sm:text-[16px]">{post?.data()?.citeInput}</p>
+            <div className="border-[1px] rounded-md dark:border-gray-900 dark:hover:bg-gray-800 border-gray-200 hover:bg-neutral-300"  onClick={() => router.push(`/posts(id)/${id}`)}>
+            <div className="flex p-1">
+            {post?.data()?.citeUserImg ? (
+            
+              <Link href={`/userProfile/${uid}`}>
+            <img
+            className="h-8 w-8 rounded-md mr-4 cursor-pointer"
+            src={post?.data()?.citeUserImg}
+            alt="user-img"
+          />
+    
+          </Link>
+            ):(
+              <Link href={`/userProfile/${uid}`}>
+            <img
+            className="h-8 w-8 rounded-md mr-4 cursor-pointer"
+            src={post?.data()?.citeImageUrl}
+            alt="user-img"
+          />
+    
+          </Link>
             )}
-          </div>
-          <Tooltip content='recast' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-          <ReplyIcon className="h-12 w-12 md:h-10 md:w-10 p-2 hover:text-sky-500 hover:bg-sky-100 cursor-pointer rounded-full dark:hover:bg-neutral-700" onClick={repost}/>
-        </Tooltip>
-        {/* recite */}
-        <Tooltip content='cite' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-        <Popover
-        aria-labelledby="profile-popover"
-          trigger="click"
-        content={
-          <div className="w-96 p-3 shadow-md dark:shadow-white">
-            <div className="flex flex-col gap-1">
-              <input type='text' 
-              value={citeInput}
-              placeholder="cite this post....."
-              onChange={(e) => setCiteInput(e.target.value)}
-              className='border-x-0 border-t-0 focus:outline-none focus:ring-0 text-black bg-transparent
-               dark:placeholder:text-gray-300 dark:text-white'/>
+          <p className="flex space-x-2 items-center">{post?.data()?.fromUser}{" "}{post?.data()?.fromlastname}{" "}@{post?.data()?.fromNickname}{" "} 
+          <Badge className="py-0" color="gray" icon={HiClock}>
+              <Moment fromNow>{post?.data()?.citetimestamp?.toDate().toLocaleString()}</Moment>
+            </Badge>
+          </p>     
+    
+         
             </div>
-            <div className="flex justify-end">
-            <button
-              type="button"
-              disabled={!citeInput}
-              className="rounded-lg bg-blue-700 px-3 py-1.5 mt-3 text-xs font-medium text-white hover:bg-blue-800 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            onClick={cite}
-            >
-              cite
-            </button>
-            </div>
-          </div>
-        }
-      >
-       <PencilAltIcon className="h-12 w-12 md:h-10 md:w-10 p-2 cursor-pointer"/>
-      </Popover>
-      </Tooltip>
-
-          <div className="flex items-center ">
-          {hasLiked ? (
-            <Tooltip content='unlike' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-              <HeartIcon fill="red"
-                onClick={likePost}
-                className="h-12 w-12 md:h-10 md:w-10 p-2 cursor-pointer text-red-600 dark:hover:bg-red-900 hover:bg-red-300 rounded-full"
-              />
-              </Tooltip>
-            ) : (
-          <Tooltip content='like' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-              <HeartIcon
-                onClick={likePost}
-                className="h-12 w-12 md:h-10 md:w-10 p-2 cursor-pointer hover:text-red-600 hover:bg-red-300 rounded-full dark:hover:bg-red-900"
-              />
-              </Tooltip>
-            )}
-            {likes.length > 0 && (
-              <span
-                className='text-[20px] sm:text-sm select-none'
-              >
-                {" "}
-                {formatNumber(likes.length)}
-              </span>
-            )}
+            <p className="ml-14 text-[20px] sm:text-[16px]" onClick={() => router.push(`/posts(id)/${id}`)}>{post?.data()?.text}</p>
+    
            
-          </div>
-          <Tooltip content='view' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-            <div className="flex items-center">
-                <EyeIcon className="h-12 w-12 md:h-10 md:w-10 p-2 hover:text-sky-500 hover:bg-blue-100 rounded-full dark:hover:bg-neutral-700"/>
-                <span className='text-[20px] sm:text-sm select-none'>{formatNumber(viewCount)}</span> 
+              <Image
+                className={`${!post?.data()?.images ? 'hidden' : "inline object-cover rounded-b-md"}`}
+                src={post?.data()?.images} // Ensure this is a single image
+                alt=""
+                width={620}
+      height={20} 
+      style={{ height: "300px" }}
+              />
+      
+    
+            
+            {post?.data()?.videos && (
+              <video autoPlay
+              onClick={(e) => { 
+                e.stopPropagation(); // Prevent the click event from bubbling up
+                e.preventDefault(); // Prevent the default action (navigation)
+                e.currentTarget.pause();
+              }}
+              className="rounded-md h-[300px] w-[500px] sm:w-full sm:h-[600px] xl:h-[250px] mr-2 object-cover"
+              src={post?.data()?.videos}
+              alt=""
+              controls
+            />
+            )}
+    
             </div>
+            </div>
+            ):(
+              <>
+              <p
+                onClick={() => router.push(`/posts(id)/${id}`)}
+                className="text-gray-800 w-96 sm:w-[490px] text-[20px] sm:text-[16px] mb-2 dark:text-gray-300 line-clamp-3 break-words cursor-pointer"
+              >
+                {post?.data()?.text} 
+            </p>
+    
+            {/* {post?.data()?.images?.length > 1 ? (
+                <Carousel className={`${!post?.data()?.images ? 'hidden' : "rounded-md h-[300px] w-[450px] sm:w-full sm:h-[600px] xl:h-[250px] mr-2 object-cover"}`}>
+                  {post?.data()?.images.map((imageUrl, index) => {
+                  console.log(imageUrl, index); // Check what images are being loaded
+                    return(
+                    <img
+                      key={index}
+                      className="object-cover h-full w-full"
+                      src={imageUrl}
+                      alt={`image-${index}`}
+                    />
+                  );
+                  })}
+                </Carousel>
+              ) : ( */}
+              <Image
+      className={` ${!post?.data()?.images ? 'hidden' : "inline rounded-md"}`}
+      src={post?.data()?.images}
+      alt=''
+      width={620}
+      height={20} 
+      style={{ height: "500px" }}
+    />
+    
+              {/* )} */}
+    
+         
+             {post?.data()?.videos && (
+              <video autoPlay
+              onClick={(e) => { 
+                e.stopPropagation(); // Prevent the click event from bubbling up
+                e.preventDefault(); // Prevent the default action (navigation)
+                e.currentTarget.pause();
+             
+              }}
+              className="rounded-2xl h-[300px] w-[450px] sm:w-full xl:h-[250px] sm:h-[600px] mr-2 object-cover"
+              src={post?.data()?.videos}
+              alt=""
+              controls
+            />
+            )}
+            </>
+          )}
+            
+            {post?.data()?.from && <p>Recast from <span className="font-bold">{post?.data()?.from}</span>{" "}<span className="text-gray-400 font-bold">@{post?.data()?.fromNickname}</span></p>}
+    
+            <div className="flex justify-between dark:text-gray-300 text-gray-500 p-2">
+            <Tooltip content='reply' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
+              <div className="flex items-center select-none z-50">
+                <ChatIcon
+                  onClick={() => {
+                   
+                      setPostId(id);
+                      setOpen(!open);
+                    
+                  }}
+                  className="h-12 w-12 sm:h-10 sm:w-10 p-2 hover:text-sky-500 hover:bg-blue-100 rounded-full cursor-pointer  dark:hover:bg-gray-800"
+                />
+                {comments.length > 0 && (
+      <span className="text-[20px] sm:text-sm">{formatNumber(comments.length)}</span>
+    )}
+              </div>
+              </Tooltip>
+              <Tooltip content='recast' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
+              <ReplyIcon className="h-12 w-12 sm:h-10 sm:w-10 p-2 hover:text-sky-500 hover:bg-blue-100 rounded-full dark:hover:bg-gray-800" onClick={repost} />
             </Tooltip>
-          <Tooltip content='share' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-          <ShareIcon className="h-12 w-12 md:h-10 md:w-10 p-2 hover:text-sky-500 hover:bg-sky-100 cursor-pointer rounded-full dark:hover:bg-neutral-700" onClick={handleShare}/>
-          </Tooltip>
-          
-        </div>
-        
+            <Tooltip content='cite' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1 shadow-sm shadow-gray-500 dark:shadow-gray-400">
+            <Popover
+            aria-labelledby="profile-popover"
+              trigger="click"
+            content={
+              <div className="w-96 p-3 shadow-md dark:shadow-white">
+                <div className="flex flex-col gap-1">
+                  <input type='text' 
+                  value={citeInput}
+                  placeholder="cite this post....."
+                  onChange={(e) => setCiteInput(e.target.value)}
+                  className='border-x-0 border-t-0 focus:outline-none focus:ring-0 text-black bg-transparent
+                   dark:placeholder:text-gray-300 dark:text-white'/>
+                </div>
+                <div className="flex justify-end">
+                <button
+                  type="button"
+                  disabled={!citeInput}
+                  className="rounded-lg bg-blue-700 px-3 py-1.5 mt-3 text-xs font-medium text-white hover:bg-blue-800 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                onClick={cite}
+                >
+                  {loading ? 'citing...' : 'cite'}
+                </button>
+                </div>
+              </div>
+            }
+          >
+           <PencilAltIcon className="h-12 w-12 sm:h-10 sm:w-10 p-2"/>
+          </Popover>
+            
+            </Tooltip>
+              <div className="flex items-center">
+                {hasLiked ? (
+                <Tooltip content='unlike' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
+                  <HeartIcon fill="red"
+                    onClick={likePost}
+                    className="h-12 w-12 sm:h-10 sm:w-10 p-2 text-red-600 dark:hover:bg-red-900 hover:bg-red-300 rounded-full"
+                  />
+                  </Tooltip>
+                ) : (
+              <Tooltip content='like' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
+                  <HeartIcon
+                    onClick={likePost}
+                    className="h-12 w-12 sm:h-10 sm:w-10 p-2 hover:text-red-600 hover:bg-red-300 rounded-full dark:hover:bg-red-900"
+                  />
+                  </Tooltip>
+                )}
+                {likes.length > 0 && (
+                  <span
+                    className='text-[20px] sm:text-sm select-none'
+                  >
+                    {" "}
+                    {formatNumber(likes.length)}
+                    
+                  </span>
+                )}
+               
+              </div>
+              <Tooltip content='view' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
+                <div className="flex items-center">
+                    <EyeIcon className="h-12 w-12 sm:h-10 sm:w-10 p-2 hover:text-sky-500 hover:bg-blue-100 rounded-full dark:hover:bg-gray-800"/>
+                    <span className="text-[20px] sm:text-sm">{formatNumber(viewCount)}</span> 
+                </div>
+                </Tooltip>
+             
+            <Tooltip content='share' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
+              <ShareIcon className="h-12 w-12 sm:h-10 sm:w-10 p-2 hover:text-sky-500 hover:bg-blue-100 rounded-full dark:hover:bg-gray-800" onClick={handleShare}/>
+            </Tooltip>
+            
+           
+            </div>
+          </div>
           </>
-      )}
-    </div>
-    </div>
+          )}
+        </div>
+        </div>
   )
 }
 

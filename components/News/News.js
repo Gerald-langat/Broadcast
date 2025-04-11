@@ -34,7 +34,7 @@ import {
   import { modalState, postIdState } from "../../atoms/modalAtom";
   import { useRouter } from "next/router";
   import { HiClock, HiCheck } from "react-icons/hi";
-  import { Badge, Button, Carousel, Popover, Spinner, Tooltip } from "flowbite-react";
+  import { Alert, Badge, Button, Carousel, Popover, Spinner, Tooltip } from "flowbite-react";
   import { FlagIcon } from "@heroicons/react/solid";
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
@@ -113,7 +113,7 @@ import { useFollow } from "../FollowContext";
           });
         }
       } else {
-        router.replace('/signup');
+        router.replace('/');
       }
     }
   
@@ -283,7 +283,7 @@ const handleNotInterested = () => {
     // Repost the posts 
     const repost = async () => {
       if(!user?.id) {
-        router.replace('/signup');
+        router.replace('/');
       }
       if (post) {
         const postData = post.data();
@@ -292,14 +292,14 @@ const handleNotInterested = () => {
           const newPostData = {
             uid: user?.id,
             text: postData.text,
-            userImg: userData.userImg,
+            userImg: userData.userImg || "",
             timestamp: serverTimestamp(),
             lastname: userData.lastname,
             name: userData.name,
             nickname: userData.nickname,
             from: postData.name,
             fromNickname: postData.nickname,
-            citeUserImg: postData.userImg,
+            imageUrl: userData.imageUrl,
             // Include image and video only if they are defined
            
             ...(postData.category && { fromCategory: postData.category }),
@@ -331,7 +331,7 @@ const handleNotInterested = () => {
     // cite
     const cite = async () => {
       if (!user?.id) { 
-        router.replace('/signup');
+        router.replace('/');
       }
       setLoading(true);
     
@@ -345,7 +345,8 @@ const handleNotInterested = () => {
               uid: user?.id,
               text: postData.text,
               citeInput: citeInput,
-              userImg: userData.userImg,
+              userImg: userData.userImg || "",
+              imageUrl: userData.imageUrl,
               lastname: userData.lastname,
               timestamp:serverTimestamp(),
               citetimestamp: postData.timestamp.toDate(),
@@ -355,9 +356,9 @@ const handleNotInterested = () => {
               fromNickname: postData.nickname,
               fromlastname: postData.lastname,
               citeUserImg: postData.userImg,
-              // Include image and video only if they are defined
-            
-              
+            // Include image and video only if they are defined
+          
+            ...(postData.imageUrl && { citeImageUrl: postData.imageUrl }),
               ...(postData.category && { fromCategory: postData.category }),
               ...(postData.images && { images: postData.images }),
               ...(postData.video && { video: postData.video }),
@@ -467,9 +468,9 @@ const handleNotInterested = () => {
            </Alert>
          )}
      
-     <div className={`w-full ${isHidden ? 'inline text-2xl sm:text-xl cursor-pointer dark:hover:bg-gray-800 hover:bg-gray-200 rounded-md p-1' : 'hidden'}`} onClick={handleUndo}>{showUndo && 'undo'}</div>
-         
-         <div className={`${isHidden ? 'hidden' : "flex cursor-pointer border-[1px] border-gray-200 dark:border-gray-900 bg-white dark:bg-gray-950 dark:text-gray-300 z-40 flex-grow h-full flex-1 p-2 rounded-md mt-1 sm:w-full"}`}>
+         <div className={`w-full ${isHidden ? 'inline text-2xl sm:text-xl cursor-pointer dark:hover:bg-gray-800 hover:bg-gray-200 rounded-md p-1' : 'hidden'}`} onClick={handleUndo}>{showUndo && 'undo'}</div>
+    
+    <div className={`${isHidden ? 'hidden' : "flex border-[1px] dark:border-gray-900 rounded-md p-1 mt-1"}`}>
        {loading ? (
              <Button color="gray" className="border-0 ">
                <Spinner aria-label="Loading spinner" size="sm" />
@@ -477,7 +478,7 @@ const handleNotInterested = () => {
              </Button>
            ) : (
              <>
-           {post?.data()?.userImg && (
+           {post?.data()?.userImg ? (
      <Link href={`/userProfile/${uid}`}>
                   <img
              className="sm:h-12 sm:w-12 h-14 w-14 rounded-md mr-4 object-fit shadow-gray-800 shadow-sm dark:shadow-gray-600"
@@ -487,6 +488,15 @@ const handleNotInterested = () => {
            />
         </Link>
           
+           ):(
+            <Link href={`/userProfile/${uid}`}>
+                  <img
+             className="sm:h-12 sm:w-12 h-14 w-14 rounded-md mr-4 object-fit shadow-gray-800 shadow-sm dark:shadow-gray-600"
+             src={post?.data()?.imageUrl}
+             alt="user-img"
+            
+           />
+        </Link>
            )}
      
            <div className="flex-1">
@@ -494,7 +504,6 @@ const handleNotInterested = () => {
                {/* post user info */}
                <div className="sm:flex sm:space-x-8">
                <div className="flex items-center space-x-2 whitespace-nowrap dark:text-gray-300 ">
-                 <HiCheck className="sm:h-4 h-6 sm:w-4 w-6 bg-green-800 rounded-full text-white"/>
                  <h4 className=" dark:text-gray-300 font-bold max-w-20 truncate text-xl sm:text-[15px] hover:underline ">
                    {post?.data()?.name}
                  </h4>
@@ -627,21 +636,27 @@ const handleNotInterested = () => {
              <p onClick={() => router.push(`/posts(id)/${id}`)} className="text-[20px] sm:text-[16px]">{post?.data()?.citeInput}</p>
              <div className="border-[1px] rounded-md dark:border-gray-900 dark:hover:bg-gray-800 border-gray-200 hover:bg-neutral-300"  onClick={() => router.push(`/posts(id)/${id}`)}>
              <div className="flex p-1">
-             {post?.data()?.citeUserImg && (
-               <>
+             {post?.data()?.citeUserImg ? (
+               
              <img
              className="h-8 w-8 rounded-md mr-4"
              src={post?.data()?.citeUserImg}
              alt="user-img"
            />
+           ):(
+            <img
+             className="h-8 w-8 rounded-md mr-4"
+             src={post?.data()?.citeImageUrl}
+             alt="user-img"
+           />
+           )}
            <p className="flex space-x-2 items-center">{post?.data()?.fromUser}{" "}{post?.data()?.fromlastname}{" "}@{post?.data()?.fromNickname}{" "} 
            <Badge className="py-0" color="gray" icon={HiClock}>
                <Moment fromNow>{post?.data()?.citetimestamp?.toDate().toLocaleString()}</Moment>
              </Badge>
            </p>     
      
-           </>
-           )}
+
              </div>
              <p className="ml-14 text-[20px] sm:text-[16px]" onClick={() => router.push(`/posts(id)/${id}`)}>{post?.data()?.text}</p>
      

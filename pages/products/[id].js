@@ -236,7 +236,13 @@ useEffect(() => {
   <div className='flex justify-between pr-4 py-2 border-b-[1px] dark:border-gray-600 items-center'>
     <p className='font-bold'>{posts?.data()?.product}</p>
     <Tooltip content={posts?.data()?.name} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-      <img src={posts?.data()?.userImg} className='h-6 w-6 rounded-md' />
+    {posts?.data()?.userImg ? (
+       <img src={posts?.data()?.userImg} className='h-6 w-6 rounded-md' />
+    ):(
+      <img src={posts?.data()?.imageUrl} className='h-6 w-6 rounded-md' />
+      
+    )}
+     
     </Tooltip>
   </div>
 
@@ -275,14 +281,17 @@ useEffect(() => {
     </div>
 
     {/* Contact and View Message buttons */}
+<Link href={'/messages'}>
     <div className={`${user?.id === posts?.data()?.uid ? 'hidden' : 'bg-green-600 text-white p-1 rounded-md cursor-pointer'}`} >
       Contact seller
     </div>
+  </Link>
 
+<Link href={'/messages'}>
     <div className={`${user?.id !== posts?.data()?.uid ? 'hidden' : 'bg-green-600 text-white p-1 rounded-md cursor-pointer'}`} >
       View message
     </div>
-
+</Link>
     {/* Delete or Reserve button */}
     {user?.id === posts?.data()?.uid ? (
       <TrashIcon className='h-10 p-2 hover:text-red-600 hover:bg-red-300 rounded-full dark:hover:bg-red-900 cursor-pointer'  />

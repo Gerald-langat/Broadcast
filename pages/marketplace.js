@@ -54,8 +54,8 @@ const sendPost = async (e) => {
         uid: user?.id,
         description: input,
         cost: inputNum,
-        userImg:userData.userImg,
-        productImg: userData.userImg,
+        userImg:userData.userImg || "",
+        imageUrl:userData.imageUrl,
         timestamp: serverTimestamp(),
         lastname: userData.lastname,
         name: userData.name,
@@ -153,7 +153,12 @@ const removeSelectedFile = (index) => {
         <p>View Products</p>
       </div>
       </Link>
-      <img src={userData.userImg} className='h-8 w-8 rounded-md shadow-sm shadow-gray-600' />
+      {userData?.userImg ? (
+        <img src={userData.userImg} className='h-8 w-8 rounded-md shadow-sm shadow-gray-600' />
+      ):(
+        <img src={userData.imageUrl} className='h-8 w-8 rounded-md shadow-sm shadow-gray-600' />
+      )}
+      
       </div>
         
 

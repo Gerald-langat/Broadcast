@@ -3,11 +3,10 @@ import { modalWardState, postIdWard } from "../../atoms/modalAtom";
 import Modal from "react-modal";
 import {
   EmojiHappyIcon,
-  PhotographIcon,
   XIcon,
 } from "@heroicons/react/outline";
-import { useEffect, useRef, useState } from "react";
-import { auth, db, storage } from "../../firebase";
+import { useEffect,  useState } from "react";
+import {db } from "../../firebase";
 import {
   addDoc,
   collection,
@@ -16,13 +15,11 @@ import {
   onSnapshot,
   query,
   serverTimestamp,
-  updateDoc,
   where,
 } from "firebase/firestore";
 import Moment from "react-moment";
 import Picker from 'emoji-picker-react'
 import { Popover, Tooltip } from "flowbite-react";
-import { getDownloadURL, ref, uploadString } from "firebase/storage";
 import { useUser } from "@clerk/nextjs";
 
 export default function CommentModal() {
@@ -69,9 +66,10 @@ export default function CommentModal() {
       comment: input,
       name: userData.name,
       lastname: userData.lastname,
-      userImg: userData.userImg,
+      userImg: userData.userImg || "",
       timestamp: serverTimestamp(),
       nickname:userData.nickname,
+      imageUrl: userData.imageUrl,
       uid: user?.id,
     });
 
@@ -110,11 +108,20 @@ const closeMode = () => {
             </div>
             <div className="p-2 flex items-center space-x-1 relative">
               <span className="w-0.5 h-full z-[-1] absolute left-8 top-11 bg-gray-300" />
-              <img
+              {post?.data()?.userImg ? (
+                <img
                 className="h-11 w-11 rounded-full mr-4"
                 src={post?.data()?.userImg}
                 alt="user-img"
               />
+              ):(
+                <img
+                className="h-11 w-11 rounded-full mr-4"
+                src={post?.data()?.imageUrl}
+                alt="user-img"
+              />
+              )}
+              
               <h4 className="font-bold text-[15px] sm:text-[16px]">
                 {post?.data()?.name}
               </h4>

@@ -31,7 +31,8 @@ export default function Input() {
   const videoPickerRef = useRef(null);
   const [emoji, setEmoji] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [selectedFiles, setSelectedFiles] = useState([]);
+  // const [selectedFiles, setSelectedFiles] = useState([]);
+  const [selectedFile, setSelectedFile] = useState(null);
   const { user } = useUser()
 
   useEffect(() => {
@@ -71,29 +72,29 @@ export default function Input() {
           views: []
         });
 
-        const imageUploadPromises = [];
-        const imageUrls = [];
-        if (selectedFiles.length > 0) {
-          selectedFiles.forEach((file, index) => {
-            const imageRef = ref(storage, `county/${docRef.id}/image-${index}`);
+        // const imageUploadPromises = [];
+        // const imageUrls = [];
+        // if (selectedFiles.length > 0) {
+        //   selectedFiles.forEach((file, index) => {
+        //     const imageRef = ref(storage, `county/${docRef.id}/image-${index}`);
   
-            // Upload each image and store the URL
-            const uploadTask = uploadString(imageRef, file, "data_url").then(async () => {
-              const downloadURL = await getDownloadURL(imageRef);
-              imageUrls.push(downloadURL);
-            });
+        //     // Upload each image and store the URL
+        //     const uploadTask = uploadString(imageRef, file, "data_url").then(async () => {
+        //       const downloadURL = await getDownloadURL(imageRef);
+        //       imageUrls.push(downloadURL);
+        //     });
   
-            imageUploadPromises.push(uploadTask);
-          });
+        //     imageUploadPromises.push(uploadTask);
+        //   });
   
-          // Wait for all images to upload
-          await Promise.all(imageUploadPromises);
+        //   // Wait for all images to upload
+        //   await Promise.all(imageUploadPromises);
   
-          // Update Firestore document with all image URLs
-          await updateDoc(doc(db, "county", collectionName, "posts", docRef.id), {
-            images: imageUrls,
-          });
-        }
+        //   // Update Firestore document with all image URLs
+        //   await updateDoc(doc(db, "county", collectionName, "posts", docRef.id), {
+        //     images: imageUrls,
+        //   });
+        // }
 
         const vidRef = ref(storage, `county/${docRef.id}/countyVideo`);
          if (selectedVidFile) {
@@ -104,13 +105,28 @@ export default function Input() {
           await uploadString(vidRef, selectedVidFile, "data_url").then(async () => {
             const downloadURL = await getDownloadURL(vidRef);
             await updateDoc(doc(db, "county", collectionName, "posts", docRef.id), {
-              video: downloadURL,
+              videos: downloadURL,
+            });
+          });
+        }
+
+        const imgRef = ref(storage, `county/${docRef.id}/countyImage`);
+         if (selectedFile) {
+          let isImage = false;
+          if (selectedFile.type) {
+            isImage = selectedFile.type.includes("image"); 
+          }
+          await uploadString(imgRef, selectedFile, "data_url").then(async () => {
+            const downloadURL = await getDownloadURL(imgRef);
+            await updateDoc(doc(db, "county", collectionName, "posts", docRef.id), {
+              images: downloadURL,
             });
           });
         }
 
         setInput("");
-        setSelectedFiles([]);
+        setSelectedFile(null);
+        // setSelectedFiles([]);
         setSelectedVidFile(null);
         setLoading(false);
       }
@@ -121,19 +137,29 @@ export default function Input() {
     setShowEmojiPicker(false);
   };
 
+  // const addImageToPost = (e) => {
+  //   const files = e.target.files;
+  //   const fileReaders = [];
+  
+  //   for (let i = 0; i < files.length; i++) {
+  //     const reader = new FileReader();
+  //     fileReaders.push(reader);
+  //     reader.readAsDataURL(files[i]);
+  
+  //     reader.onload = (readerEvent) => {
+  //       setSelectedFiles((prevFiles) => [...prevFiles, readerEvent.target.result]);
+  //     };
+  //   }
+  // };
+
   const addImageToPost = (e) => {
-    const files = e.target.files;
-    const fileReaders = [];
-  
-    for (let i = 0; i < files.length; i++) {
-      const reader = new FileReader();
-      fileReaders.push(reader);
-      reader.readAsDataURL(files[i]);
-  
-      reader.onload = (readerEvent) => {
-        setSelectedFiles((prevFiles) => [...prevFiles, readerEvent.target.result]);
-      };
+    const reader = new FileReader();
+    if (e.target.files[0]) {
+      reader.readAsDataURL(e.target.files[0]);
     }
+    reader.onload = (readerEvent) => {
+      setSelectedFile(readerEvent.target.result);
+    };
   };
 
   const addVideoToPost = (e) => {
@@ -146,9 +172,13 @@ export default function Input() {
     };
   };
 
-  const removeSelectedFile = (index) => {
-    setSelectedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
-  };
+  const removeSelectedFile = () => {
+      setSelectedFile(null);
+    };
+
+  // const removeSelectedFile = (index) => {
+  //   setSelectedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+  // };
 
   return (
     <>
@@ -202,7 +232,22 @@ export default function Input() {
               </div>
             )}
 
-            {selectedFiles.length > 0 && (
+            {selectedFile && (
+              <div className="relative">
+                <XIcon
+                  onClick={() => setSelectedFile(null)}
+                  className="border h-7 text-black absolute cursor-pointer shadow-md  border-white m-1 rounded-full"
+                />
+                <img
+                  autoPlay
+                  src={selectedFile}
+                  controls
+                  className={`${loading && "animate-pulse"} h-[200px] w-[300px] object-cover`}
+                />
+              </div>
+            )}
+
+            {/* {selectedFiles.length > 0 && (
               <div className="flex gap-2 flex-wrap ">
                 {selectedFiles.map((file, index) => (
                   <div key={index} className="relative">
@@ -218,7 +263,7 @@ export default function Input() {
                   </div>
                 ))}
               </div>
-            )}
+            )} */}
 </>
       )}
             <div className="flex items-center justify-between pt-2.5">

@@ -71,11 +71,11 @@ function MessagesFeed() {
       <Head>
         <title>messages</title>
         <meta name="description" content="Generated and created by redAnttech" />
-        <link rel="icon" href="../../images/Brod.png" />
+        <link rel="icon" href="../../images/Brodcast.jpg" />
       </Head>
     
     <div className="flex relative sm:px-8 md:px-20 xl:px-2 xl:w-4/4 ">
-    <div className='hidden xl:inline w-2/5 '> 
+    <div className='hidden xl:inline '> 
           <Sidebar />
           <StatusModal />
     </div>

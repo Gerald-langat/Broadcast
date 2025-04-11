@@ -1,8 +1,5 @@
-import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { collection, getDocs, query, where } from 'firebase/firestore';
-import { db } from '../../firebase';
-import { Card, Carousel } from 'flowbite-react';
+import {  Carousel } from 'flowbite-react';
 
 function SearchProducts({ data, id }) {
 

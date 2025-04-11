@@ -269,15 +269,15 @@ export default function Input() {
             )}
               <div className="flex gap-2 flex-wrap border-none">
                 {selectedFile && (
-                  <div key={index} className="border-none">
+                  <div className="border-none">
                     <XIcon
-                      onClick={() => removeSelectedFile(index)}
+                      onClick={() => removeSelectedFile(null)}
                       className="border h-7 text-black absolute cursor-pointer shadow-md border-white m-1 rounded-full"
                     />
                     <img
-                      src={file}
+                      src={selectedFile}
                       className={`${loading && "animate-pulse"} h-[100px] w-[200px] object-cover`}
-                      alt={`image-${index}`}
+                      alt={`image`}
                     />
                   </div>
                 )}

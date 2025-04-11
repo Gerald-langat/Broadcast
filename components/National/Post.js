@@ -350,7 +350,7 @@ const handleShare = async () => {
           
             ...(postData.imageUrl && { citeImageUrl: postData.imageUrl }),
             ...(postData.category && { category: postData.category }),
-            ...(postData.Images && { Images: postData.Images }),
+            ...(postData.images && { images: postData.images }),
             ...(postData.videos && { videos: postData.videos }),
         });
         setShowAlert(true);
@@ -539,7 +539,7 @@ const handleShare = async () => {
   {loading ? (
         <Button color="gray" className="border-0 ">
           <Spinner aria-label="Loading spinner" size="sm" />
-          <span className="pl-3 animate-pulse">Loading...</span>
+        
         </Button>
       ) : (
         <>
@@ -730,10 +730,21 @@ const handleShare = async () => {
         </div>
         <p className="ml-14 text-[20px] sm:text-[16px]" onClick={() => router.push(`/posts(id)/${id}`)}>{post?.data()?.text}</p>
 
-       
+        {/* {post?.data()?.images?.length > 1 ? (
+            <Carousel className={`${!post?.data()?.images ? 'hidden' : "rounded-2xl mr-2 h-[300px] w-[500px] sm:w-full xl:h-[250px] sm:h-[600px] -z-10"}`}>
+              {post?.data()?.images.map((imageUrl, index) => (
+                <img
+                  key={index}
+                  className="object-cover"
+                  src={imageUrl}
+                  alt={`image-${index}`}
+                />
+              ))}
+            </Carousel>
+          ) : ( */}
           <Image
-            className={`${!post?.data()?.images ? 'hidden' : "inline object-cover"}`}
-            src={post?.data()?.Images} // Ensure this is a single image
+            className={`${!post?.data()?.images ? 'hidden' : "inline object-cover rounded-b-md"}`}
+            src={post?.data()?.images} // Ensure this is a single image
             alt=""
             width={620}
   height={20} 
