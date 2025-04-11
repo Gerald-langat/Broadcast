@@ -10,7 +10,7 @@ function Index() {
   useEffect(() => {
     // Redirect to '/form' if the user is logged in
     if (user?.id) {
-      // router.push('/form');
+      router.push('/form');
     }
   }, [user, router]); // Dependency array to avoid infinite loop
 
@@ -37,7 +37,6 @@ function Index() {
   <UserButton className="rounded-md"/>
     <p>{user?.firstName}</p>
     <p>{user?.lastName}</p>
-    
   </div>
 </SignedIn>
 
