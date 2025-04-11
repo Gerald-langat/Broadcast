@@ -1,4 +1,5 @@
 import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from '@clerk/nextjs';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 
@@ -14,7 +15,12 @@ function Index() {
   }, [user, router]); // Dependency array to avoid infinite loop
 
   return (
-    <div className="flex w-full justify-center items-center h-screen ">
+    <div className="flex flex-col w-full justify-center items-center h-screen ">
+    <Image 
+      src='../../images/Brodcast.jpg'
+      width={600}
+      height={600}
+    />
       <SignedOut>
         <button
           type="button"
