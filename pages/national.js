@@ -6,7 +6,7 @@ import Widgets from "../components/National/Widgets";
 import CommentModal from "../components/National/CommentModal";
 import StatusModal from "../components/National/StatusModal";
 import Feed from "../components/National/Feed";
-import MembersModal from "../components/Members";
+
 
 
 
@@ -76,7 +76,6 @@ function Home() {
     {/* Modals */}
     <CommentModal />
     <StatusModal />
-    <MembersModal />
   </div>
 
   {/* Bottom Menu */}
