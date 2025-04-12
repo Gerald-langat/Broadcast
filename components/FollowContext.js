@@ -21,116 +21,132 @@ export const FollowProvider = ({ children }) => {
   const { user } = useUser();
   const [posts, setPosts] = useState([]);
   const [followloading, setFollowLoading] = useState({});
+  const [userDetails, setUserDetails] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  // Fetch posts in real-time
-  useEffect(() => {
+ // Fetch user data
+ useEffect(() => {
+  const fetchuserDetails = async () => {
+    if (!user?.id) return;
+    setLoading(true);
+    try {
+      const q = query(
+        collection(db, "userPosts"),
+        where("uid", "==", user.id)
+      );
+      const querySnapshot = await getDocs(q);
+      if (!querySnapshot.empty) {
+        setUserDetails(querySnapshot.docs[0].data());
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchuserDetails();
+}, [user]);
+
+// Fetch posts
+useEffect(() => {
+  if (!db) return;
+
+  const fetchPosts = async () => {
     const q = query(collection(db, "userPosts"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      setPosts(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+      const postsData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setPosts(postsData);
+      setLoading(false);
     });
 
     return () => unsubscribe();
-  }, []);
+  };
 
-  // Fetch follow status for all posts
-  useEffect(() => {
-    const fetchFollowStatus = async () => {
-      if (!user?.id || posts.length === 0) return;
+  fetchPosts();
+}, [db]);
 
-      const followStatuses = {};
-      const promises = posts.map((post) => {
-        const postId = post?.uid;
-        return getDocs(
-          query(
-            collection(db, "following"),
-            where("followerId", "==", user.id),
-            where("followingId", "==", postId)
-          )
-        ).then((followDoc) => {
-          followStatuses[postId] = !followDoc.empty;
-        });
-      });
+// Fetch follow status from Firestore on page load
+useEffect(() => {
+  if (!userDetails?.uid || posts.length === 0) return;
 
-      await Promise.all(promises);
-      setHasFollowed(followStatuses);
-    };
+  const fetchFollowStatus = async () => {
+    const followStatuses = {};
 
-    fetchFollowStatus();
-  }, [posts, user]); // Runs when posts or user changes
+    const promises = posts.map(async (post) => {
+      const postId = post?.uid;
 
-  // Follow or Unfollow function
-  const followMember = async (postId) => {
-    if (!user?.id || !postId) return;
-    setFollowLoading((prev) => ({ ...prev, [postId]: true }));
-    setHasFollowed((prev) => ({
-      ...prev,
-      [postId]: !prev[postId], // Toggle UI instantly
-    }));
+      const followQuery = query(
+        collection(db, "following"),
+        where("followerId", "==", userDetails?.uid),
+        where("followingId", "==", postId)
+      );
 
-    try {
-      if (hasFollowed[postId]) {
-        // Unfollow Logic
-        const followingQuery = query(
-          collection(db, "following"),
-          where("followerId", "==", user.id),
-          where("followingId", "==", postId)
-        );
+      const followSnapshot = await getDocs(followQuery);
+      followStatuses[postId] = !followSnapshot.empty; // If doc exists, user is following
+    });
 
-        const followerQuery = query(
-          collection(db, "following"),
-          where("followerId", "==", postId),
-          where("followingId", "==", user.id)
-        );
+    await Promise.all(promises);
+    setHasFollowed(followStatuses);
+  };
 
-        const followingSnapshot = await getDocs(followingQuery, followerQuery);
-        const batchDeletes = followingSnapshot.docs.map((docSnapshot) =>
+  fetchFollowStatus();
+}, [posts, userDetails]);
+
+// Follow or unfollow a member
+const followMember = async (postId) => {
+  if (!userDetails?.uid || !postId) return;
+
+  setFollowLoading((prev) => ({ ...prev, [postId]: true }));
+
+  try {
+    if (hasFollowed[postId]) {
+      // *Unfollow Logic*
+      const followQuery = query(
+        collection(db, "following"),
+        where("followerId", "==", userDetails?.uid),
+        where("followingId", "==", postId)
+      );
+
+      const followSnapshot = await getDocs(followQuery);
+
+      if (!followSnapshot.empty) {
+        const deletePromises = followSnapshot.docs.map((docSnapshot) =>
           deleteDoc(doc(db, "following", docSnapshot.id))
         );
 
-        await Promise.all(batchDeletes);
-      } else {
-        // Follow Logic
-        const followedUserQuery = query(
-          collection(db, "userPosts"),
-          where("uid", "==", user.id)
-        );
-        const followedUserSnapshot = await getDocs(followedUserQuery);
-
-        if (!followedUserSnapshot.empty) {
-          const followedUserData = followedUserSnapshot.docs[0].data();
-
-          await addDoc(collection(db, "following"), {
-            followerId: postId,
-            name: followedUserData.name,
-            nickname: followedUserData.nickname,
-            userImg: followedUserData.userImg,
-            timeStamp: new Date(),
-          });
-        }
-
-        const followingUserQuery = query(
-          collection(db, "userPosts"),
-          where("uid", "==", postId)
-        );
-        const followingUserSnapshot = await getDocs(followingUserQuery);
-
-        if (!followingUserSnapshot.empty) {
-          const followingUserData = followingUserSnapshot.docs[0].data();
-
-          await addDoc(collection(db, "following"), {
-            followingId: user.id,
-            name: followingUserData.name,
-            nickname: followingUserData.nickname,
-            userImg: followingUserData.userImg,
-            timeStamp: new Date(),
-          });
-        }
+        await Promise.all(deletePromises);
       }
-    } catch (error) {
-      console.error("Error following/unfollowing: ", error);
+
+      // Update state to reflect DB changes
+      setHasFollowed((prev) => ({
+        ...prev,
+        [postId]: false,
+      }));
+    } else {
+      // *Follow Logic*
+      await addDoc(collection(db, "following"), {
+        followerId: userDetails?.uid,
+        followingId: postId,
+        timeStamp: new Date(),
+      });
+
+      // Update state to reflect DB changes
+      setHasFollowed((prev) => ({
+        ...prev,
+        [postId]: true,
+      }));
     }
+  } catch (error) {
+    console.error("Error following/unfollowing: ", error);
+  } finally {
     setFollowLoading((prev) => ({ ...prev, [postId]: false }));
-  };
+  }
+};
+  
 
   return (
     <FollowContext.Provider
@@ -140,3 +156,4 @@ export const FollowProvider = ({ children }) => {
     </FollowContext.Provider>
  );
 };
+

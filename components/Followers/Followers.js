@@ -21,12 +21,12 @@ function Followers() {
 
     const followersQuery = query(
       collection(db, "following"), 
-      where("followerId", "==", user.id) // Followers: Users who follow the user
+      where("followingId", "==", user.id) // Followers: Users who follow the user
     );
 
     const followingQuery = query(
       collection(db, "following"),
-      where("followingId", "==", user.id) // Following: Users the user follows
+      where("followerId", "==", user.id) // Following: Users the user follows
     );
 
     const unsubscribeFollowers = onSnapshot(followersQuery, (snapshot) => {
