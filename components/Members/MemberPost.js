@@ -1,0 +1,44 @@
+import React from 'react'
+import { useFollow } from '../FollowContext';
+import { Spinner } from 'flowbite-react';
+
+function MemberPost({post}) {
+        const { hasFollowed, followMember, followloading } = useFollow();
+    
+  return (
+    <div className='flex justify-between items-center w-full space-y-3'>
+                    <div className="flex  items-center space-x-3 mt-3">
+                    {post?.userImg ? (
+                        <img src={post?.userImg} className='h-10 w-10 rounded-full' />
+                    ):(
+                        <img src={post?.imageUrl} className='h-10 w-10 rounded-full' />
+
+                    )}
+                        
+                    <h5 className="mb-1 font-medium text-gray-900 dark:text-white">{post?.name}</h5>
+                    <h5 className="mb-1 font-medium text-gray-900 dark:text-white">{post?.lastname}</h5>
+                        <span className="text-sm text-gray-500 dark:text-gray-400">@{post?.nickname}</span>
+                    </div>
+                  <p  
+                   className='font-bold text-blue-500 sm:text-sm text-2xl cursor-pointer space-y-2'
+         
+                   onClick={() => {
+                   
+                     followMember(post?.uid);
+                     
+                   }}
+                 >
+                  {followloading[post?.uid] ? (
+                     <Spinner aria-label="Loading spinner" size="sm" />
+                   ) : hasFollowed[post?.uid] ? (
+                     <p>Unfollow</p>
+                   ) : (
+                     <p>Follow</p>
+                   )}
+                 </p>
+       
+                    </div>
+  )
+}
+
+export default MemberPost

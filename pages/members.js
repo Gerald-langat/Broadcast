@@ -1,9 +1,8 @@
-import MembersFeed from '../components/Members'
-import React from 'react'
+import MembersFeed from '../components/Members/Members'
 
 function members() {
   return (
-    <div>
+    <div className='flex w-full h-screen max-w-6xl mx-auto justify-center'>
       <MembersFeed />
     </div>
   )

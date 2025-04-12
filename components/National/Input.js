@@ -100,7 +100,7 @@ export default function Input() {
           await addDoc(wardCollection, {
             uid: userData.uid,
             text: input,
-            userImg: userData.userImg,
+            userImg: userData.userImg || "",
             timestamp: serverTimestamp(),
             lastname: userData.lastname,
             name: userData.name,
@@ -119,7 +119,7 @@ export default function Input() {
           await addDoc(ConstituencyCollection, {
             uid: userData.uid,
             text: input,
-            userImg: userData.userImg,
+            userImg: userData.userImg || "",
             timestamp: serverTimestamp(),
             lastname: userData.lastname,
             name: userData.name,
@@ -138,7 +138,7 @@ export default function Input() {
           await addDoc(countyCollection, {
             uid: userData.uid,
             text: input,
-            userImg: userData.userImg,
+            userImg: userData.userImg || "",
             timestamp: serverTimestamp(),
             lastname: userData.lastname,
             name: userData.name,

@@ -6,7 +6,7 @@ import Widgets from "../components/National/Widgets"
 import CommentModal from "../components/National/CommentModal"
 import StatusModal from "../components/National/StatusModal"
 import Feed from "../components/News/NewsFeed";
-import MembersModal from "../components/Members";
+import MembersModal from "../components/Members/Members";
 
 
 function News() {
