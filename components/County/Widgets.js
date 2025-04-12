@@ -160,7 +160,7 @@ export default function Widgets() {
       </form>
            
       <>
-      <div className=" dark:bg-gray-950 w-full ">
+      <div className=" dark:bg-gray-950 shadow-sm shadow-gray-700 dark:shadow-gray-50 rounded-md z-50 absolute bg-gray-200 w-full ">
         {posts.map((post) => (
           <>
           <div key={post.id}>  

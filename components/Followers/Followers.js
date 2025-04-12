@@ -4,29 +4,30 @@ import { collection, query, onSnapshot, where } from 'firebase/firestore';
 import { Spinner } from 'flowbite-react';
 import FollowerCard from './FollowerCard';
 import Head from 'next/head';
-import { useUser } from '@clerk/nextjs';
+import {  useFollow } from '../FollowContext';
+
 
 function Followers() {
   const [followers, setFollowers] = useState([]);
   const [following, setFollowing] = useState([]);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('followers'); 
-  const { user } = useUser()
+  const { userDetails } = useFollow();
 
   // Fetch followers & following
   useEffect(() => {
-    if (!user?.id) return;
+    if (!userDetails?.uid) return;
 
     setLoading(true);
 
     const followersQuery = query(
       collection(db, "following"), 
-      where("followingId", "==", user.id) // Followers: Users who follow the user
+      where("followingId", "==", userDetails?.uid) // Followers: userDetailss who follow the userDetails
     );
 
     const followingQuery = query(
       collection(db, "following"),
-      where("followerId", "==", user.id) // Following: Users the user follows
+      where("followerId", "==", userDetails?.uid) // Following: Users the user follows
     );
 
     const unsubscribeFollowers = onSnapshot(followersQuery, (snapshot) => {
@@ -45,7 +46,45 @@ function Followers() {
       unsubscribeFollowers();
       unsubscribeFollowing();
     };
-  }, [user?.id]);
+  }, [userDetails?.uid]);
+
+   // Fetch members when following/followers update
+   useEffect(() => {
+    if (!following.length && !followers.length) return;
+  
+    const fetchMembers = (values, setter) => {
+      if (!values || !values.length) return;
+  
+      const q = query(collection(db, "userPosts"), where("uid", "in", values));
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        const membersData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setter(membersData);
+      });
+  
+      return unsubscribe;
+    };
+  
+    const unsubFollowing = fetchMembers(
+      following.map((u) => u.followingId).filter((id) => id !== undefined && id !== null),
+      setFollowing
+    );
+    const unsubFollowers = fetchMembers(
+      followers.map((u) => u.followerId).filter((id) => id !== undefined && id !== null),
+      setFollowers
+    );
+  
+    return () => {
+      unsubFollowing?.();
+      unsubFollowers?.();
+    };
+  }, [following, followers]);
+  
+
+
+
 
   return (
     <div className="relative min-w-screen min-h-screen flex flex-col justify-center items-center">

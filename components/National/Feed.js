@@ -37,7 +37,7 @@ export default function Feed() {
           <span className="pl-3 animate-pulse sm:text-[16px] text-[28px]">Loading...</span>
         </Button>
       ) : (
-        <>
+        <AnimatePresence>
       <div className="flex items-center justify-between dark:bg-gray-950 md:py-2 xl:px-3 sticky top-0 border-[1px] rounded-md
        border-gray-200 bg-white  dark:border-gray-900 h-10">
         <h2 className="text-2xl md:text-xl font-bold cursor-pointer top-0 fixed dark:text-gray-300 xl:p-0 ">National</h2>
@@ -71,7 +71,7 @@ export default function Feed() {
           ))}
         </AnimatePresence>
       )}
-      </>
+      </AnimatePresence>
       )}
     </div>
 

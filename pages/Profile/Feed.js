@@ -529,35 +529,29 @@ useEffect(() => {
         
       <div className="sm:px-40 space-y-4 absolute md:-mt-20 mt-4 px-2">
       <div className="flex items-center justify-between space-x-4 sm:ml-[300px] md:ml-[280px] xl:ml-[600px] 2xl:ml-[700px] 2xl:w-[500px]">
-          <div>
-            <p className="font-bold">{post?.name}</p>
-          </div>
-          <div className="cursor-pointer text-nowrap border-[1px] dark:border-gray-900 p-2 rounded-md border-gray-200" onClick={sendImage}>
-            <p>
-              Edit Profile
-            </p>
-          </div>
-          <div className="cursor-pointer text-nowrap border-[1px] dark:border-gray-900 p-2 rounded-md border-gray-200">
-            <p>
-              View Catalogue
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center justify-between space-x-4 sm:ml-[300px] md:ml-[280px] xl:ml-[600px] 2xl:ml-[700px] 2xl:w-[500px]">
-          <div className='text-nowrap'>
-            <span className="flex space-x-2">{formatNumber(userPosts.length)}{" "}posts</span>
-          </div>
-          <div className="cursor-pointer" onClick={() => router.push("/followers")}>
-            <p>
-              <span className="font-bold mr-1">{formatNumber(followerCount)}</span>Followers
-            </p>
-          </div>
-          <div className="" onClick={() => router.push("/following")}>
-            <p>
-              <span className="font-bold mr-1">{formatNumber(followingCount)}</span>following
-            </p>
-          </div>
-        </div>
+  <div>
+    <p className="font-bold">{post?.name}</p>
+  </div>
+  <div className="cursor-pointer text-nowrap border-[1px] dark:border-gray-900 p-2 rounded-md border-gray-200" onClick={sendImage}>
+    <p>Edit Profile</p>
+  </div>
+  <div className="cursor-pointer text-nowrap border-[1px] dark:border-gray-900 p-2 rounded-md border-gray-200">
+    <p>View Catalogue</p>
+  </div>
+</div>
+
+<div className="flex items-center justify-between space-x-4 sm:ml-[300px] md:ml-[280px] xl:ml-[600px] 2xl:ml-[700px] 2xl:w-[500px] mt-4">
+  <div>
+    <p className="font-bold text-nowrap">{formatNumber(userPosts.length)} posts</p>
+  </div>
+  <div className="cursor-pointer text-nowrap border-[1px] dark:border-gray-900 p-2 rounded-md border-gray-200" onClick={() => router.push("/followers")}>
+    <p className="font-bold">{formatNumber(followerCount)} Followers</p>
+  </div>
+  <div className="cursor-pointer text-nowrap border-[1px] dark:border-gray-900 p-2 rounded-md border-gray-200" onClick={() => router.push("/followers")}>
+    <p className="font-bold">{formatNumber(followingCount)} Following</p>
+  </div>
+</div>
+
 
 
         <div className="border-b-[1px] my-2 dark:border-gray-700 -mt-20 sm:-mt-0 xl:ml-[40px] 2xl:ml-72 xl:w-[950px] 2xl:w-[1000px]"></div>  

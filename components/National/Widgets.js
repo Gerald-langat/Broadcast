@@ -142,7 +142,7 @@ const clearQuery = () => {
       </form>
            
       <>
-      <div className=" dark:bg-gray-950 z-50 bg-gray-50 w-full ">
+      <div className=" dark:bg-gray-950 shadow-sm shadow-gray-700 dark:shadow-gray-50 rounded-md z-50 absolute bg-gray-200 w-full ">
         {posts.map((post) => (
           <>
           <div key={post.id}>  
@@ -159,7 +159,7 @@ const clearQuery = () => {
      
       </>
       
-      <div className='top-10 sticky'>
+      <div className='top-10 sticky '>
       <div className='flex space-x-2'>
           <Link href='/national'>
           <button className='border-gray-200 bg-green-700 p-2 rounded-full hover:bg-gray-400 text-white font-semibold hover:text-white text-xl sm:text-sm'>All

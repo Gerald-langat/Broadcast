@@ -25,13 +25,13 @@ function FollowerCard({follower}) {
                 className='font-bold text-blue-500 sm:text-sm text-2xl cursor-pointer space-y-2'
       
                 onClick={() => {
-                  followMember(follower?.followerId);
+                  followMember(follower?.uid);
                 }}
               >
-              {followloading[follower?.followerId] ? (
+              {followloading[follower?.uid] ? (
                   <Spinner aria-label="Loading spinner" size="sm" />
-                ) : hasFollowed[follower?.followerId] ? (
-                  <p className='text-sm w-20 truncate'>Unfollow</p>
+                ) : hasFollowed[follower?.uid] ? (
+                  <p className='text-sm w-20 truncate text-red-500'>Unfollow</p>
                 ) : (
                   <p className='text-sm w-20 truncate'>Follow</p>
                 )}

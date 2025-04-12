@@ -150,7 +150,7 @@ const followMember = async (postId) => {
 
   return (
     <FollowContext.Provider
-      value={{ hasFollowed, followMember, followloading }}
+      value={{ hasFollowed, userDetails, followMember, followloading }}
     >
       {children}
     </FollowContext.Provider>
