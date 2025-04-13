@@ -213,11 +213,12 @@ export default function Input() {
   
 
   return (
-    <>
+    <div>
       {userData && (
-        <div className="flex xl:p-3 space-x-3 z-40 top-0
-        pb-2 dark:border-gray-900 border-[1px] rounded-md my-1">
-        {userData.userImg ? (
+        <div className="flex-col xl:p-3 w-full space-x-3 z-40 top-0
+        pb-2 dark:border-gray-900 border-[1px] rounded-md my-1 ">
+        <div className="flex items-center space-x-2 flex-1 justify-between">
+         {userData.userImg ? (
             <img
             className="h-11 w-11 md:h-11 md:w-11 rounded-md lg:mr-4 object-fit  cursor-pointer  shadow-gray-800 shadow-sm dark:shadow-gray-600"
             src={userData.userImg}
@@ -231,19 +232,21 @@ export default function Input() {
             alt="user-img"
           />
       )}
-    
-          <div className="w-full border-none">
-          
-              <textarea
+    <textarea
                   className="dark:bg-gray-950 border-b-[1px] border-x-0 border-t-0 dark:border-gray-900 dark:placeholder:text-gray-100
-                   dark:text-gray-300 w-full outline-none  focus:ring-0 text-xl sm:text-lg placeholder-gray-700 border-gray-300
-                   placeholder:text-2xl sm:placeholder:text-xl tracking-wide min-h-[50px] text-gray-700"
+                   dark:text-gray-300 flex-1 outline-none  focus:ring-0 text-xl sm:text-lg placeholder-gray-700 border-gray-300
+                   placeholder:text-lg sm:placeholder:text-xl tracking-wide min-h-[50px] text-gray-700"
                 rows="2"
                 placeholder="type here...."
                 value={input} 
                 onChange={(e) => setInput(e.target.value)} 
                 onClick={() => setShowEmojiPicker(false)}>
-              </textarea>
+              </textarea> 
+        </div>
+        
+          <div className="border-none ">
+          
+              
 
 
             {loading ? (
@@ -292,7 +295,7 @@ export default function Input() {
                   <div className="flex">
                     <div onClick={() => filePickerRef.current.click()}>
                     <Tooltip content='image' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-                      <PhotographIcon className="h-10 w-10 md:h-9 md:w-9 rounded-full cursor-pointer 
+                      <PhotographIcon className="h-9 w-9 rounded-full cursor-pointer 
                       p-1 text-sky-500 dark:hover:bg-neutral-700 hover:bg-blue-100" />
                       <input
                         type="file"
@@ -305,7 +308,7 @@ export default function Input() {
                     </div>
                     <div onClick={() => videoPickerRef.current.click()}>
                     <Tooltip content='video' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-                      <CameraIcon className="h-10 w-10 md:h-9 md:w-9 rounded-full cursor-pointer p-1 text-sky-500 dark:hover:bg-neutral-700 hover:bg-blue-100" />
+                      <CameraIcon className="h-9 w-9 rounded-full cursor-pointer p-1 text-sky-500 dark:hover:bg-neutral-700 hover:bg-blue-100" />
                       <input
                         type="file"
                         accept="video/*"
@@ -340,11 +343,11 @@ export default function Input() {
                   </div>
                   <div className="flex space-x-1 ml-[50px] md:ml-[70px]">
                     <button className="dark:bg-gray-950 dark:border-gray-900 dark:text-gray-300 border-gray-200 border-[1px]
-                    dark:hover:bg-neutral-700 text-lg sm:text-sm bg-slate-200 rounded-full p-2 md:p-1 cursor-pointer" onClick={countyPost}>county</button>
+                    dark:hover:bg-neutral-700  sm:text-sm bg-slate-200 rounded-full p-2 md:p-1 cursor-pointer" onClick={countyPost}>county</button>
                     <button className="dark:bg-gray-950 dark:border-gray-900 dark:text-gray-300 border-gray-200 border-[1px]
-                    dark:hover:bg-neutral-700  text-lg sm:text-sm bg-slate-200 rounded-full p-2 md:p-1 cursor-pointer" onClick={constituencyPost}>constituency</button>
+                    dark:hover:bg-neutral-700   sm:text-sm bg-slate-200 rounded-full p-2 md:p-1 cursor-pointer" onClick={constituencyPost}>constituency</button>
                     <button className="dark:bg-gray-950 dark:border-gray-900 dark:text-gray-300 border-gray-200 border-[1px]
-                    dark:hover:bg-neutral-700  text-lg sm:text-sm bg-slate-200 rounded-full p-2 md:p-1 cursor-pointer" onClick={wardPost}>ward</button>
+                    dark:hover:bg-neutral-700   sm:text-sm bg-slate-200 rounded-full p-2 md:p-1 cursor-pointer" onClick={wardPost}>ward</button>
                   </div>
                   <button
                     onClick={sendPost}
@@ -361,7 +364,7 @@ export default function Input() {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
 

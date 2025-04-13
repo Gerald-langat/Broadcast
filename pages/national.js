@@ -57,7 +57,7 @@ function Home() {
       </Head>
 
       {/* Main Content */}
-      <div className="flex flex-1 min-h-screen min-w-[768px] xl:max-w-7xl mx-auto">
+      <div className="flex flex-1 min-h-screen w-full lg:min-w-[768px] xl:max-w-7xl mx-auto">
         {/* Sidebar */}
         {isSidebarVisible && (
           <div className="fixed inset-0 z-30 xl:hidden w-full" onClick={() => setIsSidebarVisible(false)}>
@@ -71,9 +71,10 @@ function Home() {
         </div>
 
         {/* Feed */}
-        <div className="flex-1 min-w-[400px]">
-          <Feed />
-        </div>
+        <div className="flex-1 min-w-0 sm:min-w-[400px] w-full">
+  <Feed />
+</div>
+
 
         {/* Widgets */}
         {isWidgetsVisible && (

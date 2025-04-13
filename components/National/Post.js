@@ -542,8 +542,9 @@ const handleShare = async () => {
         
         </Button>
       ) : (
-        <>
+        <><div className="flex-1">
         {post?.data()?.userImg ? (
+      
   <Link href={`/userProfile/${uid}`}>
     <img
       className="sm:h-12 sm:w-12 h-14 w-14 rounded-md cursor-pointer mr-4 object-fit shadow-gray-800 shadow-sm dark:shadow-gray-600"
@@ -561,18 +562,15 @@ const handleShare = async () => {
   </Link>
 )}
 
- 
-
-      <div className="flex-1">
         <div className="flex items-center justify-between">
           {/* post user info */}
           <div className="sm:flex sm:space-x-8">
           <div className="flex items-center space-x-2 whitespace-nowrap dark:text-gray-300 ">
-            <h4 className=" dark:text-gray-300 font-bold max-w-20 truncate text-xl sm:text-[15px] hover:underline ">
+            <h4 className=" dark:text-gray-300 font-bold max-w-20 truncate text-lg sm:text-[15px] hover:underline ">
               {post?.data()?.name}
             </h4>
-            <h4 className="font-bold text-xl sm:text-[15px] max-w-20 truncate dark:text-gray-300"> {post?.data()?.lastname}</h4>
-         <h4 className="max-w-20 truncate flex-1 text-xl sm:text-[15px] dark:text-gray-300">@{post?.data()?.nickname}</h4>
+            <h4 className="font-bold text-lg sm:text-[15px] max-w-20 truncate dark:text-gray-300"> {post?.data()?.lastname}</h4>
+         <h4 className="max-w-20 truncate flex-1 text-lg sm:text-[15px] dark:text-gray-300">@{post?.data()?.nickname}</h4>
            <Badge className="text-[16px] hover:underline sm:-ml-28 dark:text-gray-300 md:text-sm py-0" color="gray"  icon={HiClock}>
               <Moment fromNow>{post?.data()?.timestamp?.toDate()}</Moment>
             </Badge>
@@ -587,7 +585,7 @@ const handleShare = async () => {
            
             <TrashIcon
                onClick={user?.id === post?.data()?.uid ? deleteRepost : deletePost}
-              className="h-12 w-12 md:h-10 md:w-10 p-2 hover:text-red-600 hover:bg-red-100 rounded-full dark:hover:bg-gray-800"
+              className="h-9 w-9 md:h-10 md:w-10 p-2 hover:text-red-600 hover:bg-red-100 rounded-full dark:hover:bg-gray-800"
             />
                       
           )}
@@ -687,7 +685,7 @@ const handleShare = async () => {
                 }
                 arrow={false}
               >
-                <DotsHorizontalIcon className="dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-gray-800 rounded-full h-10 hover:text-sky-500 p-1 sm:p-2"/>
+                <DotsHorizontalIcon className="dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-gray-800 rounded-full h-9 sm:h-10 hover:text-sky-500 p-1 sm:p-2"/>
               
              </Popover>
            
@@ -728,7 +726,7 @@ const handleShare = async () => {
 
      
         </div>
-        <p className="ml-14 text-[20px] sm:text-[16px]" onClick={() => router.push(`/posts(id)/${id}`)}>{post?.data()?.text}</p>
+        <p className="ml-14 text-lg sm:text-[16px]" onClick={() => router.push(`/posts(id)/${id}`)}>{post?.data()?.text}</p>
 
         {/* {post?.data()?.images?.length > 1 ? (
             <Carousel className={`${!post?.data()?.images ? 'hidden' : "rounded-2xl mr-2 h-[300px] w-[500px] sm:w-full xl:h-[250px] sm:h-[600px] -z-10"}`}>
@@ -761,7 +759,7 @@ const handleShare = async () => {
             e.preventDefault(); // Prevent the default action (navigation)
             e.currentTarget.pause();
           }}
-          className="rounded-md h-[300px] w-[500px] sm:w-full sm:h-[600px] xl:h-[250px] mr-2 object-cover"
+          className="rounded-md h-[300px] w-full sm:h-[600px] xl:h-[250px] mr-2 object-cover"
           src={post?.data()?.videos}
           alt=""
           controls
@@ -836,7 +834,7 @@ const handleShare = async () => {
                   setOpen(!open);
                 
               }}
-              className="h-12 w-12 sm:h-10 sm:w-10 p-2 hover:text-sky-500 hover:bg-blue-100 rounded-full cursor-pointer  dark:hover:bg-gray-800"
+              className="h-9 w-9 sm:h-10 sm:w-10 p-2 hover:text-sky-500 hover:bg-blue-100 rounded-full cursor-pointer  dark:hover:bg-gray-800"
             />
             {comments.length > 0 && (
   <span className="text-[20px] sm:text-sm">{formatNumber(comments.length)}</span>
@@ -844,7 +842,7 @@ const handleShare = async () => {
           </div>
           </Tooltip>
           <Tooltip content='recast' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-          <ReplyIcon className="h-12 w-12 sm:h-10 sm:w-10 p-2 hover:text-sky-500 hover:bg-blue-100 rounded-full dark:hover:bg-gray-800" onClick={repost} />
+          <ReplyIcon className="h-9 w-9 sm:h-10 sm:w-10 p-2 hover:text-sky-500 hover:bg-blue-100 rounded-full dark:hover:bg-gray-800" onClick={repost} />
         </Tooltip>
         <Tooltip content='cite' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1 shadow-sm shadow-gray-500 dark:shadow-gray-400">
         <Popover
@@ -873,7 +871,7 @@ const handleShare = async () => {
           </div>
         }
       >
-       <PencilAltIcon className="h-12 w-12 sm:h-10 sm:w-10 p-2"/>
+       <PencilAltIcon className="h-9 w-9 sm:h-10 sm:w-10 p-2"/>
       </Popover>
         
         </Tooltip>
@@ -882,14 +880,14 @@ const handleShare = async () => {
             <Tooltip content='unlike' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
               <HeartIcon fill="red"
                 onClick={likePost}
-                className="h-12 w-12 sm:h-10 sm:w-10 p-2 text-red-600 dark:hover:bg-red-900 hover:bg-red-300 rounded-full"
+                className="h-9 w-9 sm:h-10 sm:w-10 p-2 text-red-600 dark:hover:bg-red-900 hover:bg-red-300 rounded-full"
               />
               </Tooltip>
             ) : (
           <Tooltip content='like' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
               <HeartIcon
                 onClick={likePost}
-                className="h-12 w-12 sm:h-10 sm:w-10 p-2 hover:text-red-600 hover:bg-red-300 rounded-full dark:hover:bg-red-900"
+                className="h-9 w-9 sm:h-10 sm:w-10 p-2 hover:text-red-600 hover:bg-red-300 rounded-full dark:hover:bg-red-900"
               />
               </Tooltip>
             )}
@@ -906,13 +904,13 @@ const handleShare = async () => {
           </div>
           <Tooltip content='view' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
             <div className="flex items-center">
-                <EyeIcon className="h-12 w-12 sm:h-10 sm:w-10 p-2 hover:text-sky-500 hover:bg-blue-100 rounded-full dark:hover:bg-gray-800"/>
+                <EyeIcon className="h-9 w-9 sm:h-10 sm:w-10 p-2 hover:text-sky-500 hover:bg-blue-100 rounded-full dark:hover:bg-gray-800"/>
                 <span className="text-[20px] sm:text-sm">{formatNumber(viewCount)}</span> 
             </div>
             </Tooltip>
          
         <Tooltip content='share' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-          <ShareIcon className="h-12 w-12 sm:h-10 sm:w-10 p-2 hover:text-sky-500 hover:bg-blue-100 rounded-full dark:hover:bg-gray-800" onClick={handleShare}/>
+          <ShareIcon className="h-9 w-9 sm:h-10 sm:w-10 p-2 hover:text-sky-500 hover:bg-blue-100 rounded-full dark:hover:bg-gray-800" onClick={handleShare}/>
         </Tooltip>
         
        
