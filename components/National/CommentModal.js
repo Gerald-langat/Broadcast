@@ -2,11 +2,13 @@ import { useRecoilState } from "recoil";
 import { modalState, postIdState } from "../../atoms/modalAtom";
 import Modal from "react-modal";
 import {
+  CameraIcon,
   EmojiHappyIcon,
+  PhotographIcon,
   XIcon,
 } from "@heroicons/react/outline";
 import { useEffect, useRef, useState } from "react";
-import { db } from "../../firebase";
+import { db, storage } from "../../firebase";
 import {
   addDoc,
   collection,
@@ -15,12 +17,14 @@ import {
   onSnapshot,
   query,
   serverTimestamp,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import Moment from "react-moment";
 import Picker from 'emoji-picker-react'
 import { Tooltip } from "flowbite-react";
 import { useUser } from "@clerk/nextjs";
+import { getDownloadURL, ref, uploadString } from "firebase/storage";
 
 export default function CommentModal() {
   
@@ -32,8 +36,11 @@ export default function CommentModal() {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [loading, setLoading] = useState(false);
   const filePickerRef = useRef(null);
-  const [post, setPost] = useState({})
-  const { user } = useUser()
+  const [post, setPost] = useState({});
+  const { user } = useUser();
+    const [selectedFile, setSelectedFile] = useState(null);
+      const [selectedVidFile, setSelectedVidFile] = useState(null);
+    const VidRef = useRef(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -62,7 +69,7 @@ export default function CommentModal() {
     if (!loading) {
       setLoading(true);
     }
-   await addDoc(collection(db, "national", postId, "comments"), {
+   const docRef = await addDoc(collection(db, "national", postId, "comments"), {
       comment: input,
       userImg: userData.userImg || "",
       imageUrl:userData.imageUrl,
@@ -72,10 +79,30 @@ export default function CommentModal() {
       uid: user?.id,
     });
 
-
+   const imgRef = ref(storage, `national/${docRef.id}/images`);
+       if (selectedFile) {
+          await uploadString(imgRef, selectedFile, "data_url").then(async () => {
+            const downloadURL = await getDownloadURL(imgRef);
+            await updateDoc(doc(db, "national", postId, "comments", docRef.id), {
+              images: downloadURL,
+            });
+          });
+        }
+        
+        const vidRef = ref(storage, `national/${docRef.id}/videos`);
+       if (selectedVidFile) {
+          await uploadString(vidRef, selectedVidFile, "data_url").then(async () => {
+            const downloadURL = await getDownloadURL(vidRef);
+            await updateDoc(doc(db, "national", postId, "comments", docRef.id), {
+              videos: downloadURL,
+            });
+          });
+        }
     setLoading(false);
     setOpen(false);
     setInput("");
+    setSelectedFile(null);
+    setSelectedVidFile(null);
   }
 
   const closeMode = () => {
@@ -84,6 +111,27 @@ export default function CommentModal() {
     setInput("");
   }
 
+  
+  const addImageToPost = (e) => {
+    const reader = new FileReader();
+    if (e.target.files[0]) {
+      reader.readAsDataURL(e.target.files[0]);
+    }
+    reader.onload = (readerEvent) => {
+      setSelectedFile(readerEvent.target.result);
+    };
+  };
+
+
+  const addVideoToPost = (e) => {
+    const reader = new FileReader();
+    if (e.target.files[0]) {
+      reader.readAsDataURL(e.target.files[0]);
+    }
+    reader.onload = (readerEvent) => {
+      setSelectedVidFile(readerEvent.target.result);
+    };
+  };
 
   return (
     <div>
@@ -91,7 +139,7 @@ export default function CommentModal() {
         <Modal
           isOpen={open}
           onRequestClose={() => setOpen(false)}
-          className="max-w-lg w-[90%]  absolute top-62 left-[50%] translate-x-[-50%] bg-white rounded-md shadow-md border-none"
+          className="max-w-lg w-[90%]  absolute top-24  left-[50%] translate-x-[-50%] bg-gray-200 rounded-md shadow-md border-none"
         >
           <div className="p-1 dark:bg-gray-950 rounded-md">
             <div className="border-b dark:border-gray-900 py-2 px-1.5">
@@ -100,7 +148,7 @@ export default function CommentModal() {
                 className="hover:bg-blue-100 w-10 h-10 rounded-full dark:hover:bg-gray-900 flex items-center justify-center"
               >
               <Tooltip content='close' arrow={false} placement="right" className="p-1 text-xs bg-gray-500 ml-1">
-                <XIcon className="h-14 sm:h-8 text-gray-700 p-0 cursor-pointer dark:text-gray-100" />
+                <XIcon className="h-8 text-gray-700 p-0 cursor-pointer dark:text-gray-100" />
               </Tooltip>
               </div>
             </div>
@@ -141,7 +189,7 @@ export default function CommentModal() {
               <div className="w-full divide-y dark:divide-gray-900">
                 <div className="">
                   <textarea
-                    className="w-full dark:bg-gray-950 dark:placeholder:text-gray-200 dark:text-gray-100 border-none focus:ring-0 text-xl sm:text-lg dark:placeholder-gray-500 placeholder-gray-700 tracking-wide min-h-[50px] text-gray-700"
+                    className="w-full bg-gray-200 dark:bg-gray-950 dark:placeholder:text-gray-200 dark:text-gray-100 border-none focus:ring-0 text-xl sm:text-lg dark:placeholder-gray-500 placeholder-gray-700 tracking-wide min-h-[50px] text-gray-700"
                     rows="2"
                     placeholder="Post your reply..."
                     value={input}
@@ -150,25 +198,49 @@ export default function CommentModal() {
                   ></textarea>
                 </div>
 
+
+
                 <div className="flex items-center justify-between pt-2.5">
                   <div className="flex">
                     <div
-                      className=""
                       onClick={() => filePickerRef.current.click()}
                     >
-                    
+                    <Tooltip content='media' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
+                    <PhotographIcon className=" h-10 w-10 rounded-full p-2 cursor-pointer text-sky-500 hover:bg-sky-100 dark:hover:bg-neutral-700" />
+                     <input
+                        type="file"
+                        hidden
+                        accept="image/*"
+                        ref={filePickerRef}
+                        onChange={addImageToPost}
+                      />
+                  </Tooltip>
+                    </div>
+                    <div
+                      onClick={() => VidRef.current.click()}
+                    >
+                    <Tooltip content='video' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
+                    <CameraIcon className=" h-10 w-10 rounded-full p-2 cursor-pointer text-sky-500 hover:bg-sky-100 dark:hover:bg-neutral-700" />
+                     <input
+                        type="file"
+                        hidden
+                        accept="video/*"
+                        ref={VidRef}
+                        onChange={addVideoToPost}
+                      />
+                  </Tooltip>
                     </div>
                     <Tooltip content='emoji' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
                     <EmojiHappyIcon className="hidden md:inline h-10 w-10 rounded-full p-2 cursor-pointer text-sky-500 hover:bg-sky-100 dark:hover:bg-neutral-700" onClick={() => setShowEmojiPicker(!showEmojiPicker)}/>
                   </Tooltip>
-                 
+                  
                   </div>
                   <button
                     onClick={sendComment}
                     disabled={!input.trim()}
                     className="bg-blue-400 text-white px-4 py-1.5 rounded-full font-bold shadow-md hover:brightness-95 disabled:opacity-50"
                   >
-                   {loading ? <p>Replying...</p> : <p className="text-lg sm:text-sm">Reply</p>}
+                   {loading ? <p className="animate-pulse items-center">.....</p> : <p className="text-lg sm:text-sm">Reply</p>}
                   </button>
                 </div>
               </div>
@@ -181,6 +253,36 @@ export default function CommentModal() {
             setInput(input + e.emoji)
           }}/>}
           </div>
+          {selectedFile && (
+                  <div className="border-none">
+                    <XIcon
+                      onClick={() => setSelectedFile(null)}
+                      className="border h-7 text-black absolute cursor-pointer shadow-md border-white m-1 rounded-full"
+                    />
+                    <img
+                      src={selectedFile}
+                      className={`${loading && "animate-pulse"} h-[100px] w-[200px] object-cover rounded-bl-md`}
+                      alt={`image`}
+                    />
+                  </div>
+                )}
+                {selectedVidFile && (
+                  <div className="border-none">
+                    <XIcon
+                      onClick={() => setSelectedVidFile(null)}
+                      className="border h-7 text-black absolute cursor-pointer shadow-md border-white m-1 rounded-full"
+                    />
+                    <video
+                    autoPlay
+                    muted
+                    controls
+                      src={selectedVidFile}
+                      className={`${loading && "animate-pulse"} h-[100px] w-[200px] object-cover rounded-bl-md`}
+                      alt={`video`}
+                    />
+                  </div>
+                )}
+              
         </Modal>
       )}
     </div>

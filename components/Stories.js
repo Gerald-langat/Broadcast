@@ -70,7 +70,7 @@ const { user } = useUser()
   };
 
   return (
-    <div className='border-[1px] border-gray-200 dark:border-gray-900 rounded-md mt-1'>
+    <div className='border-[1px] border-gray-200 dark:border-gray-950 rounded-md mt-1'>
       {posts.length > 0 && (
         <>
           <div className="flex justify-between items-center absolute xl:w-[560px] w-[500px] sm:w-[600px] mt-3 dark:bg-gray-950">

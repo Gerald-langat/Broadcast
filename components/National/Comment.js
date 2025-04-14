@@ -33,6 +33,7 @@ import { useFollow } from "../FollowContext";
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 
+
 export default function Comment({ comment, commentId, originalPostId }) {
   const [likes, setLikes] = useState([]);
   const [hasLiked, setHasLiked] = useState(false);
@@ -45,7 +46,9 @@ export default function Comment({ comment, commentId, originalPostId }) {
   const [reportReason, setReportReason] = useState("");
   const [isReported, setIsReported] = useState({});
   const [isBookmarked, setIsBookmarked] = useState({});
-  const { user } = useUser()
+  const { user } = useUser();
+
+  
 
     useEffect(() => {
       const fetchUserData = async () => {
@@ -143,8 +146,8 @@ export default function Comment({ comment, commentId, originalPostId }) {
             deleteDoc(likeDoc.ref)
           );
           await Promise.all(deleteLikesPromises);
-    
-      deleteDoc(doc(db, "national", commentId));
+     
+      deleteDoc(doc(db, "national", originalPostId, "comments", commentId));
         } catch (err) {
           console.error('Error deleting the post:', err);
         }
@@ -179,6 +182,10 @@ export default function Comment({ comment, commentId, originalPostId }) {
             // Include image  only if they are defined
            
             ...(postData.category && { fromCategory: postData.category }),
+            ...(postData.images && { images: postData.images }),
+            ...(postData.videos && { videos: postData.videos }),
+
+
             
           };
     
@@ -217,6 +224,8 @@ export default function Comment({ comment, commentId, originalPostId }) {
     }
   };
 
+ 
+
     // Check if the post is already bookmarked
     const userId = user?.id;
     const pstId = commentId;
@@ -251,7 +260,7 @@ export default function Comment({ comment, commentId, originalPostId }) {
           }));
         } else {
           // Add bookmark
-          const image = comment?.image || null;
+          const image = comment?.images || null;
           
           // Add new document to the collection
           const bookmarkData = { pstId, timestamp: Date.now() };
@@ -334,9 +343,10 @@ export default function Comment({ comment, commentId, originalPostId }) {
     const uid = comment?.uid;
 
   return (
-    <div>
+    <div className="border-b-[1px] dark:border-gray-900">
     <div className={`w-full ${isHidden ? 'inline text-2xl sm:text-xl cursor-pointer dark:hover:bg-gray-900 hover:bg-gray-200 rounded-md p-1' : 'hidden'}`} onClick={handleUndo}>{showUndo && 'undo'}</div>
     <div className={`${isHidden ? 'hidden' : "flex p-3 cursor-pointer pl-20"}`}>
+
       {/* user image */}
       <Link href={`/userProfile/${uid}`}>
       {comment?.userImg ? (
@@ -485,10 +495,15 @@ export default function Comment({ comment, commentId, originalPostId }) {
         <p className="text-gray-800 text-[20px] sm:text-[16px] mb-2 dark:text-gray-300">
           {comment?.comment} 
          </p>
-        {comment?.image && (
-         
-          <img src={comment?.image} alt="" className="h-32 w-full object-cover rounded-sm"/>
-        
+        {comment?.images ? (
+          <img src={comment?.images} alt="" className={`${!comment?.images ? 'hidden' : "h-60 w-full object-cover rounded-md"}`}/>
+        ): (
+          <video 
+          autoplay
+          muted
+          controls
+          src={comment?.videos} alt="" className={`${!comment?.videos ? 'hidden' : "h-60 w-full object-cover rounded-md"}`}/>
+
         )}
         
         </div>

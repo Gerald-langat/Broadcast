@@ -38,7 +38,7 @@ export default function Feed() {
       </Button>
     ) : (
       <AnimatePresence>
-        <div className="flex items-center justify-between dark:bg-gray-950 md:py-2 xl:px-3 sticky top-0 border-[1px] rounded-md border-gray-200 dark:border-gray-900 h-10 w-full">
+        <div className="flex items-center justify-between dark:bg-gray-950 md:py-2 xl:px-3 sticky top-0 border-[1px] rounded-md border-gray-200 dark:border-gray-900 h-10 ">
           <h2 className="text-2xl md:text-xl font-bold cursor-pointer fixed dark:text-gray-300 xl:p-0">National</h2>
         </div>
   

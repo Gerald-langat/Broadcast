@@ -55,8 +55,7 @@ const { user } = useUser()
      <div className="xl:border-0 sm:border-x-[1px] dark:border-gray-700 border-gray-200">
      {loading ? (
         <Button color="gray" className="border-0 items-center flex mt-4 sm:mt-0">
-          <Spinner aria-label="Loading spinner" size="md" />
-          <span className="pl-3 animate-pulse sm:text-[16px] text-[28px]">Loading...</span>
+          <Spinner aria-label="Loading spinner" size="sm" />
         </Button>
       ) : (
         <>
@@ -71,12 +70,7 @@ const { user } = useUser()
         <Input />
       </div>
       
-      {loading ? (
-        <Button color="gray" className="border-0">
-          <Spinner aria-label="Loading spinner" size="sm" />
-          <span className="pl-3 animate-pulse">Loading...</span>
-        </Button>
-      ) : (
+    
         <AnimatePresence>
           {posts.map((post) => (
             <motion.div
@@ -86,11 +80,16 @@ const { user } = useUser()
               exit={{ opacity: 0 }}
               transition={{ duration: 1 }}
             >
-              <Post key={post.id} id={post.id} post={post} />
+            {loading ? <Button color="gray" className="border-0">
+                                  <Spinner aria-label="Alternate spinner button example" size="sm" />
+                                  <span className="pl-3">Loading...</span>
+                                </Button> :(
+                        <Post key={post.id} id={post.id} post={post} />
+                                )}
             </motion.div>
           ))}
         </AnimatePresence>
-      )}
+     
       </>
       )}
     </div>

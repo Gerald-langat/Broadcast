@@ -79,7 +79,7 @@ export default function Sidebar() {
   
 
   return (
-    <div className="dark:bg-gray-950 mr-1 top-0 sticky  p-2 ">  
+    <div className="dark:bg-gray-950 mr-1 bg-white top-0 sticky  p-2 ">  
 {loading ? (
           <Spinner aria-label="Loading spinner" size="sm" />
       ) : (
@@ -112,7 +112,7 @@ export default function Sidebar() {
                   onClick={() => setOpen(true)}
                 >
                   <PlusIcon className="h-10 sm:h-8 dark:bg-gray-900 dark:text-gray-500 bg-gray-50 rounded-full text-gray-400" />
-                  <p className="font-bold text-sky-400 text-xl sm:text-sm cursor-pointer lg:inline">Add status</p>
+                  <p className="font-bold text-sky-400 text-lg sm:text-sm cursor-pointer lg:inline">Add status</p>
                 </div>
               </div>
             </div>

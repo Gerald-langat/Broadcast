@@ -165,7 +165,9 @@ export default function Comment({ comment, commentId, originalPostId }) {
               // Include image  only if they are defined
              
               ...(postData.category && { fromCategory: postData.category }),
-              ...(postData.image && { image: postData.image }),
+              ...(postData.images && { images: postData.images }),
+              ...(postData.videos && { videos: postData.videos }),
+
             };
       
            await addDoc(collection( db, "constituency", originalPostId, "comments",
@@ -344,205 +346,211 @@ export default function Comment({ comment, commentId, originalPostId }) {
     const uid = comment?.uid;
 
   return (
-    <div>
-    <div className={`w-full ${isHidden ? 'inline text-2xl sm:text-xl cursor-pointer dark:hover:bg-gray-900 hover:bg-gray-200 rounded-md p-1' : 'hidden'}`} onClick={handleUndo}>{showUndo && 'undo'}</div>
-    <div className={`${isHidden ? 'hidden' : "flex p-3 cursor-pointer pl-20"}`}>
-      {/* user image */}
+    <div className="border-b-[1px] dark:border-gray-900">
+        <div className={`w-full ${isHidden ? 'inline text-2xl sm:text-xl cursor-pointer dark:hover:bg-gray-900 hover:bg-gray-200 rounded-md p-1' : 'hidden'}`} onClick={handleUndo}>{showUndo && 'undo'}</div>
+        <div className={`${isHidden ? 'hidden' : "flex p-3 cursor-pointer pl-20"}`}>
     
- <Link href={`/userProfile/${uid}`}>
-      {comment?.userImg ? (
-        <img
-        className="h-11 w-11 rounded-full mr-4"
-        src={comment?.userImg}
-        alt="user-img"
-      /> 
-      ):(
-        <img
-        className="h-11 w-11 rounded-full mr-4"
-        src={comment?.imageUrl}
-        alt="user-img"
-      />
-      )}
-        
-      </Link>
-      {/* right side */}
-      <div className="flex-1">
-        {/* Header */}
-
-        <div className="flex items-center justify-between">
-          {/* post user info */}
-          <div className="flex items-center space-x-1 whitespace-nowrap">
-            <h4 className="font-bold text-[15px] sm:text-[16px] hover:underline">
-              {comment?.name}
-            </h4>
-            <span className="text-sm sm:text-[15px]">
-              @{comment?.username} -{" "}
-            </span>
-            <span className="text-sm sm:text-[15px] hover:underline">
-              <Moment fromNow>{comment?.timestamp?.toDate()}</Moment>
-            </span>
-          </div>
-<div className="flex">
-  {user?.id === comment?.uid && (
-           
-           <TrashIcon
-              onClick={user?.id === comment?.uid ? deleteRepost : deleteComment}
-             className="h-12 w-12 md:h-9 md:w-9 p-2 hover:text-red-600 hover:bg-red-100 rounded-full dark:hover:bg-gray-800"
-           />
-                     
-         )}
-          {/* dot icon */}
-          <Popover
-                aria-labelledby="profile-popover"
-                className="md:-ml-28 -ml-8 z-20 shadow-md rounded-lg dark:shadow-gray-400 shadow-gray-500"
-                content={
-                  <div className="w-64 text-xl sm:text-sm text-gray-500 dark:text-gray-300 bg-gray-300 dark:bg-gray-900 
-                     py-2 space-y-3 border-none">
-                     
-                     { comment?.uid !== user?.id ? 
-                        (
-                          <>
-                          <div className="flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900" onClick={handleNotInterested}>
-                    <EyeOffIcon className="h-6"/>
-                      <p>Not interested</p>
-                    </div>
-                    
-
-                    <div className={`${userData?.name == comment?.name ? 'hidden' : 'flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900 '}`} >
-                    {hasFollowed[comment?.uid] ? (
-                      <UserRemoveIcon className="h-6" />
-
-                    ) : (
-                      <UserAddIcon className="h-6" />
-
-                    )}
-                   
-                      <p onClick={() => followMember(comment?.uid)}>{hasFollowed[comment?.uid] ? 'Unfollow' : 'Follow'} @{comment?.nickname}</p>
-                    
-                    </div>
-                   
-                    <div className="flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900"  onClick={() => setShowModal(true)}>
-                     
-                     {isReported[pstId] ? (
-                              <FlagIcon className="h-6 w-6 text-blue-700" />
-                            ) : (
-                              <FlagIcon className="h-6 w-6 text-gray-500" />
-                            )}
-                    
-                      <p> {isReported[pstId]  ? "Reported" : "Report Post"}</p>
-                    </div>
-                    {showModal && (
-                      <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
-                          <div className="bg-white dark:bg-gray-900 p-6 rounded shadow-md w-80">
-                            <h2 className="text-lg font-semibold mb-4">Report Post</h2>
-                            <p className="text-sm mb-4">Why are you reporting this post?</p>
-
-                            {/* Dropdown for report reasons */}
-                            <select
-                              value={reportReason}
-                              onChange={(e) => setReportReason(e.target.value)}
-                              className="w-full p-2 rounded mb-4 dark:bg-gray-900 border-none"
-                            >
-                              <option>Select a reason</option>
-                              <option value="Spam">Spam</option>
-                              <option value="Inappropriate Content">Inappropriate Content</option>
-                              <option value="Hate Speech">Hate Speech</option>
-                              <option value="Other">Other</option>
-                            </select>
-
-                            {/* Buttons */}
-                            <div className="flex justify-between w-full">
-                            <button
-                                onClick={handleCancel}
-                                className="px-4 py-2 bg-gray-300 rounded dark:bg-gray-800 dark:hover:bg-gray-700 hover:bg-gray-400"
-                              >
-                                Cancel
-                              </button>
-                              
-                              <button
-                                onClick={submitReport}
-                                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded"
-                              >
-                               {isReported[pstId]  ? "unSubmit" : "Submit"} 
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                    )}
-               
-                      </>
-                        ):(
-                          <div className="flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900" onClick={toggleBookmark}>
-                          {isBookmarked[pstId] ? (
-                              <BookmarkIcon fill="blue" className="h-6 w-6 text-blue-700" />
-                            ) : (
-                              <BookmarkIcon className="h-6 w-6 text-gray-500" />
-                            )}
-                      <p>{isBookmarked[pstId] ? "Remove Bookmark" : "Add Bookmark"}</p>
-                      </div>
-      )}                  
-                  </div>
-                }
-                arrow={false}
-              >
-                <DotsHorizontalIcon className="dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-gray-900 rounded-full h-10 hover:text-sky-500 p-1 sm:p-2"/>
-              
-             </Popover>
-</div>
-          
-        </div>
-
-        <div>
-        <p className="text-gray-800 text-[20px] sm:text-[16px] mb-2 dark:text-gray-300">
-          {comment?.comment}
-         </p>
-        {comment?.image && (
+          {/* user image */}
+          <Link href={`/userProfile/${uid}`}>
+          {comment?.userImg ? (
+            <img
+            className="h-11 w-11 rounded-full mr-4"
+            src={comment?.userImg}
+            alt="user-img"
+          /> 
+          ):(
+            <img
+            className="h-11 w-11 rounded-full mr-4"
+            src={comment?.imageUrl}
+            alt="user-img"
+          />
+          )}
+            
+          </Link>
          
-          <img src={comment?.image} alt="" className="h-32 w-full object-cover rounded-sm"/>
-        
-        )}
-        
-        </div>
-        {comment?.from && <p>Recast from <span className="font-bold">{comment?.from}</span>{" "}<span className="text-gray-400 font-bold">@{comment?.fromNickname}</span></p>}
-
-        {/* icons */}
-
-        <div className="flex justify-between text-gray-500 dark:text-gray-300 p-2">
-          <div className="flex items-center">
-            {hasLiked ? (
-          <Tooltip content='unlike' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-              <HeartIconFilled
-                onClick={likeComment}
-                className="h-9 w-9 p-2 text-red-700 hover:bg-red-100 dark:hover:bg-neutral-700 rounded-full"
-              />
-          </Tooltip>
-            ) : (
-          <Tooltip content='like' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-              <HeartIcon
-                onClick={likeComment}
-                className="h-9 w-9 p-2 hover:text-red-600 dark:hover:bg-neutral-700 hover:bg-red-100 rounded-full"
-              />
-          </Tooltip>
+          {/* right side */}
+          <div className="flex-1">
+            {/* Header */}
+    
+            <div className="flex items-center justify-between">
+              {/* post user info */}
+              <div className="flex items-center space-x-1 whitespace-nowrap">
+                <h4 className="font-bold text-[20px] sm:text-[16px] hover:underline">
+                  {comment?.name}
+                </h4>
+                <span className="text-[20px] sm:text-[15px]">
+                  @{comment?.nickname} -{" "}
+                </span>
+                <span className="text-[20px] sm:text-[15px] hover:underline">
+                  <Moment fromNow>{comment?.timestamp?.toDate()}</Moment>
+                </span>
+              </div>
+              <div className="flex">{user?.id === comment?.uid && (
+               
+               <TrashIcon
+                  onClick={user?.id === comment?.uid ? deleteRepost : deleteComment}
+                 className="h-12 w-12 md:h-9 md:w-9 p-2 hover:text-red-600 hover:bg-red-100 rounded-full dark:hover:bg-gray-800"
+               />
+                         
+             )}
+              {/* dot icon */}
+              <Popover
+                    aria-labelledby="profile-popover"
+                    className="md:-ml-28 -ml-8 z-20 shadow-md rounded-lg dark:shadow-gray-400 shadow-gray-500"
+                    content={
+                      <div className="w-64 text-xl sm:text-sm text-gray-500 dark:text-gray-300 bg-gray-300 dark:bg-gray-900 
+                         py-2 space-y-3 border-none">
+                         
+                         { comment?.uid !== user?.id ? 
+                            (
+                              <>
+                              <div className="flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900" onClick={handleNotInterested}>
+                        <EyeOffIcon className="h-6"/>
+                          <p>Not interested</p>
+                        </div>
+                        
+    
+                        <div className={`${userData?.name == comment?.name ? 'hidden' : 'flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900 '}`} >
+                        {hasFollowed[comment?.id] ? (
+                          <UserRemoveIcon className="h-6" />
+    
+                        ) : (
+                          <UserAddIcon className="h-6" />
+    
+                        )}
+                       
+                          <p onClick={() => followMember(comment?.uid, user)}>{hasFollowed[comment?.uid] ? 'Unfollow' : 'Follow'} @{comment?.nickname}</p>
+                        
+                        </div>
+                       
+                        <div className="flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900"  onClick={() => setShowModal(true)}>
+                         
+                         {isReported[pstId] ? (
+                                  <FlagIcon className="h-6 w-6 text-blue-700" />
+                                ) : (
+                                  <FlagIcon className="h-6 w-6 text-gray-500" />
+                                )}
+                        
+                          <p> {isReported[pstId]  ? "Reported" : "Report Post"}</p>
+                        </div>
+                        {showModal && (
+                          <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+                              <div className="bg-white dark:bg-gray-900 p-6 rounded shadow-md w-80">
+                                <h2 className="text-lg font-semibold mb-4">Report Post</h2>
+                                <p className="text-sm mb-4">Why are you reporting this post?</p>
+    
+                                {/* Dropdown for report reasons */}
+                                <select
+                                  value={reportReason}
+                                  onChange={(e) => setReportReason(e.target.value)}
+                                  className="w-full p-2 rounded mb-4 dark:bg-gray-900 border-none"
+                                >
+                                  <option>Select a reason</option>
+                                  <option value="Spam">Spam</option>
+                                  <option value="Inappropriate Content">Inappropriate Content</option>
+                                  <option value="Hate Speech">Hate Speech</option>
+                                  <option value="Other">Other</option>
+                                </select>
+    
+                                {/* Buttons */}
+                                <div className="flex justify-between w-full">
+                                <button
+                                    onClick={handleCancel}
+                                    className="px-4 py-2 bg-gray-300 rounded dark:bg-gray-800 dark:hover:bg-gray-700 hover:bg-gray-400"
+                                  >
+                                    Cancel
+                                  </button>
+                                  
+                                  <button
+                                    onClick={submitReport}
+                                    className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded"
+                                  >
+                                   {isReported[pstId]  ? "unSubmit" : "Submit"} 
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                        )}
+                   
+                          </>
+                            ):(
+                              <div className="flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-900" onClick={toggleBookmark}>
+                              {isBookmarked[pstId] ? (
+                                  <BookmarkIcon fill="blue" className="h-6 w-6 text-blue-700" />
+                                ) : (
+                                  <BookmarkIcon className="h-6 w-6 text-gray-500" />
+                                )}
+                          <p>{isBookmarked[pstId] ? "Remove Bookmark" : "Add Bookmark"}</p>
+                          </div>
+          )}                  
+                      </div>
+                    }
+                    arrow={false}
+                  >
+                    <DotsHorizontalIcon className="dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-gray-900 rounded-full h-10 hover:text-sky-500 p-1 sm:p-2"/>
+                  
+                 </Popover></div>
+              
+            </div>
+    
+                  {/* image */}
+            <div>
+            <p className="text-gray-800 text-[20px] sm:text-[16px] mb-2 dark:text-gray-300">
+              {comment?.comment} 
+             </p>
+            {comment?.images ? (
+              <img src={comment?.images} alt="" className={`${!comment?.images ? 'hidden' : "h-60 w-full object-cover rounded-md"}`}/>
+            ): (
+              <video 
+              autoPlay
+              muted
+              controls
+              src={comment?.videos} alt="" className={`${!comment?.videos ? 'hidden' : "h-60 w-full object-cover rounded-md"}`}/>
+    
             )}
-            {likes.length > 0 && (
-              <span
-                className='text-[20px] sm:text-sm select-none'
-              >
-                {" "}
-                {formatNumber(likes.length)}
-              </span>
-            )}
+            
+            </div>
+            {comment?.from && <p>Recast from <span className="font-bold">{comment?.from}</span>{" "}<span className="text-gray-400 font-bold">@{comment?.fromNickname}</span></p>}
+            <div className="flex justify-between text-gray-500 dark:text-gray-300 p-2">
+              
+              
+              <div className="flex items-center">
+                {hasLiked ? (
+                  <Tooltip content='unlike' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
+    
+                  <HeartIconFilled
+                    onClick={likeComment}
+                    className="sm:h-9 sm:w-9 h-12 w-12 rounded-full cursor-pointer p-2 text-red-700 hover:bg-red-100 dark:hover:bg-neutral-700"
+                  />
+                  </Tooltip>
+                ) : (
+                  <Tooltip content='like' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
+    
+                  <HeartIcon
+                    onClick={likeComment}
+                    className="sm:h-9 sm:w-9 h-12 w-12 rounded-full cursor-pointer p-2 hover:text-red-600 hover:bg-red-100 dark:hover:bg-neutral-700"
+                  />
+                  </Tooltip>
+                )}
+                {likes.length > 0 && (
+                  <span
+                    className='text-[20px] sm:text-sm select-none'
+                  >
+                    {" "}
+                    {formatNumber(likes.length)}
+                  </span>
+                )}
+              </div>
+     
+             
+              <Tooltip content='share' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
+               <ShareIcon className="sm:h-9 sm:w-9 h-12 w-12 rounded-full cursor-pointer p-2 hover:text-sky-500 hover:bg-sky-100 dark:hover:bg-neutral-700" onClick={handleShare}/>
+              </Tooltip>
+              <ReplyIcon className="sm:h-9 sm:w-9 h-12 w-12 rounded-full cursor-pointer p-2 hover:text-sky-500 hover:bg-sky-100 dark:hover:bg-neutral-700" onClick={repost}/>
+            </div>
           </div>
-          
-          <Tooltip content='share' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-          <ShareIcon className="h-9 w-9 p-2 hover:text-sky-500 hover:bg-sky-100 rounded-full dark:hover:bg-neutral-700" onClick={handleShare}/>
-          </Tooltip>
-          <Tooltip content='repost' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-          <ReplyIcon className="h-9 w-9 p-2 hover:text-sky-500 hover:bg-sky-100 rounded-full dark:hover:bg-neutral-700" onClick={repost}/>
-        </Tooltip>
+    
         </div>
       </div>
-    </div>
-    </div>
   );
 }

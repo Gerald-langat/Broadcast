@@ -107,7 +107,7 @@ const toggleHome = () => {
 
     {/* Post content */}
     <div className="flex flex-col flex-grow max-w-full xl:max-w-2xl 2xl:max-w-3xl px-2">
-      <div className="flex items-center space-x-2 py-2 px-3 sticky top-0 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 rounded-md z-20">
+      <div className="flex items-center space-x-2 py-2 px-3 sticky top-0 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 rounded-md">
         <Tooltip content="Back" arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500">
           <Link href={`/national`}>
             <ArrowLeftIcon className="h-8 sm:h-6 cursor-pointer" />

@@ -69,7 +69,7 @@ function county() {
       </div>
   
       {/* Feed */}
-      <div className="flex-1 min-w-[400px]">
+      <div className="flex-1 min-w-0 sm:min-w-[400px] mx-auto">
         <Feed />
       </div>
   

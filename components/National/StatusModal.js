@@ -155,11 +155,11 @@ export default function StatusModal() {
                 onClick={closeMode}
                 className="rounded-full cursor-pointer w-10 h-10 flex items-center justify-center hover:bg-blue-100 dark:hover:bg-neutral-700"
               >
-                <XIcon className="sm:h-[23px] h-10 text-gray-700 dark:text-gray-100"/>
+                <XIcon className="sm:h-[23px] h-6 text-gray-700 dark:text-gray-100"/>
               </div>
           </Tooltip>
 
-              <h2 className='text-2xl sm:text-lg '>Add Status</h2>
+              <h2 className='text-lg '>Add Status</h2>
             </div>
             <div className="hidden lg:inline absolute lg:-ml-[350px] -mt-[100px]">
             {emoji.emoji}
@@ -170,7 +170,7 @@ export default function StatusModal() {
             }}/>}
             </div>
           
-            <div className="p-2 flex items-center space-x-1 relative text-2xl sm:text-lg">
+            <div className="p-2 flex items-center space-x-1 relative text-lg">
               <span className="w-0.5 h-full z-[-1] absolute left-8 top-11 bg-gray-300" />
               {userData?.userImg ? (
                 <img
@@ -205,7 +205,7 @@ export default function StatusModal() {
                 <div className="">
                   <textarea
                     className="w-full text-2xl sm:text-lg border-none focus:ring-0 dark:bg-gray-950 placeholder-gray-700 tracking-wide 
-                    min-h-[50px] text-gray-700 dark:text-gray-100 dark:placeholder:text-gray-100 sm:placeholder:text-lg placeholder:text-2xl"
+                    min-h-[50px] text-gray-700 dark:text-gray-100 dark:placeholder:text-gray-100 placeholder:text-lg "
                     rows="2"
                     placeholder="Post a status..."
                     value={input}
@@ -264,7 +264,7 @@ export default function StatusModal() {
                       className=""
                       onClick={() => filePickerRef.current.click()}
                     >
-                      <PhotographIcon className="sm:h-10 sm:w-10 h-16 w-16 rounded-full cursor-pointer p-2 text-sky-500 hover:bg-sky-100 dark:hover:bg-neutral-700" />
+                      <PhotographIcon className="h-10 w-10 rounded-full cursor-pointer p-2 text-sky-500 hover:bg-sky-100 dark:hover:bg-neutral-700" />
                       <input
                         type="file"
                         hidden
@@ -279,7 +279,7 @@ export default function StatusModal() {
                       className=""
                       onClick={() => videoPickerRef.current.click()}
                     >
-                       <CameraIcon className="sm:h-10 sm:w-10 h-16 w-16  rounded-full cursor-pointer p-2 text-sky-500 hover:bg-sky-100 dark:hover:bg-neutral-700" />
+                       <CameraIcon className="h-10 w-10  rounded-full cursor-pointer p-2 text-sky-500 hover:bg-sky-100 dark:hover:bg-neutral-700" />
                       <input
                         type="file"
                         hidden

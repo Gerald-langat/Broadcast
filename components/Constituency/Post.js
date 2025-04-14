@@ -658,8 +658,8 @@ useEffect(() => {
                  {/* display cite */}
                  {post?.data()?.citeInput ? (
                    <div>
-                 <p onClick={() => router.push(`/countyposts(id)/${id}`)} className="text-[20px] sm:text-[16px]">{post?.data()?.citeInput}</p>
-                 <div className="border-[1px] rounded-md dark:border-gray-900 dark:hover:bg-gray-800 border-gray-200 hover:bg-neutral-300"  onClick={() => router.push(`/countyposts(id)/${id}`)}>
+                 <p onClick={() => router.push(`/constituencyposts(id)/${id}`)} className="text-[20px] sm:text-[16px]">{post?.data()?.citeInput}</p>
+                 <div className="border-[1px] rounded-md dark:border-gray-900 dark:hover:bg-gray-800 border-gray-200 hover:bg-neutral-300"  onClick={() => router.push(`/constituencyposts(id)/${id}`)}>
                  <div className="flex p-1">
                  {post?.data()?.citeUserImg ? (
                  
@@ -689,7 +689,7 @@ useEffect(() => {
          
               
                  </div>
-                 <p className="ml-14 text-[20px] sm:text-[16px]" onClick={() => router.push(`/countyposts(id)/${id}`)}>{post?.data()?.text}</p>
+                 <p className="ml-14 text-[20px] sm:text-[16px]" onClick={() => router.push(`/constituencyposts(id)/${id}`)}>{post?.data()?.text}</p>
          
                  {/* {post?.data()?.images?.length > 1 ? (
                      <Carousel className={`${!post?.data()?.images ? 'hidden' : "rounded-2xl mr-2 h-[300px] w-[500px] sm:w-full xl:h-[250px] sm:h-[600px] -z-10"}`}>
@@ -733,7 +733,7 @@ useEffect(() => {
                  ):(
                    <>
                    <p
-                     onClick={() => router.push(`/countyposts(id)/${id}`)}
+                     onClick={() => router.push(`/constituencyposts(id)/${id}`)}
                      className="text-gray-800 w-96 sm:w-[490px] text-[20px] sm:text-[16px] mb-2 dark:text-gray-300 line-clamp-3 break-words cursor-pointer"
                    >
                      {post?.data()?.text} 

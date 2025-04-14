@@ -16,10 +16,9 @@ import {
 } from "firebase/firestore";
 import { getDownloadURL, ref, uploadString } from "firebase/storage";
 import { useState, useRef, useEffect } from "react";
-import { auth, db, storage } from "../../firebase";
+import { db, storage } from "../../firebase";
 import Picker from 'emoji-picker-react'// Import your EmojiPicker component
 import { Popover, Spinner, Tooltip } from "flowbite-react";
-import { useRouter } from "next/router";
 import { useUser } from "@clerk/nextjs";
 
 export default function Input() {
@@ -264,6 +263,7 @@ export default function Input() {
                 />
                 <video
                   autoPlay
+                  muted
                   src={selectedVidFile}
                   controls
                   className={`${loading && "animate-pulse"} h-[200px] w-[300px] object-cover` }
@@ -289,7 +289,7 @@ export default function Input() {
             )}
 
 
-            <div className="flex items-center justify-between pt-2.5 border-none">
+            <div className="flex items-center justify-between pt-2.5 border-none ">
               {!loading && (
                 <div className='flex w-full justify-between px-2'>
                   <div className="flex">
