@@ -157,7 +157,7 @@ export default function Sidebar() {
             </div>
             </Link>
           </div>
-          <div>
+       
          
          <div className='flex justify-between w-full items-center'>
             <h2 className="font-bold ml-4 dark:text-gray-300 text-2xl sm:text-lg">Members</h2>
@@ -167,70 +167,82 @@ export default function Sidebar() {
         </div>
 
         <div className="h-[500px] w-[300px] overflow-auto scrollbar-hide">
-  {posts.map((post) => (
-     <Link href={`/userProfile/${post?.uid}`}>
-    <div key={post.id} className="flex items-center w-fit p-1 ">
-   
-      {/* Profile Image or Initials */}
-      <div className="m-4">
-        {post?.userImg ? (
-          <img
-            className="h-14 w-14 sm:h-10 object-cover sm:w-10 rounded-md shadow-gray-800 shadow-sm dark:shadow-gray-600"
-            src={post.userImg} 
-            alt="User Profile"
-            width={400}
-            height={400}
-            layout="intrinsic"
-          />
-        ) : (
-          <img
-            className="h-14 w-14 sm:h-10 sm:w-10 rounded-md shadow-gray-800 shadow-sm dark:shadow-gray-600"
-            src={post?.imageUrl} 
-            alt="User Profile"
-            width={400}
-            height={400}
-            layout="intrinsic"
-          />
-        )}
-      </div>
 
-      {/* User Info */}
-      <div className="flex-1 w-full">
-        <div>
-          <div className="flex dark:text-gray-200 text-2xl sm:text-lg">
-            <p className="mr-1">{post?.name}</p>
-            <p className="mr-1">{post?.lastname}</p>
+  {posts
+    .filter((post) => post?.uid === user?.id) // Only the current user
+    .map((post) => (
+      <Link href={`/userProfile/${post?.uid}`} key={post.id}>
+        <div className="flex items-center w-fit p-1">
+          {/* Profile Image */}
+          <div className="m-4">
+            {post?.userImg ? (
+              <img
+                className="h-14 w-14 sm:h-10 sm:w-10 object-cover rounded-md shadow-gray-800 shadow-sm dark:shadow-gray-600"
+                src={post.userImg}
+                alt="User Profile"
+              />
+            ) : (
+              <img
+                className="h-14 w-14 sm:h-10 sm:w-10 object-cover rounded-md shadow-gray-800 shadow-sm dark:shadow-gray-600"
+                src={post?.imageUrl}
+                alt="User Profile"
+              />
+            )}
           </div>
-          <div className="font-bold text-lg truncate w-28 sm:text-sm text-gray-500">
-            @{post?.nickname}
+
+          {/* User Info */}
+          <div className="flex-1 w-full">
+            <div className="flex dark:text-gray-200 text-2xl sm:text-lg">
+              <p className="mr-1">{post?.name}</p>
+              <p className="mr-1">{post?.lastname}</p>
+            </div>
+            <div className="font-bold text-lg truncate w-28 sm:text-sm text-gray-500">
+              @{post?.nickname}
+            </div>
           </div>
         </div>
-      </div>
+      </Link>
+    ))}
 
-      {/* Follow Button */}
-      {/* <div className="ml-auto">
-        <p
-          className={`${
-            userPosts?.name === post?.name ? 'hidden' : 'font-bold text-blue-500 sm:text-sm text-lg cursor-pointer'
-          }`}
-          onClick={() => followMember(post?.id)}
-        >
-          {followloading[post?.id] ? (
-            <Spinner aria-label="Loading spinner" size="sm" />
-          ) : hasFollowed[post?.id] ? (
-            "Unfollow"
-          ) : (
-            "Follow"
-          )}
-        </p>
-      </div> */}  
-    </div>
-    </Link>
-  ))}
-</div>
+  {/* Then, show other users' posts */}
+  {posts
+    .filter((post) => post?.uid !== user?.id) // All other users
+    .map((post) => (
+      <Link href={`/userProfile/${post?.uid}`} key={post.id}>
+        <div className="flex items-center w-fit p-1">
+          {/* Profile Image */}
+          <div className="m-4">
+            {post?.userImg ? (
+              <img
+                className="h-14 w-14 sm:h-10 sm:w-10 object-cover rounded-md shadow-gray-800 shadow-sm dark:shadow-gray-600"
+                src={post.userImg}
+                alt="User Profile"
+              />
+            ) : (
+              <img
+                className="h-14 w-14 sm:h-10 sm:w-10 object-cover rounded-md shadow-gray-800 shadow-sm dark:shadow-gray-600"
+                src={post?.imageUrl}
+                alt="User Profile"
+              />
+            )}
           </div>
-          </>
+
+          {/* User Info */}
+          <div className="flex-1 w-full">
+            <div className="flex dark:text-gray-200 text-2xl sm:text-lg">
+              <p className="mr-1">{post?.name}</p>
+              <p className="mr-1">{post?.lastname}</p>
+            </div>
+            <div className="font-bold text-lg truncate w-28 sm:text-sm text-gray-500">
+              @{post?.nickname}
+            </div>
+          </div>
+        </div>
+      </Link>
+    ))}
+</div>
+</>
       )}
-    </div>
+      </div>
   );
 }

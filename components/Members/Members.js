@@ -1,9 +1,10 @@
 import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { db } from '../../firebase';
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion';
 import MemberPost from './MemberPost';
 import { Spinner } from 'flowbite-react';
+
 
 function MembersFeed() {
 const [memberPost, setMemberPosts] = useState()
@@ -39,10 +40,8 @@ const formatNumber = (number) => {
        {loading ? (           
                 <Spinner aria-label="Loading spinner" size="sm" />
             ) : (
-            
               <AnimatePresence>
     <h1 className='w-full underline justify-center flex p-2'>Members ({formatNumber(memberPost?.length)})</h1>
-
                 {memberPost.map((post) => (
                   <motion.div
                     key={post.id}
@@ -52,6 +51,7 @@ const formatNumber = (number) => {
                     transition={{ duration: 1 }}
                   >
                     <MemberPost key={post.id} id={post.id} post={post} />
+                    
                   </motion.div>
                 ))}
               </AnimatePresence>
