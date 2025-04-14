@@ -22,7 +22,7 @@ import {
 } from "firebase/firestore";
 import Moment from "react-moment";
 import Picker from 'emoji-picker-react'
-import { Popover, Tooltip } from "flowbite-react";
+import { Tooltip } from "flowbite-react";
 import { getDownloadURL, ref, uploadString } from "firebase/storage";
 import { useUser } from "@clerk/nextjs";
 
