@@ -264,7 +264,7 @@ const handleShare = async () => {
       await navigator.share({
         title: 'Check this out!',
         text: 'Sharing this amazing content.',
-        url: `https://broadcast-gwly.vercel.app/${id}`
+        url: `https://broadcastke.com/${id}`
       });
     } catch (error) {
       console.error('Error sharing content:', error);

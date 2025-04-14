@@ -147,22 +147,21 @@ async function likePost() {
  }
   
 // share
-  const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: 'Check this out!',
-          text: 'Sharing this amazing content.',
-          url: window.location.href,
-        });
-      } catch (error) {
-        console.error('Error sharing content:', error);
-      }
-    } else {
-      // Fallback for browsers that do not support the Web Share API
-      alert('Web Share API is not supported in your browser.');
+const handleShare = async () => {
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: 'Check this out!',
+        text: 'Sharing this amazing content.',
+        url: `https://broadcastke.com/${id}`
+      });
+    } catch (error) {
+      console.error('Error sharing content:', error);
     }
-  };
+  } else {
+    alert('Web Share API is not supported in your browser.');
+  }
+};
 
   useEffect(() => {
     const fetchUserData = async () => {

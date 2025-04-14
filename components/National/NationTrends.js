@@ -186,14 +186,12 @@ const viewCount = Array.isArray(post?.data()?.views) ? post.data().views.length 
         await navigator.share({
           title: 'Check this out!',
           text: 'Sharing this amazing content.',
-          url: window.location.href,
+          url: `https://broadcastke.com/${id}`
         });
-        console.log('Content shared successfully');
       } catch (error) {
         console.error('Error sharing content:', error);
       }
     } else {
-      // Fallback for browsers that do not support the Web Share API
       alert('Web Share API is not supported in your browser.');
     }
   };
