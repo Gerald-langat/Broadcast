@@ -565,7 +565,6 @@ const handleShare = async () => {
        
              <div className="flex-1">
                <div className="flex items-center justify-between ml-1">
-                 {/* post user info */}
                  <div className="flex space-x-8">
                  <div className="flex items-center space-x-2 whitespace-nowrap dark:text-gray-300 ">
                    <h4 className=" dark:text-gray-300 font-bold max-w-20 truncate text-lg  hover:underline ">
@@ -697,7 +696,7 @@ const handleShare = async () => {
                {/* display cite */}
                {post?.data()?.citeInput ? (
                  <div>
-               <p onClick={() => router.push(`/posts(id)/${id}`)} className="text-[20px] sm:text-[16px]">{post?.data()?.citeInput}</p>
+               <p onClick={() => router.push(`/posts(id)/${id}`)} className="sm:text-[16px]">{post?.data()?.citeInput}</p>
                <div className="border-[1px] rounded-md dark:border-gray-900 dark:hover:bg-gray-800 border-gray-200 hover:bg-neutral-300"  onClick={() => router.push(`/posts(id)/${id}`)}>
                <div className="flex p-1">
                {post?.data()?.citeUserImg ? (
@@ -731,7 +730,7 @@ const handleShare = async () => {
        
             
                </div>
-               <p className="ml-14 text-[20px] sm:text-[16px]" onClick={() => router.push(`/posts(id)/${id}`)}>{post?.data()?.text}</p>
+               <p className="line-clamp-3 w-96 break-words  text-md sm:text-[16px]" onClick={() => router.push(`/posts(id)/${id}`)}>{post?.data()?.text}</p>
        
                {/* {post?.data()?.images?.length > 1 ? (
                    <Carousel className={`${!post?.data()?.images ? 'hidden' : "rounded-2xl mr-2 h-[300px] w-[500px] sm:w-full xl:h-[250px] sm:h-[600px] -z-10"}`}>
@@ -776,7 +775,7 @@ const handleShare = async () => {
                  <>
                  <p
                    onClick={() => router.push(`/posts(id)/${id}`)}
-                   className="text-gray-800 w-96 sm:w-[490px] text-[20px] sm:text-[16px] mb-2 dark:text-gray-300 line-clamp-3 break-words cursor-pointer"
+                   className="text-gray-800 w-96 sm:w-[490px]  sm:text-[16px] mb-2 dark:text-gray-300 line-clamp-3 break-words cursor-pointer"
                  >
                    {post?.data()?.text} 
                </p>

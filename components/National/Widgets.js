@@ -125,7 +125,7 @@ const clearQuery = () => {
   return (
  
       <div className='dark:bg-gray-950 top-0 sticky h-screen sm:ml-1 items-start'>
-        <form className='flex items-center rounded-full dark:bg-gray-950 bg-gray-200 px-3 mb-2 border-[1px] mt-2 dark:border-gray-700'>
+        <form className='flex items-center rounded-full  dark:bg-gray-950 bg-gray-200 px-3 mb-2 border-[1px] mt-2 dark:border-gray-700'>
           <SearchIcon className='h-6 text-gray-500 z-40 dark:text-gray-300' />
         <input
           className="border-0 dark:bg-gray-950 bg-gray-200 w-full text-2xl sm:text-lg placeholder:text-lg 
