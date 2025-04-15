@@ -192,7 +192,7 @@ export default function Sidebar() {
 
           {/* User Info */}
           <div className="flex-1 w-full">
-            <div className="flex dark:text-gray-200 text-2xl sm:text-lg">
+            <div className="flex dark:text-gray-200 text-lg">
               <p className="mr-1">{post?.name}</p>
               <p className="mr-1">{post?.lastname}</p>
             </div>
@@ -229,7 +229,7 @@ export default function Sidebar() {
 
           {/* User Info */}
           <div className="flex-1 w-full">
-            <div className="flex dark:text-gray-200 text-2xl sm:text-lg">
+            <div className="flex dark:text-gray-200 text-lg">
               <p className="mr-1">{post?.name}</p>
               <p className="mr-1">{post?.lastname}</p>
             </div>

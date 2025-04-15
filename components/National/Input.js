@@ -251,7 +251,7 @@ export default function Input() {
             {loading ? (
         <div  className="border-none items-center flex mt-4 sm:mt-0">
           <Spinner aria-label="Loading spinner" size="md" />
-          <span className="pl-3 animate-pulse sm:text-[16px] text-[28px]">Loading...</span>
+          <span className="pl-3 animate-pulse sm:text-lg">Loading...</span>
         </div>
       ) :(
         <>

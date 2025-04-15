@@ -106,14 +106,14 @@ const toggleHome = () => {
     </div>
 
     {/* Post content */}
-    <div className="flex flex-col flex-grow max-w-full xl:max-w-2xl 2xl:max-w-3xl px-2">
+    <div className="flex-col flex-1 min-h-screen sm:min-w-[768px] xl:max-w-7xl mx-auto">
       <div className="flex items-center space-x-2 py-2 px-3 sticky top-0 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 rounded-md">
         <Tooltip content="Back" arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500">
           <Link href={`/national`}>
             <ArrowLeftIcon className="h-8 sm:h-6 cursor-pointer" />
           </Link>
         </Tooltip>
-        <h2 className="text-lg sm:text-xl font-bold truncate">
+        <h2 className="text-lg sm:text-xl font-bold max-w-96 truncate">
           {post?.data()?.text && (
             <span className="text-2xl sm:text-lg">{post?.data()?.text}</span>
           )}
@@ -131,7 +131,7 @@ const toggleHome = () => {
 
       {/* Comments */}
       {comments.length > 0 && (
-        <div className="mt-4 space-y-4">
+        <>
           {comments.map((comment) => (
             <Comment
               key={comment.id}
@@ -140,7 +140,7 @@ const toggleHome = () => {
               comment={comment.data()}
             />
           ))}
-        </div>
+  </>
       )}
     </div>
 
@@ -152,7 +152,7 @@ const toggleHome = () => {
       >
         <div
           onClick={(e) => e.stopPropagation()}
-          className="relative w-64 h-full"
+          className="relative  h-full"
         >
           <Widgets />
         </div>

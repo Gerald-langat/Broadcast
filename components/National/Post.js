@@ -544,17 +544,17 @@ const handleShare = async () => {
              ) : (
                <>
                {post?.data()?.userImg ? (
-         <Link href={`/userProfile/${uid}`}>
+         <Link href={`/userProfile/${uid}`} className="h-12 w-12 rounded-md">
            <img
-             className="sm:h-12 sm:w-12 h-14 w-14 rounded-md cursor-pointer mr-4 object-fit shadow-gray-800 shadow-sm dark:shadow-gray-600"
+             className="h-12 w-12  rounded-md cursor-pointer object-fit shadow-gray-800 shadow-sm dark:shadow-gray-600"
              src={post?.data()?.userImg}
              alt="user-img"
            />
          </Link>
        ) : (
-         <Link href={`/userProfile/${uid}`}>
+         <Link href={`/userProfile/${uid}`} className="h-12 w-12 rounded-md mr-1">
            <img
-             className="sm:h-12 sm:w-12 h-14 w-14 rounded-md cursor-pointer mr-4 object-fit shadow-gray-800 shadow-sm dark:shadow-gray-600"
+             className="h-12 w-12  rounded-md cursor-pointer object-fit shadow-gray-800 shadow-sm dark:shadow-gray-600"
              src={post?.data()?.imageUrl}
              alt="user-img"
            />
@@ -564,16 +564,16 @@ const handleShare = async () => {
         
        
              <div className="flex-1">
-               <div className="flex items-center justify-between">
+               <div className="flex items-center justify-between ml-1">
                  {/* post user info */}
-                 <div className="sm:flex sm:space-x-8">
+                 <div className="flex space-x-8">
                  <div className="flex items-center space-x-2 whitespace-nowrap dark:text-gray-300 ">
-                   <h4 className=" dark:text-gray-300 font-bold max-w-20 truncate text-xl sm:text-[15px] hover:underline ">
+                   <h4 className=" dark:text-gray-300 font-bold max-w-20 truncate text-lg  hover:underline ">
                      {post?.data()?.name}
                    </h4>
-                   <h4 className="font-bold text-xl sm:text-[15px] max-w-20 truncate dark:text-gray-300"> {post?.data()?.lastname}</h4>
-                <h4 className="max-w-20 truncate flex-1 text-xl sm:text-[15px] dark:text-gray-300">@{post?.data()?.nickname}</h4>
-                  <Badge className="text-[16px] hover:underline sm:-ml-28 dark:text-gray-300 md:text-sm py-0" color="gray"  icon={HiClock}>
+                   <h4 className="font-bold text-lg  max-w-20 truncate dark:text-gray-300"> {post?.data()?.lastname}</h4>
+                <h4 className="max-w-20 truncate flex-1 text-lg  dark:text-gray-300">@{post?.data()?.nickname}</h4>
+                  <Badge className="text-[16px] max-w-20 truncate hover:underline sm:-ml-28 dark:text-gray-300 md:text-sm py-0" color="gray"  icon={HiClock}>
                      <Moment fromNow>{post?.data()?.timestamp?.toDate()}</Moment>
                    </Badge>
                   
@@ -587,7 +587,7 @@ const handleShare = async () => {
                   
                    <TrashIcon
                       onClick={user?.id === post?.data()?.uid ? deleteRepost : deletePost}
-                     className="h-12 w-12 md:h-10 md:w-10 p-2 hover:text-red-600 hover:bg-red-100 rounded-full dark:hover:bg-gray-800"
+                     className="h-10 w-10 p-2 hover:text-red-600 hover:bg-red-100 rounded-full dark:hover:bg-gray-800"
                    />
                              
                  )}
@@ -711,7 +711,7 @@ const handleShare = async () => {
        
              </Link>
                ):(
-                 <Link href={`/userProfile/${uid}`}>
+                 <Link href={`/userProfile/${uid}`} >
                <img
                className="h-8 w-8 rounded-md mr-4 cursor-pointer"
                src={post?.data()?.citeImageUrl}
@@ -720,11 +720,14 @@ const handleShare = async () => {
        
              </Link>
                )}
-             <p className="flex space-x-2 items-center">{post?.data()?.fromUser}{" "}{post?.data()?.fromlastname}{" "}@{post?.data()?.fromNickname}{" "} 
-             <Badge className="py-0" color="gray" icon={HiClock}>
-                 <Moment fromNow>{post?.data()?.citetimestamp?.toDate().toLocaleString()}</Moment>
+             <div className="flex space-x-2 items-center w-full">
+             <p className="max-w-20 truncate ">{post?.data()?.fromUser}</p>{" "}
+             <p className="max-w-20 truncate ">{post?.data()?.fromlastname}</p>{" "}
+             <p className="max-w-20 truncate ">@{post?.data()?.fromNickname}</p>{" "} 
+             <Badge className="py-0 max-w-20 truncate " color="gray" icon={HiClock}>
+                 <Moment fromNow>{post?.data()?.citetimestamp?.toDate()}</Moment>
                </Badge>
-             </p>     
+             </div>     
        
             
                </div>
@@ -748,7 +751,7 @@ const handleShare = async () => {
                    alt=""
                    width={620}
          height={20} 
-         style={{ height: "300px" }}
+      
                  />
                {/* )} */}
        
@@ -837,7 +840,7 @@ const handleShare = async () => {
                      className="h-10 w-10 sm:h-10 sm:w-10 p-2 hover:text-sky-500 hover:bg-blue-100 rounded-full cursor-pointer  dark:hover:bg-gray-800"
                    />
                    {comments.length > 0 && (
-         <span className="text-[20px] sm:text-sm">{formatNumber(comments.length)}</span>
+         <span className="text-sm">{formatNumber(comments.length)}</span>
        )}
                  </div>
                  </Tooltip>
@@ -893,7 +896,7 @@ const handleShare = async () => {
                    )}
                    {likes.length > 0 && (
                      <span
-                       className='text-[20px] sm:text-sm select-none'
+                       className='text-sm select-none'
                      >
                        {" "}
                        {formatNumber(likes.length)}
@@ -905,7 +908,7 @@ const handleShare = async () => {
                  <Tooltip content='view' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
                    <div className="flex items-center">
                        <EyeIcon className="h-10 w-10 sm:h-10 sm:w-10 p-2 hover:text-sky-500 hover:bg-blue-100 rounded-full dark:hover:bg-gray-800"/>
-                       <span className="text-[20px] sm:text-sm">{formatNumber(viewCount)}</span> 
+                       <span className="text-sm">{formatNumber(viewCount)}</span> 
                    </div>
                    </Tooltip>
                 

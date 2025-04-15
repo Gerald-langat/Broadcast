@@ -107,7 +107,7 @@ const WardPost = () => {
           </div>
       
           {/* Feed */}
-          <div className="flex-grow max-w-full xl:max-w-2xl 2xl:max-w-3xl">
+          <div className="flex-col flex-1 min-h-screen sm:min-w-[768px] xl:max-w-7xl mx-auto">
             <div className="flex items-center space-x-2 py-3 w-full px-4 sticky top-0 bg-white dark:bg-gray-950 border-b dark:border-gray-800 border-gray-200">
               <Tooltip content="back" arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
                 <Link href={`/national`}>
@@ -137,7 +137,7 @@ const WardPost = () => {
           {/* Widgets */}
           {isWidgetsVisible && (
             <div className="fixed inset-0 z-30 bg-black bg-opacity-50 xl:hidden" onClick={() => setIsWidgetsVisible(false)}>
-              <div onClick={(e) => e.stopPropagation()} className="ml-8">
+              <div onClick={(e) => e.stopPropagation()} className="relative  h-full">
                 <Widgets />
               </div>
             </div>

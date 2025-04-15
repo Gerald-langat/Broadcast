@@ -50,7 +50,7 @@ function MemberPost({post}) {
                    }}
                  >
                   {followloading[post?.uid] ? (
-                     <Spinner aria-label="Loading spinner" size="sm" />
+                     <Spinner aria-label="Loading spinner" size="sm" className='mr-8'/>
                    ) : hasFollowed[post?.uid] ? (
                      <p className='text-sm w-20 truncate text-red-500'>Unfollow</p>
                    ) : (

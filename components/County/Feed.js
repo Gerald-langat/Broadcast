@@ -55,7 +55,7 @@ const { user } = useUser()
      <div className="xl:border-0 sm:border-x-[1px] dark:border-gray-700 border-gray-200">
      {loading ? (
         <Button color="gray" className="border-0 items-center flex mt-4 sm:mt-0">
-          <Spinner aria-label="Loading spinner" size="sm" />
+          <Spinner aria-label="Loading spinner" size="md" />
         </Button>
       ) : (
         <>

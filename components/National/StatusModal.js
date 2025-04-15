@@ -296,7 +296,7 @@ export default function StatusModal() {
                   <button
                     onClick={sendStatus}
                     disabled={!input.trim()}
-                    className="bg-blue-400 text-2xl sm:text-lg text-white px-4 py-1.5 rounded-full font-bold shadow-md hover:brightness-95 disabled:opacity-50"
+                    className="bg-blue-400 text-2xl sm:text-lg text-white px-4 py-1.5 rounded-full font-bold shadow-md hover:brightness-95 disabled:opacity-50 items-center"
                   >
                    {loading ? 'Posting...' : 'post'}
                   </button>

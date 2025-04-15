@@ -148,14 +148,14 @@ export default function Widgets() {
         <input
           className="border-0 dark:bg-gray-950 bg-gray-200 w-full text-2xl sm:text-lg placeholder:text-2xl  sm:placeholder:text-lg 
           dark:placeholder:text-gray-400 dark:text-gray-100 focus:ring-0 focus:outline-none 
-            border-gray-50 sm:py-2 py-6 z-50 rounded-full"
+            border-gray-50 sm:py-2 py-4 z-50 rounded-full"
           type="text"
           value={querySearch}
           onChange={e => setQuery(e.target.value)}
           placeholder="Search name/nickname..."
         />
         <div className={`p-1 bg-sky-500  rounded-full cursor-pointer hover:bg-sky-400 ${!querySearch ? 'hidden' : 'inline'}`}>
-          <XIcon className='sm:h-4 h-8' onClick={clearQuery}/>
+          <XIcon className='h-4 ' onClick={clearQuery}/>
         </div>
       </form>
            

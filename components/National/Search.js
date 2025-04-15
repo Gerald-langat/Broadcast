@@ -13,23 +13,23 @@ function SearchComponent({ post }) {
           <div className="flex items-center">
           {post?.data()?.userImg ? (
             <img
-              className="sm:h-9 sm:w-9 h-12 w-12 rounded-full mb-1 ml-1 mt-1 mr-1"
+              className="sm:h-9 sm:w-9 h-12 w-12 rounded-md mb-1 ml-1 mt-1 mr-1"
               src={post.data().userImg}
               alt="user-img"
             />
           ): (
             <img
-              className="sm:h-9 sm:w-9 h-12 w-12 rounded-full mb-1 ml-1 mt-1 mr-1"
+              className="sm:h-9 sm:w-9 h-12 w-12 rounded-md mb-1 ml-1 mt-1 mr-1"
               src={post?.data()?.imageUrl}
               alt="user-img"
             />
           )}
             
           </div>
-            <div className='flex space-x-2 text-2xl sm:text-sm'>
-              <p>{post.data().name}</p>
-              <p>{post.data().lastname}</p>
-              <p className="text-gray-400">@{post.data().nickname}</p>
+            <div className='flex space-x-2 text-lg sm:text-sm'>
+              <p className='max-w-24 truncate '>{post.data().name}lkdlfkdfd</p>
+              <p className='max-w-24 truncate '>{post.data().lastname}lkflvcc</p>
+              <p className="max-w-24 truncate text-gray-400">@{post.data().nickname}lskddsdfd</p>
             </div>
         </div>
 </Link>

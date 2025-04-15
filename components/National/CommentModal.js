@@ -139,7 +139,7 @@ export default function CommentModal() {
         <Modal
           isOpen={open}
           onRequestClose={() => setOpen(false)}
-          className="max-w-lg w-[90%]  absolute top-24  left-[50%] translate-x-[-50%] bg-gray-200 rounded-md shadow-md border-none"
+          className="max-w-lg w-[90%]  absolute top-24  left-[50%] translate-x-[-50%] dark:bg-gray-950 bg-gray-200 rounded-md shadow-md border-none"
         >
           <div className="p-1 dark:bg-gray-950 rounded-md">
             <div className="border-b dark:border-gray-900 py-2 px-1.5">
@@ -152,35 +152,35 @@ export default function CommentModal() {
               </Tooltip>
               </div>
             </div>
-            <div className="p-2 flex items-center space-x-1 relative">
+            <div className="p-2 flex items-center space-x-1 relative ">
             {post?.data()?.userImg ? (
               <img
-                className="sm:h-10 h-16 sm:w-10 w-16 rounded-md mr-4"
+                className="sm:h-10 h-16 sm:w-10 w-16 rounded-md mr-1"
                 src={post?.data()?.userImg}
                 alt="user-img"
               />
             ):(
               <img
-                className="sm:h-10 h-16 sm:w-10 w-16 rounded-md mr-4"
+                className="sm:h-10 h-16 sm:w-10 w-16 rounded-md mr-1"
                 src={post?.data()?.imageUrl}
                 alt="user-img"
               />
             )}
               
-              <h4 className="font-bold text-[20px] sm:text-[16px] hover:underline">
+              <h4 className="font-bold max-w-20 truncate">
                 {post?.data()?.name}
               </h4>
-              <h4 className="font-bold">
+              <h4 className="font-bold max-w-20 truncate">
                 {post?.data()?.lastname}
               </h4>
-              <span className="text-[20px] sm:text-[16px] font-bold">
+              <span className=" font-bold max-w-20 truncate">
                 @{post?.data()?.nickname} -{" "}
               </span>
-              <span className="text-[20px] sm:text-[16px] hover:underline">
+              <span className=" max-w-20  text-sm">
                 <Moment fromNow>{post?.data()?.timestamp?.toDate()}</Moment>
               </span>
             </div>
-            <p className="text-gray-500 text-[20px] sm:text-[16px] ml-16 mb-2 dark:text-gray-100 ">
+            <p className="text-gray-900 ml-16 mb-2 dark:text-gray-100 line-clamp-3 break-words">
               {post?.data()?.text}
             </p>
 
