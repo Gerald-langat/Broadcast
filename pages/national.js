@@ -94,9 +94,9 @@ function Home() {
       
         {/* Bottom Menu */}
         <div className="xl:hidden justify-between bottom-0 z-40 fixed bg-slate-50 dark:bg-gray-900 w-full flex py-4 sm:px-10 md:px-24 px-4">
-          <MenuAlt1Icon className="pl-4 h-9 cursor-pointer" onClick={toggleSidebar} />
-          <HomeIcon className="h-9 cursor-pointer" onClick={toggleHome} />
-          <SearchIcon className="pr-6 h-9 cursor-pointer" onClick={toggleWidgets} />
+          <MenuAlt1Icon className="pl-4 h-8 cursor-pointer" onClick={toggleSidebar} />
+          <HomeIcon className="h-8 cursor-pointer" onClick={toggleHome} />
+          <SearchIcon className="pr-6 h-8 cursor-pointer" onClick={toggleWidgets} />
         </div>
       </div>
   );

@@ -586,7 +586,7 @@ const handleShare = async () => {
                   
                    <TrashIcon
                       onClick={user?.id === post?.data()?.uid ? deleteRepost : deletePost}
-                     className="h-10 w-10 p-2 hover:text-red-600 hover:bg-red-100 rounded-full dark:hover:bg-gray-800"
+                     className="h-9 w-9 p-2 hover:text-red-600 hover:bg-red-100 rounded-full dark:hover:bg-gray-800"
                    />
                              
                  )}
@@ -696,7 +696,7 @@ const handleShare = async () => {
                {/* display cite */}
                {post?.data()?.citeInput ? (
                  <div>
-               <p onClick={() => router.push(`/posts(id)/${id}`)} className="sm:text-[16px]">{post?.data()?.citeInput}</p>
+               <p onClick={() => router.push(`/posts(id)/${id}`)} className="text-md">{post?.data()?.citeInput}</p>
                <div className="border-[1px] rounded-md dark:border-gray-900 dark:hover:bg-gray-800 border-gray-200 hover:bg-neutral-300"  onClick={() => router.push(`/posts(id)/${id}`)}>
                <div className="flex p-1">
                {post?.data()?.citeUserImg ? (
@@ -730,7 +730,7 @@ const handleShare = async () => {
        
             
                </div>
-               <p className="line-clamp-3 w-96 break-words  text-md sm:text-[16px]" onClick={() => router.push(`/posts(id)/${id}`)}>{post?.data()?.text}</p>
+               <p className="line-clamp-3 w-96 break-words  text-sm sm:text-[16px]" onClick={() => router.push(`/posts(id)/${id}`)}>{post?.data()?.text}</p>
        
                {/* {post?.data()?.images?.length > 1 ? (
                    <Carousel className={`${!post?.data()?.images ? 'hidden' : "rounded-2xl mr-2 h-[300px] w-[500px] sm:w-full xl:h-[250px] sm:h-[600px] -z-10"}`}>
@@ -836,7 +836,7 @@ const handleShare = async () => {
                          setOpen(!open);
                        
                      }}
-                     className="h-10 w-10 sm:h-10 sm:w-10 p-2 hover:text-sky-500 hover:bg-blue-100 rounded-full cursor-pointer  dark:hover:bg-gray-800"
+                     className="h-10 w-10 p-2 hover:text-sky-500 hover:bg-blue-100 rounded-full cursor-pointer  dark:hover:bg-gray-800"
                    />
                    {comments.length > 0 && (
          <span className="text-sm">{formatNumber(comments.length)}</span>
@@ -844,7 +844,7 @@ const handleShare = async () => {
                  </div>
                  </Tooltip>
                  <Tooltip content='recast' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-                 <ReplyIcon className="h-10 w-10 sm:h-10 sm:w-10 p-2 hover:text-sky-500 hover:bg-blue-100 rounded-full dark:hover:bg-gray-800" onClick={repost} />
+                 <ReplyIcon className="h-10 w-10 p-2 hover:text-sky-500 hover:bg-blue-100 rounded-full dark:hover:bg-gray-800" onClick={repost} />
                </Tooltip>
                <Tooltip content='cite' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1 shadow-sm shadow-gray-500 dark:shadow-gray-400">
                <Popover
@@ -873,7 +873,7 @@ const handleShare = async () => {
                  </div>
                }
              >
-              <PencilAltIcon className="h-10 w-10 sm:h-10 sm:w-10 p-2"/>
+              <PencilAltIcon className="h-10 w-10 p-2"/>
              </Popover>
                
                </Tooltip>
@@ -882,14 +882,14 @@ const handleShare = async () => {
                    <Tooltip content='unlike' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
                      <HeartIcon fill="red"
                        onClick={likePost}
-                       className="h-10 w-10 sm:h-10 sm:w-10 p-2 text-red-600 dark:hover:bg-red-900 hover:bg-red-300 rounded-full"
+                       className="h-10 w-10 p-2 text-red-600 dark:hover:bg-red-900 hover:bg-red-300 rounded-full"
                      />
                      </Tooltip>
                    ) : (
                  <Tooltip content='like' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
                      <HeartIcon
                        onClick={likePost}
-                       className="h-10 w-10 sm:h-10 sm:w-10 p-2 hover:text-red-600 hover:bg-red-300 rounded-full dark:hover:bg-red-900"
+                       className="h-10 w-10 p-2 hover:text-red-600 hover:bg-red-300 rounded-full dark:hover:bg-red-900"
                      />
                      </Tooltip>
                    )}
@@ -906,13 +906,13 @@ const handleShare = async () => {
                  </div>
                  <Tooltip content='view' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
                    <div className="flex items-center">
-                       <EyeIcon className="h-10 w-10 sm:h-10 sm:w-10 p-2 hover:text-sky-500 hover:bg-blue-100 rounded-full dark:hover:bg-gray-800"/>
+                       <EyeIcon className="h-10 w-10 p-2 hover:text-sky-500 hover:bg-blue-100 rounded-full dark:hover:bg-gray-800"/>
                        <span className="text-sm">{formatNumber(viewCount)}</span> 
                    </div>
                    </Tooltip>
                 
                <Tooltip content='share' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-                 <ShareIcon className="h-10 w-10 sm:h-10 sm:w-10 p-2 hover:text-sky-500 hover:bg-blue-100 rounded-full dark:hover:bg-gray-800" onClick={handleShare}/>
+                 <ShareIcon className="h-10 w-10 p-2 hover:text-sky-500 hover:bg-blue-100 rounded-full dark:hover:bg-gray-800" onClick={handleShare}/>
                </Tooltip>
                
               

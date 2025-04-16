@@ -70,18 +70,15 @@ const { user } = useUser()
   };
 
   return (
+
     <div className='flex border-[1px] border-gray-200 dark:border-gray-950 rounded-md mt-1  '>
+    {posts.length > 0 && (
+        <>
     <ChevronLeftIcon
               className="h-14 text-blue-300 hover:scale-125 transition transform duration-500 cursor-pointer hover:text-blue-500 pl-4"
               onClick={handlePrevClick}
             />
-      {posts.length > 0 && (
-        <>
-         
-            
-           
-       
-        
+      
             <div className="flex space-x-2 p-2 justify-center rounded-sm items-center overflow-hidden w-full">
             {posts.slice(currentIndex, currentIndex + postsPerPage).map((post) => (
               <div key={post.id}>
@@ -90,12 +87,15 @@ const { user } = useUser()
               </div>
             ))}
           </div>      
-        </>
-      )}
+        
+     
        <ChevronRightIcon
               className="h-14 text-blue-300 hover:scale-125 transition transform duration-500 cursor-pointer hover:text-blue-500 pr-4"
               onClick={handleNextClick}
             />
+
+            </>
+             )}
     </div>
   );
 }

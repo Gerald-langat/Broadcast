@@ -346,7 +346,7 @@ export default function Comment({ comment, commentId, originalPostId }) {
     <div className={`${isHidden ? 'hidden' : "flex p-3 cursor-pointer pl-20"}`}>
 
       {/* user image */}
-      <Link href={`/userProfile/${uid}`} className="h-11 w-11 bg-red-600">
+      <Link href={`/userProfile/${uid}`} className="h-11 w-11">
       {comment?.userImg ? (
         <img
         className="h-11 w-11 rounded-full mr-4"
@@ -490,7 +490,7 @@ export default function Comment({ comment, commentId, originalPostId }) {
 
               {/* image */}
         <div>
-        <p className="text-gray-800 text-[20px] sm:text-[16px] mb-2 dark:text-gray-300">
+        <p className="text-gray-800 text-sm sm:text-lg mb-2 dark:text-gray-300">
           {comment?.comment} 
          </p>
         {comment?.images ? (
