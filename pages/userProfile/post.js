@@ -22,7 +22,7 @@ function post({ post, id }) {
                     <Link href={`/posts(id)/${id}`}>
           
             <img
-                  className={` ${!post?.images ? 'hidden' : "rounded-md h-[300px] w-[450px] sm:w-full sm:h-[600px] xl:h-[200px] mr-2 object-cover"}`}
+                  className={` ${!post?.images ? 'hidden' : "rounded-md h-[200px] w-[350px] sm:w-full sm:h-[600px] xl:h-[200px] mr-2 object-cover"}`}
                   src={post?.images}
                   alt=''
                   onClick={() => router.push(`/posts(id)/${id}`)}
@@ -38,7 +38,7 @@ function post({ post, id }) {
             e.currentTarget.pause();
          
           }}
-          className="rounded-2xl h-[300px] w-[450px] sm:w-full xl:h-[200px] sm:h-[600px] mr-2 object-cover"
+          className="rounded-2xl h-[200px] w-[350px] sm:w-full xl:h-[200px] sm:h-[600px] mr-2 object-cover"
           src={post?.video}
           alt=""
           controls

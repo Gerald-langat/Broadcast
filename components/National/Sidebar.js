@@ -172,9 +172,9 @@ export default function Sidebar() {
     .filter((post) => post?.uid === user?.id) // Only the current user
     .map((post) => (
       <Link href={`/userProfile/${post?.uid}`} key={post.id}>
-        <div className="flex items-center w-fit p-1">
+        <div className="flex items-center justify-between w-full  p-1">
           {/* Profile Image */}
-          <div className="m-4">
+          <div className="mr-2">
             {post?.userImg ? (
               <img
                 className="h-14 w-14 sm:h-10 sm:w-10 object-cover rounded-md shadow-gray-800 shadow-sm dark:shadow-gray-600"
@@ -191,10 +191,10 @@ export default function Sidebar() {
           </div>
 
           {/* User Info */}
-          <div className="flex-1 w-full">
+          <div className="flex-1">
             <div className="flex dark:text-gray-200 text-lg">
-              <p className="mr-1">{post?.name}</p>
-              <p className="mr-1">{post?.lastname}</p>
+              <p className="mr-1 w-20 truncate">{post?.name}</p>
+              <p className="mr-1 w-20 truncate">{post?.lastname}</p>
             </div>
             <div className="font-bold text-lg truncate w-28 sm:text-sm text-gray-500">
               @{post?.nickname}
@@ -211,7 +211,7 @@ export default function Sidebar() {
       <Link href={`/userProfile/${post?.uid}`} key={post.id}>
         <div className="flex items-center w-fit p-1">
           {/* Profile Image */}
-          <div className="m-4">
+          <div className="mr-2">
             {post?.userImg ? (
               <img
                 className="h-14 w-14 sm:h-10 sm:w-10 object-cover rounded-md shadow-gray-800 shadow-sm dark:shadow-gray-600"
@@ -230,8 +230,8 @@ export default function Sidebar() {
           {/* User Info */}
           <div className="flex-1 w-full">
             <div className="flex dark:text-gray-200 text-lg">
-              <p className="mr-1 w-16 truncate">{post?.name}</p>
-              <p className="mr-1 w-16 truncate">{post?.lastname}</p>
+              <p className="mr-1 w-20 truncate">{post?.name}</p>
+              <p className="mr-1 w-20 truncate">{post?.lastname}</p>
             </div>
             <div className="font-bold text-lg truncate w-28 sm:text-sm text-gray-500">
               @{post?.nickname}

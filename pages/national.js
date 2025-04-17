@@ -61,7 +61,7 @@ function Home() {
           {/* Sidebar */}
           {isSidebarVisible && (
             <div className="fixed inset-0 z-30 xl:hidden w-full" onClick={() => setIsSidebarVisible(false)}>
-              <div onClick={(e) => e.stopPropagation()} className="relative">
+              <div onClick={(e) => e.stopPropagation()}>
                 <Sidebar />
               </div>
             </div>
@@ -78,7 +78,7 @@ function Home() {
           {/* Widgets */}
           {isWidgetsVisible && (
             <div className="fixed inset-0 z-30 bg-white dark:bg-gray-950 xl:hidden" onClick={() => setIsWidgetsVisible(false)}>
-              <div onClick={(e) => e.stopPropagation()} className="relative ">
+              <div onClick={(e) => e.stopPropagation()}>
                 <Widgets />
               </div>
             </div>
