@@ -15,7 +15,7 @@ export default function Trends({ topic, postCount }) {
 
   return (
     <div className="dark:bg-gray-950  lg:inline  space-y-5 py-2">      
-        <div className=' dark:bg-gray-950 cursor-pointer ml-3 bg-slate-50'>       
+        <div className=' dark:bg-gray-950 cursor-pointer bg-slate-50'>       
           <div className=" dark:bg-gray-950 items-center py-2 px-4  hover:bg-slate-200">
           <Link href={`/nationtrend/${topic.topic}`}>
           <div className='lg:w-[380px] 2xl:w-[400px] sm:w-[88%] w-[570px] dark:hover:bg-gray-900 flex flex-col dark:text-gray-300 hover:scale-105 

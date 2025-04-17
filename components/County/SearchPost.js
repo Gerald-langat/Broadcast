@@ -501,12 +501,12 @@ useEffect(
                        <div className="flex items-center justify-between ml-1">
                          <div className="flex space-x-8">
                          <div className="flex items-center space-x-2 whitespace-nowrap dark:text-gray-300 ">
-                           <h4 className=" dark:text-gray-300 font-bold max-w-20 truncate text-lg  hover:underline ">
+                           <h4 className=" dark:text-gray-300 font-bold max-w-20 truncate text-lg">
                              {post?.data()?.name}
                            </h4>
                            <h4 className="font-bold text-lg  max-w-20 truncate dark:text-gray-300"> {post?.data()?.lastname}</h4>
                         <h4 className="max-w-20 truncate flex-1 text-lg  dark:text-gray-300">@{post?.data()?.nickname}</h4>
-                          <Badge className="text-[16px] max-w-20 truncate hover:underline sm:-ml-28 dark:text-gray-300 md:text-sm py-0" color="gray"  icon={HiClock}>
+                          <Badge className="text-[16px] max-w-20 truncate sm:-ml-28 dark:text-gray-300 md:text-sm py-0" color="gray"  icon={HiClock}>
                              <Moment fromNow>{post?.data()?.timestamp?.toDate()}</Moment>
                            </Badge>
                           

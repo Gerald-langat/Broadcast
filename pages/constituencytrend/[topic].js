@@ -101,8 +101,8 @@ export default function TopicPostsPage() {
              </div>
          
              {/* Feed */}
-             <div className="flex-col min-w-0 sm:min-w-[400px] mx-auto">
-               <div className="flex items-center space-x-2 py-3 w-full px-4 sticky top-0 bg-white dark:bg-gray-950 border-b dark:border-gray-800 border-gray-200">
+             <div className="flex-col w-full sm:min-w-[400px] mx-auto">
+               <div className="flex space-x-2 py-3 w-full px-4 sticky top-0 bg-white dark:bg-gray-950 border-b dark:border-gray-800 border-gray-200">
                  <Tooltip content="back" arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
                    <Link href={`/constituency`}>
                      <ArrowLeftIcon className="h-8 sm:h-8 cursor-pointer animate-pulse" />

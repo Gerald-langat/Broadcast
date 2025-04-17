@@ -85,7 +85,7 @@ export default function TopicPostsPage() {
         <meta name="description" content="Generated and created by redAndttech" />
         <link rel="icon" href="../../images/Brodcast.jpg" />
       </Head>
-        <main className="flex max-w-7xl mx-auto">
+        <main className="flex flex-1 min-h-screen sm:min-w-[768px] xl:max-w-7xl mx-auto mb-12">
                       {/* Sidebar for mobile */}
                       {isSidebarVisible && (
                         <div className="fixed inset-0 z-30 bg-black bg-opacity-50 xl:hidden" onClick={() => setIsSidebarVisible(false)}>
@@ -101,8 +101,8 @@ export default function TopicPostsPage() {
                       </div>
                   
                       {/* Feed */}
-                      <div className="flex-1 min-w-0 sm:min-w-[400px] mx-auto">
-                        <div className="flex items-center space-x-2 py-3 w-full px-4 sticky top-0 bg-white dark:bg-gray-950 border-b dark:border-gray-800 border-gray-200">
+                      <div className="flex-1 w-full sm:min-w-[400px] mx-auto">
+                        <div className="flex space-x-2 py-3 w-full px-4 sticky top-0 bg-white dark:bg-gray-950 border-b dark:border-gray-800 border-gray-200">
                           <Tooltip content="back" arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
                             <Link href={`/ward`}>
                               <ArrowLeftIcon className="h-8 sm:h-8 cursor-pointer animate-pulse" />
@@ -130,7 +130,7 @@ export default function TopicPostsPage() {
                       {/* Widgets */}
                       {isWidgetsVisible && (
                         <div className="fixed inset-0 z-30 bg-black bg-opacity-50 xl:hidden" onClick={() => setIsWidgetsVisible(false)}>
-                          <div onClick={(e) => e.stopPropagation()} className="ml-8">
+                          <div onClick={(e) => e.stopPropagation()} >
                             <Widgets />
                           </div>
                         </div>

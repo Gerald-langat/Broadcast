@@ -52,7 +52,6 @@ export default function Feed() {
         {loading ? (
           <Button color="gray" className="border-0">
             <Spinner aria-label="Loading spinner" size="sm" />
-            <span className="pl-3 animate-pulse">Loading...</span>
           </Button>
         ) : (
           <AnimatePresence>

@@ -210,7 +210,7 @@ export default function Widgets() {
                 </Button>
               ): (
                 <div>
-                <div className="items-center justify-center  -mt-2 ">
+                <div className="items-center justify-center -mt-2 ">
                 
                 {trendingTopics.map((topic) => (
                   <>

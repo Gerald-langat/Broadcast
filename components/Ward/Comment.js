@@ -338,12 +338,12 @@ const submitReport = async () => {
 const uid = comment?.uid
 
   return (
-    <div className="border-b-[1px] ">
+    <div className="border-b-[1px] dark:border-gray-900">
             <div className={`w-full ${isHidden ? 'inline text-2xl sm:text-xl cursor-pointer dark:hover:bg-gray-900 hover:bg-gray-200 rounded-md p-1' : 'hidden'}`} onClick={handleUndo}>{showUndo && 'undo'}</div>
             <div className={`${isHidden ? 'hidden' : "flex p-3 cursor-pointer pl-20"}`}>
         
               {/* user image */}
-              <Link href={`/userProfile/${uid}`}>
+              <Link href={`/userProfile/${uid}`} className="h-11 w-11">
               {comment?.userImg ? (
                 <img
                 className="h-11 w-11 rounded-full mr-4"
@@ -367,13 +367,13 @@ const uid = comment?.uid
                 <div className="flex items-center justify-between">
                   {/* post user info */}
                   <div className="flex items-center space-x-1 whitespace-nowrap">
-                    <h4 className="font-bold text-[20px] sm:text-[16px] hover:underline">
+                    <h4 className="font-bold text-lg">
                       {comment?.name}
                     </h4>
-                    <span className="text-[20px] sm:text-[15px]">
+                    <span className="text-[15px]">
                       @{comment?.nickname} -{" "}
                     </span>
-                    <span className="text-[20px] sm:text-[15px] hover:underline">
+                    <span className="text-[15px]">
                       <Moment fromNow>{comment?.timestamp?.toDate()}</Moment>
                     </span>
                   </div>
@@ -381,7 +381,7 @@ const uid = comment?.uid
                    
                    <TrashIcon
                       onClick={user?.id === comment?.uid ? deleteRepost : deleteComment}
-                     className="h-12 w-12 md:h-9 md:w-9 p-2 hover:text-red-600 hover:bg-red-100 rounded-full dark:hover:bg-gray-800"
+                     className="h-9 w-9 p-2 hover:text-red-600 hover:bg-red-100 rounded-full dark:hover:bg-gray-800"
                    />
                              
                  )}
@@ -487,14 +487,14 @@ const uid = comment?.uid
         
                       {/* image */}
                 <div>
-                <p className="text-gray-800 text-[20px] sm:text-[16px] mb-2 dark:text-gray-300">
+                <p className="text-gray-800 text-sm sm:text-lg mb-2 dark:text-gray-300">
                   {comment?.comment} 
                  </p>
                 {comment?.images ? (
-                  <img src={comment?.images} alt="" className={`${!comment?.images ? 'hidden' : "h-60 w-full object-fit rounded-md"}`}/>
+                  <img src={comment?.images} alt="" className={`${!comment?.images ? 'hidden' : "h-60 w-full object-cover rounded-md"}`}/>
                 ): (
                   <video 
-                  autoPlay
+                  autoplay
                   muted
                   controls
                   src={comment?.videos} alt="" className={`${!comment?.videos ? 'hidden' : "h-60 w-full object-cover rounded-md"}`}/>
@@ -512,7 +512,7 @@ const uid = comment?.uid
         
                       <HeartIconFilled
                         onClick={likeComment}
-                        className="sm:h-9 sm:w-9 h-12 w-12 rounded-full cursor-pointer p-2 text-red-700 hover:bg-red-100 dark:hover:bg-neutral-700"
+                        className="h-9 w-9  rounded-full cursor-pointer p-2 text-red-700 hover:bg-red-100 dark:hover:bg-neutral-700"
                       />
                       </Tooltip>
                     ) : (
@@ -520,13 +520,13 @@ const uid = comment?.uid
         
                       <HeartIcon
                         onClick={likeComment}
-                        className="sm:h-9 sm:w-9 h-12 w-12 rounded-full cursor-pointer p-2 hover:text-red-600 hover:bg-red-100 dark:hover:bg-neutral-700"
+                        className="h-9 w-9  rounded-full cursor-pointer p-2 hover:text-red-600 hover:bg-red-100 dark:hover:bg-neutral-700"
                       />
                       </Tooltip>
                     )}
                     {likes.length > 0 && (
                       <span
-                        className='text-[20px] sm:text-sm select-none'
+                        className='text-sm select-none'
                       >
                         {" "}
                         {formatNumber(likes.length)}
@@ -536,9 +536,9 @@ const uid = comment?.uid
          
                  
                   <Tooltip content='share' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-                   <ShareIcon className="sm:h-9 sm:w-9 h-12 w-12 rounded-full cursor-pointer p-2 hover:text-sky-500 hover:bg-sky-100 dark:hover:bg-neutral-700" onClick={handleShare}/>
+                   <ShareIcon className="h-9 w-9 rounded-full cursor-pointer p-2 hover:text-sky-500 hover:bg-sky-100 dark:hover:bg-neutral-700" onClick={handleShare}/>
                   </Tooltip>
-                  <ReplyIcon className="sm:h-9 sm:w-9 h-12 w-12 rounded-full cursor-pointer p-2 hover:text-sky-500 hover:bg-sky-100 dark:hover:bg-neutral-700" onClick={repost}/>
+                  <ReplyIcon className="h-9 w-9 rounded-full cursor-pointer p-2 hover:text-sky-500 hover:bg-sky-100 dark:hover:bg-neutral-700" onClick={repost}/>
                 </div>
               </div>
         

@@ -36,7 +36,7 @@ const { user } = useUser()
   };
 
   return (
-    <div className="dark:bg-gray-950 lg:w-[380px] 2xl:w-[400px] sm:w-[88%] w-[570px] ml-2 space-y-5  py-2">      
+    <div className="dark:bg-gray-950 lg:w-[380px] 2xl:w-[400px] sm:w-[88%] w-[570px] space-y-5  py-2">      
     <div className='cursor-pointer dark:bg-gray-950'>       
       <div className="w-full items-center py-2 px-1 hover:bg-slate-200 dark:text-gray-100 dark:hover:bg-gray-900 hover:scale-105 transition transform duration-500">
           <Link href={`/wardtrend/${topic.topic}`}>

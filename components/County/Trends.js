@@ -37,7 +37,7 @@ export default function Trends({ topic, postCount }) {
   };
 
   return (
-    <div className="dark:bg-gray-950 lg:w-[380px] 2xl:w-[400px] sm:w-[88%] w-[570px] ml-2 space-y-5 py-2">      
+    <div className="dark:bg-gray-950 lg:w-[380px] 2xl:w-[400px] sm:w-[88%] w-[570px] space-y-5 py-2">      
         <div className='dark:bg-gray-950 cursor-pointer bg-slate-50'>       
           <div className="dark:bg-gray-950 items-center py-2 px-4 hover:bg-slate-200">
           <Link href={`/countytrend/${topic.topic}`}>
