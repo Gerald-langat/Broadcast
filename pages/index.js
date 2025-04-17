@@ -22,7 +22,12 @@ function Index() {
 
   useEffect(() => {
     if (!user?.id) return;
-
+  
+    const pathname = window.location.pathname;
+  
+    // Prevent redirect if user is already on a deep link (e.g., /national/post/123)
+    const isOnHomePage = pathname === '/' || pathname === '/index';
+  
     const checkUserExists = async () => {
       try {
         const userQuery = query(
@@ -30,8 +35,10 @@ function Index() {
           where('uid', '==', user.id)
         );
         const querySnapshot = await getDocs(userQuery);
-
-        if (querySnapshot.empty) {
+  
+        if (!querySnapshot.empty && isOnHomePage) {
+          router.push('/national');
+        } else if (isOnHomePage) {
           router.push('/form');
         }
       } catch (error) {
