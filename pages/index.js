@@ -31,11 +31,7 @@ function Index() {
         );
         const querySnapshot = await getDocs(userQuery);
 
-        if (!querySnapshot.empty) {
-          // If user already has posts, go to /national
-          router.push('/national');
-        } else {
-          // If user doesn't have posts, go to /form
+        if (querySnapshot.empty) {
           router.push('/form');
         }
       } catch (error) {
