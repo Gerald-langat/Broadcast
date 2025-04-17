@@ -101,12 +101,12 @@ const toggleHome = () => {
              )}
          
              {/* Sidebar for desktop */}
-             <div className="hidden xl:inline-flex  ">
+             <div className="hidden xl:inline-flex w-[20%] ">
                <Sidebar />
              </div>
          
              {/* Feed */}
-             <div className="flex-col w-full sm:min-w-[768px] mx-auto">
+             <div className="flex-col w-full sm:min-w-[400px] mx-auto">
                <div className="flex items-center space-x-2 py-3 w-full px-4 sticky top-0 bg-white dark:bg-gray-950 border-b dark:border-gray-800 border-gray-200">
                  <Tooltip content="back" arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
                    <Link href={`/ward`}>
@@ -142,7 +142,7 @@ const toggleHome = () => {
                </div>
              )}
          
-             <div className="hidden xl:inline-flex w-[320px]">
+             <div className="hidden xl:inline-flex w-[30%]">
                <Widgets />
              </div>
          
