@@ -123,37 +123,37 @@ export default function Sidebar() {
           <Link href='/national'>
             <div className='flex cursor-pointer items-center space-x-4 dark:text-gray-200 dark:hover:bg-gray-900 hover:bg-gray-200 rounded-full w-full px-2 sm:py-2 py-4'>
               <HomeIcon className='h-6'/>
-              <span className='text-2xl sm:text-lg'>Home</span>
+              <span className='sm:text-lg'>Home</span>
             </div>
             </Link>
             <Link href='/media'>
             <div className='flex  items-center space-x-4 dark:text-gray-200 cursor-pointer dark:hover:bg-gray-900 hover:bg-gray-200 rounded-full w-full px-2 sm:py-2 py-4'>
               <PauseIcon className='h-6'/>
-              <span className='text-2xl sm:text-lg'>Media</span>
+              <span className='text-lg'>Media</span>
             </div>
             </Link>
             <Link href='/news'>
             <div className='flex  items-center space-x-4 dark:text-gray-200 cursor-pointer dark:hover:bg-gray-900 hover:bg-gray-200 rounded-full w-full px-2 sm:py-2 py-4'>
               <NewspaperIcon className='h-6'/>
-              <span className='text-2xl sm:text-lg'>News</span>
+              <span className='text-lg'>News</span>
             </div>
             </Link>
             <Link href='/marketplace'>
             <div className='flex  items-center space-x-4 dark:text-gray-200 dark:hover:bg-gray-900 hover:bg-gray-200 rounded-full w-full px-2 sm:py-2 py-4 cursor-pointer'>
               <OfficeBuildingIcon className='h-6'/>
-              <span className='text-2xl sm:text-lg'>MarketPlace</span>
+              <span className='text-lg'>MarketPlace</span>
             </div>
             </Link>
             <Link href={'/messages'}>
             <div className='flex  items-center space-x-4 dark:text-gray-200 dark:hover:bg-gray-900 hover:bg-gray-200 rounded-full w-full px-2 sm:py-2 py-4 cursor-pointer'>
               <InboxInIcon className='h-6'/>
-              <span className='text-2xl sm:text-lg'>Message</span>
+              <span className='text-lg'>Message</span>
             </div>
             </Link>
             <Link href={'/profile'}>
             <div className='flex items-center space-x-4 dark:text-gray-200 dark:hover:bg-gray-900 hover:bg-gray-200 rounded-full w-full px-2 sm:py-2 py-4 cursor-pointer'>
               <UserIcon className='h-6'/>
-              <span className='text-2xl sm:text-lg'>Profile</span>
+              <span className='text-lg'>Profile</span>
             </div>
             </Link>
           </div>
