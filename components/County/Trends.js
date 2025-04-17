@@ -43,7 +43,7 @@ export default function Trends({ topic, postCount }) {
           <Link href={`/countytrend/${topic.topic}`}>
           <div className='w-full px-1 flex flex-col dark:text-gray-300 dark:hover:bg-gray-900 hover:scale-105 transition transform duration-500'>
           <h6 className='text-sm'>Trending in {userData && userData.county}</h6>
-            <span className="font-bold  dark:text-gray-300 text-gray-950">{topic.topic}</span>
+            <span className="font-bold  dark:text-gray-300 text-gray-950 w-96 truncate">{topic.topic}</span>
             <span className='text-sm'>{formatNumber(postCount)} posts</span>
             </div>
             </Link>

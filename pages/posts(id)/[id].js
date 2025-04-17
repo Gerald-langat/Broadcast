@@ -85,7 +85,7 @@ const toggleHome = () => {
     <link rel="icon" href="../../images/Brodcast.jpg" />
   </Head>
 
-  <div className="flex flex-1 w-full max-w-7xl mx-auto px-2 sm:px-4">
+  <div className="flex flex-1 min-h-screen sm:min-w-[768px] xl:max-w-7xl mx-auto mb-12">
 
     {/* Sidebar */}
     {isSidebarVisible && (
@@ -106,8 +106,8 @@ const toggleHome = () => {
     </div>
 
     {/* Post content */}
-    <div className="flex-col flex-1 min-h-screen sm:min-w-[768px] xl:max-w-7xl mx-auto">
-      <div className="flex items-center space-x-2 py-2 px-3 sticky top-0 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 rounded-md">
+    <div className="flex-col min-w-0 sm:min-w-[400px] mx-auto">
+      <div className="flex items-start  space-x-2 py-2 px-3 sticky top-0 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 rounded-md">
         <Tooltip content="Back" arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500">
           <Link href={`/national`}>
             <ArrowLeftIcon className="h-8 sm:h-6 cursor-pointer" />
@@ -123,7 +123,6 @@ const toggleHome = () => {
       {loading ? (
         <Button color="gray" className="border-0 mt-4">
           <Spinner aria-label="Loading" size="sm" />
-          <span className="pl-3">Loading...</span>
         </Button>
       ) : (
         <Post id={id} post={post} />
@@ -169,11 +168,11 @@ const toggleHome = () => {
   <StatusModal />
 
   {/* Bottom Navigation for Mobile */}
-  <div className="xl:hidden fixed bottom-0 left-0 w-full z-40 bg-slate-50 dark:bg-gray-900 flex justify-around items-center py-3 border-t border-gray-200 dark:border-gray-800">
-    <MenuAlt1Icon className="h-8 w-8 cursor-pointer" onClick={toggleSidebar} />
-    <HomeIcon className="h-8 w-8 cursor-pointer" onClick={toggleHome} />
-    <SearchIcon className="h-8 w-8 cursor-pointer" onClick={toggleWidgets} />
-  </div>
+ <div className="xl:hidden justify-between bottom-0 z-40 fixed bg-slate-50  dark:bg-gray-900 w-full flex py-4 sm:px-10 md:px-24 px-4">
+           <MenuAlt1Icon className="pl-4 h-8 cursor-pointer" onClick={toggleSidebar} />
+           <HomeIcon className="h-8 cursor-pointer" onClick={toggleHome} />
+           <SearchIcon className="pr-6 h-8 cursor-pointer" onClick={toggleWidgets} />
+         </div>
 </div>
 
   );

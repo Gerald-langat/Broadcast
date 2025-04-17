@@ -1,14 +1,12 @@
 import { useUser } from '@clerk/nextjs';
-import { auth, db } from '../../firebase';
+import { db } from '../../firebase';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 export default function Trends({ topic, postCount }) {
-  const router = useRouter();
   const [userData, setUserData ] = useState(null);
-  const [userDetails, setUserDetails] = useState(null);
   const { user } = useUser()
 
   useEffect(() => {
@@ -45,7 +43,7 @@ export default function Trends({ topic, postCount }) {
           <Link href={`/constituencytrend/${topic.topic}`}>
           <div className='flex flex-col'>
           <h6 className='text-sm'>Trending in {userData && userData.constituency}</h6>
-            <span className="font-bold text-gray-950 dark:text-gray-300">{topic.topic}</span>
+            <span className="font-bold text-gray-950 dark:text-gray-300 w-96 truncate">{topic.topic}</span>
             <span className='text-sm'>{formatNumber(postCount)} posts</span>
             </div>
 </Link>

@@ -79,7 +79,7 @@ export default function TopicPostsPage() {
 
 
   return (
-    <div>
+    <div className="flex flex-col min-h-screen w-full">
       <Head>
         <title>{topic ? topic : 'loading...'}</title>
         <meta name="description" content="Generated and created by redAndttech" />
@@ -101,7 +101,7 @@ export default function TopicPostsPage() {
                       </div>
                   
                       {/* Feed */}
-                      <div className="flex-grow max-w-full xl:max-w-2xl 2xl:max-w-3xl">
+                      <div className="flex-1 min-w-0 sm:min-w-[400px] mx-auto">
                         <div className="flex items-center space-x-2 py-3 w-full px-4 sticky top-0 bg-white dark:bg-gray-950 border-b dark:border-gray-800 border-gray-200">
                           <Tooltip content="back" arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
                             <Link href={`/ward`}>

@@ -21,7 +21,7 @@ export default function Trends({ topic, postCount }) {
           <div className='lg:w-[380px] 2xl:w-[400px] sm:w-[88%] w-[570px] dark:hover:bg-gray-900 flex flex-col dark:text-gray-300 hover:scale-105 
           transition transform duration-500'>
           <h6 className='sm:text-sm dark:text-gray-400 pt-3 sm:pt-1'>Trends in Kenya</h6>
-            <span className="font-bold text-gray-950 dark:text-gray-300 sm:text-lg ">{topic.topic}</span>
+            <span className="font-bold text-gray-950 dark:text-gray-300 sm:text-lg w-96 truncate">{topic.topic}</span>
             <span className='text-sm  dark:text-gray-400'>{formatNumber(postCount)} posts</span>
             </div>
             </Link>

@@ -26,7 +26,8 @@ export default function TopicPostsPage() {
       setLoading(true);
     }
 
-    const q = query(collection(db, "national"), orderBy('timestamp', 'desc'));
+    try{
+      const q = query(collection(db, "national"), orderBy('timestamp', 'desc'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const filteredPosts = snapshot.docs
         .filter(doc => {
@@ -37,8 +38,11 @@ export default function TopicPostsPage() {
       setPosts(filteredPosts);
       setLoading(false);
     });
-  
     return () => unsubscribe();
+    } catch (error) {
+      console.log("the error occured is:", error)
+    }
+    
   }, [topic]);
   
 
@@ -67,7 +71,7 @@ export default function TopicPostsPage() {
     <link rel="icon" href="../../images/Brodcast.jpg" />
   </Head>
 
-  <main className="flex max-w-7xl mx-auto">
+  <main className="flex flex-1 min-h-screen sm:min-w-[768px] xl:max-w-7xl mx-auto mb-12">
     {/* Sidebar for mobile */}
     {isSidebarVisible && (
       <div className="fixed inset-0 z-30 bg-black bg-opacity-50 xl:hidden" onClick={() => setIsSidebarVisible(false)}>
@@ -83,7 +87,7 @@ export default function TopicPostsPage() {
     </div>
 
     {/* Feed */}
-    <div className="flex-grow max-w-full xl:max-w-2xl 2xl:max-w-3xl">
+    <div className="flex-col min-w-0 sm:min-w-[400px] mx-auto">
       <div className="flex items-center space-x-2 py-3 w-full px-4 sticky top-0 bg-white dark:bg-gray-950 border-b dark:border-gray-800 border-gray-200">
         <Tooltip content="back" arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
           <Link href={`/national`}>
@@ -112,7 +116,7 @@ export default function TopicPostsPage() {
     {/* Widgets */}
     {isWidgetsVisible && (
       <div className="fixed inset-0 z-30 bg-black bg-opacity-50 xl:hidden" onClick={() => setIsWidgetsVisible(false)}>
-        <div onClick={(e) => e.stopPropagation()} className="ml-8">
+        <div onClick={(e) => e.stopPropagation()} >
           <Widgets />
         </div>
       </div>
@@ -127,11 +131,11 @@ export default function TopicPostsPage() {
   </main>
 
   {/* Bottom Navigation for Mobile */}
-  <div className="xl:hidden fixed bottom-0 z-40 w-full bg-white dark:bg-gray-900 flex justify-around items-center py-3 border-t dark:border-gray-800 border-gray-200">
-    <MenuAlt1Icon className="h-8 cursor-pointer" onClick={toggleSidebar} />
-    <HomeIcon className="h-8 cursor-pointer" onClick={toggleHome} />
-    <SearchIcon className="h-8 cursor-pointer" onClick={toggleWidgets} />
-  </div>
+<div className="xl:hidden justify-between bottom-0 z-40 fixed bg-slate-50  dark:bg-gray-900 w-full flex py-4 sm:px-10 md:px-24 px-4">
+          <MenuAlt1Icon className="pl-4 h-8 cursor-pointer" onClick={toggleSidebar} />
+          <HomeIcon className="h-8 cursor-pointer" onClick={toggleHome} />
+          <SearchIcon className="pr-6 h-8 cursor-pointer" onClick={toggleWidgets} />
+        </div>
 </div>
 
   );

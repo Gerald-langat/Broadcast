@@ -181,152 +181,151 @@ export default function Input() {
   // };
 
   return (
-    <>
-      {userData && (
-        <div className=" flex border-[1px] dark:bg-gray-950 bg-white border-gray-200 dark:border-gray-900 p-3 space-x-3 z-10 top-0 sticky-top rounded-md mt-1">
-          {userData?.userImg ? (
-            <img
-            src={userData.userImg}
-            alt="user-img"
-            className="h-11 w-11 rounded-md cursor-pointer hover:brightness-95 shadow-gray-800 shadow-sm dark:shadow-gray-600"
-          />
-          ):(
-            <img
-            src={userData?.imageUrl}
-            alt="user-img"
-            className="h-11 w-11 rounded-md cursor-pointer hover:brightness-95 shadow-gray-800 shadow-sm dark:shadow-gray-600"
-          />
-          )}
-          
-          <div className="w-full divide-y divide-gray-200 dark:divide-gray-900">
-            <div className="">
-              <textarea
-                className="dark:bg-gray-950 dark:border-gray-700 dark:placeholder:text-gray-100 dark:text-gray-300 w-full border-none focus:ring-0 placeholder-gray-700 tracking-wide min-h-[50px] text-gray-700 text-2xl sm:text-lg placeholder:text-2xl"
-                rows="2"
-                placeholder="type here...."
-                value={input}
-                onChange={(e) => setInput(e.target.value)}  
-                onClick={() => setShowEmojiPicker(false)}>
-              </textarea>
-            </div>
-
-            {loading ? (
-        <div  className="border-none items-center flex mt-4 sm:mt-0">
-          <Spinner aria-label="Loading spinner" size="md" />
-          <span className="pl-3 animate-pulse sm:text-[16px] text-[28px]">Loading...</span>
-        </div>
-      ) :(
-        <>
-            {selectedVidFile && (
-              <div className="relative">
-                <XIcon
-                  onClick={() => setSelectedVidFile(null)}
-                  className="border h-7 text-black absolute cursor-pointer shadow-md  border-white m-1 rounded-full"
-                />
-                <video
-                  autoPlay
-                  src={selectedVidFile}
-                  controls
-                  className={`${loading && "animate-pulse"} h-[200px] w-[300px] object-cover`}
-                />
-              </div>
-            )}
-
-            {selectedFile && (
-              <div className="relative">
-                <XIcon
-                  onClick={() => setSelectedFile(null)}
-                  className="border h-7 text-black absolute cursor-pointer shadow-md  border-white m-1 rounded-full"
-                />
-                <img
-                  autoPlay
-                  src={selectedFile}
-                  controls
-                  className={`${loading && "animate-pulse"} h-[200px] w-[300px] object-cover`}
-                />
-              </div>
-            )}
-
-            {/* {selectedFiles.length > 0 && (
-              <div className="flex gap-2 flex-wrap ">
-                {selectedFiles.map((file, index) => (
-                  <div key={index} className="relative">
-                    <XIcon
-                      onClick={() => removeSelectedFile(index)}
-                      className="border h-7 text-black absolute cursor-pointer shadow-md border-white m-1 rounded-full"
-                    />
-                    <img
-                      src={file}
-                      className={`${loading && "animate-pulse"} h-[100px] w-[200px] object-cover`}
-                      alt={`image-${index}`}
-                    />
-                  </div>
-                ))}
-              </div>
-            )} */}
-</>
-      )}
-            <div className="flex items-center justify-between pt-2.5">
-              {!loading && (
-                <>
-                  <div className="flex">
-                    <div onClick={() => filePickerRef.current.click()}>
-                    <Tooltip content='image' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-                      <PhotographIcon className="h-14 w-14 md:h-10 md:w-10 rounded-full cursor-pointer p-2 text-sky-500 dark:hover:bg-neutral-700 hover:bg-sky-100" />
-                      <input
-                        type="file"
-                        hidden
-                        accept="image/*"
-                        ref={filePickerRef}
-                        onChange={addImageToPost}
-                      />
-                      </Tooltip>
-                    </div>
-                    <div onClick={() => videoPickerRef.current.click()}>
-                    <Tooltip content='video' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
-                      <CameraIcon className="h-14 w-14 md:h-10 md:w-10 rounded-full cursor-pointer p-2 text-sky-500 hover:bg-sky-100 dark:hover:bg-neutral-700" />
-                      <input
-                        type="file"
-                        accept="video/*"
-                        hidden
-                        ref={videoPickerRef}
-                        onChange={addVideoToPost}
-                      />
-                      </Tooltip>
-                    </div>
-                    <Popover
-                      aria-labelledby="profile-popover"
-                      content={
-                        <div className="w-64 ">
-                          {emoji.emoji}
-                          {emoji && <a href={emoji.getImageUrl()}></a>}
-                          {showEmojiPicker && <Picker className="dark:bg-gray-950" height={400} width={300} emojiStyle="twitter" onEmojiClick={(e) => {
-                            setInput(input + e.emoji)
-                          }}/>}
-                        </div>
-                      }>
-             
-                      <EmojiHappyIcon
-                        className="hidden md:inline h-14 w-14 md:h-10 md:w-10 rounded-full cursor-pointer p-2 text-sky-500 dark:hover:bg-neutral-700 hover:bg-blue-100"
-                        onClick={() => setShowEmojiPicker(true)}
-                      />
-                   
-                    </Popover>
-                  </div>
-                  <button
-                    onClick={sendPost}
-                    disabled={!input.trim()}
-                    className="bg-blue-400 text-white px-4 py-1.5 rounded-full font-bold shadow-md hover:brightness-95 disabled:opacity-50 text-2xl sm:text-lg"
-                  >
-                    Cast
-                  </button>
-                </>
-              )}
-            </div>
+    <div>
+                 {userData && (
+                   <div className="flex-col xl:p-3 w-full space-x-3 z-40 top-0
+                   pb-2 dark:border-gray-900 border-[1px] rounded-md my-1 ">
+                   <div className="flex items-center space-x-2 flex-1 justify-between">
+                    {userData.userImg ? (
+                       <img
+                       className="h-11 w-11 md:h-11 md:w-11 rounded-md lg:mr-4 object-fit  cursor-pointer  shadow-gray-800 shadow-sm dark:shadow-gray-600"
+                       src={userData.userImg}
+                       alt="user-img"
+                     />
            
-          </div>
-        </div>
-      )}
-    </>
+                 ):(
+                   <img
+                       className="h-11 w-11 md:h-11 md:w-11 rounded-md lg:mr-4 object-fit  cursor-pointer  shadow-gray-800 shadow-sm dark:shadow-gray-600"
+                       src={userData.imageUrl}
+                       alt="user-img"
+                     />
+                 )}
+               <textarea
+                             className="dark:bg-gray-950 border-b-[1px] border-x-0 border-t-0 dark:border-gray-900 dark:placeholder:text-gray-100
+                              dark:text-gray-300 flex-1 outline-none  focus:ring-0 text-xl sm:text-lg placeholder-gray-700 border-gray-300
+                              placeholder:text-lg sm:placeholder:text-xl tracking-wide min-h-[50px] text-gray-700"
+                           rows="2"
+                           placeholder="type here...."
+                           value={input} 
+                           onChange={(e) => setInput(e.target.value)} 
+                           onClick={() => setShowEmojiPicker(false)}>
+                         </textarea> 
+                   </div>
+                   
+                     <div className="border-none ">
+                     
+                         
+           
+           
+                       {loading ? (
+                   <div  className="border-none items-center flex mt-4 sm:mt-0">
+                     <Spinner aria-label="Loading spinner" size="md" />
+                     <span className="pl-3 animate-pulse sm:text-lg ">Loading...</span>
+                   </div>
+                 ) :(
+                   <>
+                       {selectedVidFile && (
+                         <div className="relative">
+                           <XIcon
+                             onClick={() => setSelectedVidFile(null)}
+                             className="border h-7 text-black absolute cursor-pointer shadow-md border-white m-1 rounded-full"
+                           />
+                           <video
+                             autoPlay
+                             muted
+                             src={selectedVidFile}
+                             controls
+                             className={`${loading && "animate-pulse"} h-[200px] w-[300px] object-cover` }
+                           />
+                         </div>
+                       )}
+                         <div className="flex gap-2 flex-wrap border-none">
+                           {selectedFile && (
+                             <div className="border-none">
+                               <XIcon
+                                 onClick={() => removeSelectedFile(null)}
+                                 className="border h-7 text-black absolute cursor-pointer shadow-md border-white m-1 rounded-full"
+                               />
+                               <img
+                                 src={selectedFile}
+                                 className={`${loading && "animate-pulse"} h-[100px] w-[200px] object-cover`}
+                                 alt={`image`}
+                               />
+                             </div>
+                           )}
+                         </div>
+                         </>
+                       )}
+           
+           
+                       <div className="flex items-center justify-between pt-2.5 border-none ">
+                         {!loading && (
+                           <div className='flex w-full justify-between px-2'>
+                             <div className="flex">
+                               <div onClick={() => filePickerRef.current.click()}>
+                               <Tooltip content='image' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
+                                 <PhotographIcon className="h-9 w-9 rounded-full cursor-pointer 
+                                 p-1 text-sky-500 dark:hover:bg-neutral-700 hover:bg-blue-100" />
+                                 <input
+                                   type="file"
+                                   hidden
+                                   accept="image/*"
+                                   ref={filePickerRef}
+                                   onChange={addImageToPost}
+                                 />
+                                 </Tooltip>
+                               </div>
+                               <div onClick={() => videoPickerRef.current.click()}>
+                               <Tooltip content='video' arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
+                                 <CameraIcon className="h-9 w-9 rounded-full cursor-pointer p-1 text-sky-500 dark:hover:bg-neutral-700 hover:bg-blue-100" />
+                                 <input
+                                   type="file"
+                                   accept="video/*"
+                                   hidden
+                                   ref={videoPickerRef}
+                                   onChange={addVideoToPost}
+                                 />
+                                 </Tooltip>
+                               </div>
+           
+                             
+                               <Popover
+                                 aria-labelledby="profile-popover"
+                                 content={
+                                   <div className="w-64 ">
+                                     {emoji.emoji}
+                                     {emoji && <a href={emoji.getImageUrl()}></a>}
+                                     {showEmojiPicker && <Picker className="dark:bg-gray-950" height={400} width={300} emojiStyle="twitter" onEmojiClick={(e) => {
+                                       setInput(input + e.emoji)
+                                     }}/>}
+                                   </div>
+                                 }>
+                        
+                                 <EmojiHappyIcon
+                                   className="hidden md:inline h-14 w-14 md:h-10 md:w-10 rounded-full cursor-pointer p-2 text-sky-500 dark:hover:bg-neutral-700 hover:bg-blue-100"
+                                   onClick={() => setShowEmojiPicker(true)}
+                                 />
+                              
+                               </Popover>
+                               
+                           
+                             </div>
+                             
+                             <button
+                               onClick={sendPost}
+                               disabled={!input.trim()}
+                               className="bg-blue-400 text-white  text-lg sm:text-sm px-2 md:py-1.5 rounded-full font-bold shadow-md hover:brightness-95
+                                disabled:opacity-50"
+                             >
+                               Cast
+                             </button>
+                           </div>
+                         )}
+                       </div>
+                     
+                     </div>
+                   </div>
+                 )}
+               </div>
   );
 }

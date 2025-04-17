@@ -42,7 +42,7 @@ const { user } = useUser()
           <Link href={`/wardtrend/${topic.topic}`}>
           <div className='flex flex-col'>
           <h6 className='text-sm'>Trending in {userData && userData.ward}</h6>
-            <span className="font-bold text-gray-950 dark:text-gray-300">{topic.topic}</span>
+            <span className="font-bold text-gray-950 dark:text-gray-300 w-96 truncate">{topic.topic}</span>
             <span className='text-sm'>{formatNumber(postCount)} posts</span>
             </div>
 </Link>

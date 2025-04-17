@@ -29,7 +29,7 @@ function SearchComponent({ post }) {
             <div className='flex space-x-2 text-lg sm:text-sm'>
               <p className='max-w-24 truncate '>{post.data().name}lkdlfkdfd</p>
               <p className='max-w-24 truncate '>{post.data().lastname}lkflvcc</p>
-              <p className="max-w-24 truncate text-gray-400">@{post.data().nickname}lskddsdfd</p>
+              <p className="max-w-24 truncate text-gray-400">@{post.data().nickname}</p>
             </div>
         </div>
 </Link>

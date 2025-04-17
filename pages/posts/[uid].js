@@ -91,7 +91,7 @@ const WardPost = () => {
         <meta name="description" content="Generated and created by redAndtech" />
         <link rel="icon" href="../../images/Brodcast.jpg" />
       </Head>
-      <main className="flex max-w-7xl mx-auto">
+      <main className="flex flex-1 min-h-screen sm:min-w-[768px] xl:max-w-7xl mx-auto mb-12">
           {/* Sidebar for mobile */}
           {isSidebarVisible && (
             <div className="fixed inset-0 z-30 bg-black bg-opacity-50 xl:hidden" onClick={() => setIsSidebarVisible(false)}>
@@ -107,7 +107,7 @@ const WardPost = () => {
           </div>
       
           {/* Feed */}
-          <div className="flex-col flex-1 min-h-screen sm:min-w-[768px] xl:max-w-7xl mx-auto">
+          <div className="flex-col min-w-0 sm:min-w-[400px] mx-auto">
             <div className="flex items-center space-x-2 py-3 w-full px-4 sticky top-0 bg-white dark:bg-gray-950 border-b dark:border-gray-800 border-gray-200">
               <Tooltip content="back" arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500 -mt-1">
                 <Link href={`/national`}>
@@ -150,14 +150,11 @@ const WardPost = () => {
           <CommentModal />
           <StatusModal />
         </main>
-      <div
-        className="xl:hidden justify-between bottom-0 z-40 fixed bg-slate-50
-        dark:bg-gray-900 w-full flex py-4 sm:px-10 md:px-24 px-4"
-      >
-          <MenuAlt1Icon className='pl-4 h-10 cursor-pointer' onClick={toggleSidebar} />
-          <HomeIcon className='h-10 cursor-pointer' onClick={toggleHome}/>
-          <SearchIcon className='pr-6 h-10 cursor-pointer' onClick={toggleWidgets}/>
-      </div>
+     <div className="xl:hidden justify-between bottom-0 z-40 fixed bg-slate-50  dark:bg-gray-900 w-full flex py-4 sm:px-10 md:px-24 px-4">
+               <MenuAlt1Icon className="pl-4 h-8 cursor-pointer" onClick={toggleSidebar} />
+               <HomeIcon className="h-8 cursor-pointer" onClick={toggleHome} />
+               <SearchIcon className="pr-6 h-8 cursor-pointer" onClick={toggleWidgets} />
+             </div>
     </div>
   );
 }
