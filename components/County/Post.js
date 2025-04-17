@@ -723,7 +723,7 @@ useEffect(() => {
            
                    
                    {post?.data()?.videos && (
-                     <video autoPlay
+                     <video muted autoPlay
                      onClick={(e) => { 
                        e.stopPropagation(); // Prevent the click event from bubbling up
                        e.preventDefault(); // Prevent the default action (navigation)
@@ -777,7 +777,7 @@ useEffect(() => {
            
                 
                     {post?.data()?.videos && (
-                     <video autoPlay
+                     <video muted autoPlay
                      onClick={(e) => { 
                        e.stopPropagation(); // Prevent the click event from bubbling up
                        e.preventDefault(); // Prevent the default action (navigation)

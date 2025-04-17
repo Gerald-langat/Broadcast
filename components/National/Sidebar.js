@@ -166,7 +166,7 @@ export default function Sidebar() {
           </Link>
         </div>
 
-        <div className="h-[500px] w-[300px] overflow-auto scrollbar-hide">
+        <div className="h-[500px] overflow-auto scrollbar-hide">
 
   {posts
     .filter((post) => post?.uid === user?.id) // Only the current user
