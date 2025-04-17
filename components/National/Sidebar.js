@@ -160,7 +160,7 @@ export default function Sidebar() {
        
          
          <div className='flex justify-between w-full items-center'>
-            <h2 className="font-bold  dark:text-gray-300 text-2xl sm:text-lg">Members</h2>
+            <h2 className="font-bold  dark:text-gray-300 text-xl">Members</h2>
     <Link href={'/members'}>
             <p className='text-xs text-blue-500 cursor-pointer ' >View all Members(<span>{formatNumber(posts.length)}</span>)</p>
           </Link>
