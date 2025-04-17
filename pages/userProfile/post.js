@@ -1,9 +1,10 @@
-import { Carousel } from 'flowbite-react';
+import Link from "next/link";
 
-function post({ post }) {
+
+function post({ post, id }) {
   return (
     <div>
-          {post?.images?.length > 1 ? (
+          {/* {post?.images?.length > 1 ? (
             <Carousel className={`${!post?.images ? 'hidden' : "rounded-md h-[300px] w-[450px] sm:w-full sm:h-[600px] xl:h-[250px] mr-2 object-cover"}`}>
               {post?.images.map((imageUrl, index) => {
               console.log(imageUrl, index); // Check what images are being loaded
@@ -17,14 +18,17 @@ function post({ post }) {
               );
               })}
             </Carousel>
-          ) : (
+          ) : ( */}
+                    <Link href={`/posts(id)/${id}`}>
+          
             <img
                   className={` ${!post?.images ? 'hidden' : "rounded-md h-[300px] w-[450px] sm:w-full sm:h-[600px] xl:h-[200px] mr-2 object-cover"}`}
                   src={post?.images}
                   alt=''
+                  onClick={() => router.push(`/posts(id)/${id}`)}
                 />
-          )}
-
+          {/* )} */}
+</Link>
      
          {post?.video && (
           <video autoPlay

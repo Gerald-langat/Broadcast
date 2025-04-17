@@ -172,7 +172,7 @@ const deleteRepost = async () => {
         await navigator.share({
           title: 'Check this out!',
           text: 'Sharing this amazing content.',
-          url: `https://broadcastke.com/${id}`
+          url: `https://broadcastke.com/wardposts(id)/${id}`
         });
       } catch (error) {
         console.error('Error sharing content:', error);
@@ -690,6 +690,8 @@ const uid = post?.data()?.uid;
                  width={620}
                  height={20} 
                  style={{ height: "500px" }}
+         onClick={() => router.push(`/wardposts(id)/${id}`)}
+
                />
                
                          {/* )} */}

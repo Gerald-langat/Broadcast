@@ -134,7 +134,7 @@ const { user } = useUser()
         await navigator.share({
           title: 'Check this out!',
           text: 'Sharing this amazing content.',
-          url: `https://broadcastke.com/${id}`
+          url: `https://broadcastke.com/countyposts(id)/${id}`
         });
       } catch (error) {
         console.error('Error sharing content:', error);
@@ -663,7 +663,7 @@ useEffect(() => {
                    {/* display cite */}
                    {post?.data()?.citeInput ? (
                      <div>
-                   <p onClick={() => router.push(`/countyposts(id)/${id}`)} className="text-md">{post?.data()?.citeInput}</p>
+                   <p onClick={() => router.push(`/countyposts(id)/${id}`)} >{post?.data()?.citeInput}</p>
                    <div className="border-[1px] rounded-md dark:border-gray-900 dark:hover:bg-gray-800 border-gray-200 hover:bg-neutral-300"  onClick={() => router.push(`/countyposts(id)/${id}`)}>
                    <div className="flex p-1">
                    {post?.data()?.citeUserImg ? (
@@ -763,12 +763,14 @@ useEffect(() => {
                        </Carousel>
                      ) : ( */}
                      <Image
-             className={` ${!post?.data()?.images ? 'hidden' : "inline rounded-md"}`}
+             className={` ${!post?.data()?.images ? 'hidden' : "inline rounded-md cursor-pointer"}`}
              src={post?.data()?.images}
              alt=''
              width={620}
              height={20} 
              style={{ height: "500px" }}
+         onClick={() => router.push(`/countyposts(id)/${id}`)}
+
            />
            
                      {/* )} */}

@@ -186,7 +186,7 @@ const viewCount = Array.isArray(post?.data()?.views) ? post.data().views.length 
         await navigator.share({
           title: 'Check this out!',
           text: 'Sharing this amazing content.',
-          url: `https://broadcastke.com/${id}`
+          url: `https://broadcastke.com/posts(id)/${id}`
         });
       } catch (error) {
         console.error('Error sharing content:', error);
@@ -678,11 +678,12 @@ const uid = post?.data()?.uid
              </Carousel>
            ) : ( */}
            <Image
-             className={`${!post?.data()?.images ? 'hidden' : "inline object-cover rounded-b-md"}`}
+             className={`${!post?.data()?.images ? 'hidden' : "inline object-cover rounded-b-md cursor-pointer"}`}
              src={post?.data()?.images} // Ensure this is a single image
              alt=""
              width={620}
    height={20} 
+   onClick={() => router.push(`/posts(id)/${id}`)}
 
            />
          {/* )} */}

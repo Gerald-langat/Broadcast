@@ -171,7 +171,7 @@ useEffect(
         await navigator.share({
           title: 'Check this out!',
           text: 'Sharing this amazing content.',
-          url: `https://broadcastke.com/${id}`
+          url: `https://broadcastke.com/countyposts(id)/${id}`
         });
       } catch (error) {
         console.error('Error sharing content:', error);
@@ -730,12 +730,14 @@ useEffect(
                            </Carousel>
                          ) : ( */}
                          <Image
-                 className={` ${!post?.data()?.images ? 'hidden' : "inline rounded-md"}`}
+                 className={` ${!post?.data()?.images ? 'hidden' : "inline rounded-md cursor-pointer"}`}
                  src={post?.data()?.images}
                  alt=''
                  width={620}
                  height={20} 
                  style={{ height: "500px" }}
+         onClick={() => router.push(`/countyposts(id)/${id}`)}
+
                />
                
                          {/* )} */}

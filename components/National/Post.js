@@ -264,7 +264,7 @@ const handleShare = async () => {
       await navigator.share({
         title: 'Check this out!',
         text: 'Sharing this amazing content.',
-        url: `https://broadcastke.com/${id}`
+        url: `https://broadcastke.com/posts(id)/${id}`
       });
     } catch (error) {
       console.error('Error sharing content:', error);
@@ -434,7 +434,7 @@ const handleShare = async () => {
         }));
       } else {
         // Add bookmark
-        const Images = post?.data()?.Images || [];
+        const Images = post?.data()?.images || [];
         const video = post?.data()?.videos || null;
 
         // Add new document to the collection
@@ -696,7 +696,7 @@ const handleShare = async () => {
                {/* display cite */}
                {post?.data()?.citeInput ? (
                  <div>
-               <p onClick={() => router.push(`/posts(id)/${id}`)} className="text-md">{post?.data()?.citeInput}</p>
+               <p onClick={() => router.push(`/posts(id)/${id}`)}>{post?.data()?.citeInput}</p>
                <div className="border-[1px] rounded-md dark:border-gray-900 dark:hover:bg-gray-800 border-gray-200 hover:bg-neutral-300"  onClick={() => router.push(`/posts(id)/${id}`)}>
                <div className="flex p-1">
                {post?.data()?.citeUserImg ? (
@@ -796,12 +796,13 @@ const handleShare = async () => {
                    </Carousel>
                  ) : ( */}
                  <Image
-         className={` ${!post?.data()?.images ? 'hidden' : "inline rounded-md"}`}
+         className={` ${!post?.data()?.images ? 'hidden' : "inline rounded-md cursor-pointer"}`}
          src={post?.data()?.images}
          alt=''
          width={620}
          height={20} 
          style={{ height: "500px" }}
+         onClick={() => router.push(`/posts(id)/${id}`)}
        />
        
                  {/* )} */}

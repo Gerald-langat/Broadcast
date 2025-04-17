@@ -1,10 +1,11 @@
-import { Carousel } from 'flowbite-react';
+import Link from "next/link";
+
 
 function Book({post}) {
   return (
 
        <div>
-           {post?.images?.length > 1 ? (
+           {/* {post?.images?.length > 1 ? (
             <Carousel className={`${!post?.images ? 'hidden' : "rounded-md h-[300px] w-[450px] sm:w-full sm:h-[600px] xl:h-[250px] mr-2 object-cover"}`}>
               {post?.images.map((imageUrl, index) => {
               console.log(imageUrl, index); // Check what images are being loaded
@@ -18,14 +19,16 @@ function Book({post}) {
               );
               })}
             </Carousel>
-          ) : (
+          ) : ( */}
+                    <Link href={`/posts(id)/${id}`}>
+          
             <img
                   className={` ${!post?.images ? 'hidden' : "rounded-md h-[300px] w-[450px] sm:w-full sm:h-[600px] xl:h-[250px] mr-2 object-cover"}`}
                   src={post?.images}
                   alt=''
                 />
-          )}
-
+          {/* )} */}
+</Link>
      
          {post?.video && (
           <video autoPlay

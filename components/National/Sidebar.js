@@ -145,13 +145,13 @@ export default function Sidebar() {
             </div>
             </Link>
             <Link href={'/messages'}>
-            <div className='flex  items-center space-x-4 dark:text-gray-200 dark:hover:bg-gray-900 hover:bg-gray-200 rounded-full w-full px-2 sm:py-2 py-4 cursor-pointer' onClick={() => router.push('/messages')}>
+            <div className='flex  items-center space-x-4 dark:text-gray-200 dark:hover:bg-gray-900 hover:bg-gray-200 rounded-full w-full px-2 sm:py-2 py-4 cursor-pointer'>
               <InboxInIcon className='h-6'/>
               <span className='text-2xl sm:text-lg'>Message</span>
             </div>
             </Link>
             <Link href={'/profile'}>
-            <div className='flex items-center space-x-4 dark:text-gray-200 dark:hover:bg-gray-900 hover:bg-gray-200 rounded-full w-full px-2 sm:py-2 py-4 cursor-pointer' onClick={() => router.push('/profile')}>
+            <div className='flex items-center space-x-4 dark:text-gray-200 dark:hover:bg-gray-900 hover:bg-gray-200 rounded-full w-full px-2 sm:py-2 py-4 cursor-pointer'>
               <UserIcon className='h-6'/>
               <span className='text-2xl sm:text-lg'>Profile</span>
             </div>

@@ -167,7 +167,7 @@ useEffect(
         await navigator.share({
           title: 'Check this out!',
           text: 'Sharing this amazing content.',
-          url: `https://broadcastke.com/${id}`
+           url: `https://broadcastke.com/constituencyposts(id)/${id}`
         });
       } catch (error) {
         console.error('Error sharing content:', error);
@@ -735,6 +735,8 @@ useEffect(() => {
                   width={620}
                   height={20} 
                   style={{ height: "500px" }}
+         onClick={() => router.push(`/constituencyposts(id)/${id}`)}
+
                 />
                 
                           {/* )} */}
