@@ -90,7 +90,7 @@ const toggleHome = () => {
     {/* Sidebar */}
     {isSidebarVisible && (
       <div
-        className="fixed inset-0 z-30 xl:hidden bg-black/50"
+        className="fixed inset-0 z-30 xl:hidden dark:bg-gray-950 bg-white"
         onClick={() => setIsSidebarVisible(false)}
       >
         <div
@@ -101,12 +101,12 @@ const toggleHome = () => {
         </div>
       </div>
     )}
-    <div className="hidden xl:block w-[20%] ">
+    <div className="hidden xl:block w-[20%]">
       <Sidebar />
     </div>
 
     {/* Post content */}
-    <div className="flex-col w-full sm:min-w-[400px] mx-auto">
+    <div className="flex-col w-full sm:min-w-[500px] mx-auto">
       <div className="flex space-x-2 py-2 px-3 sticky top-0 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 rounded-md">
         <Tooltip content="Back" arrow={false} placement="bottom" className="p-1 text-xs bg-gray-500">
           <Link href={`/national`}>

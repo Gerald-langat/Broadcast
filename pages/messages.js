@@ -59,7 +59,7 @@ const [isSidebarVisible, setIsSidebarVisible] = useState(false);
           </div>
       
           {/* Feed */}
-          <div className="flex-1 min-w-0 sm:min-w-[400px] mx-auto">
+          <div className="flex-1 min-w-0 sm:min-w-[500px] mx-auto">
             <MessagesFeed />
           </div>
           <StatusModal />
