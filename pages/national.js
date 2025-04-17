@@ -66,7 +66,7 @@ function Home() {
               </div>
             </div>
           )}
-          <div className="hidden xl:block w-[20%]">
+          <div className="hidden xl:block w-[20%] ">
             <Sidebar />
           </div>
       

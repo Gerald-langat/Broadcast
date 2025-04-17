@@ -23,10 +23,8 @@ function Index() {
   useEffect(() => {
     if (!isLoaded || !user?.id) return;
 
-    const currentPath = window.location.pathname;
-    const isOnHomePage = currentPath === '/' || currentPath === '/index';
-
-    if (!isOnHomePage) return; // Only redirect if on homepage
+    // ✅ Make sure we only run this logic on the homepage
+    if (router.pathname !== '/') return;
 
     const checkUserExists = async () => {
       try {
@@ -47,7 +45,7 @@ function Index() {
     };
 
     checkUserExists();
-  }, [isLoaded, user?.id, router]);
+  }, [isLoaded, user?.id, router.pathname]);
 
   return (
     <div className="flex flex-col w-full justify-center items-center h-screen">

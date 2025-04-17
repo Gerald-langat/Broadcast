@@ -79,9 +79,9 @@ export default function Sidebar() {
   
 
   return (
-    <div className="dark:bg-gray-950 mr-1 bg-white top-0 sticky  p-2 ">  
+    <div className="dark:bg-gray-950 mr-1 w-full h-screen bg-white top-0 sticky  p-2 ">  
 {loading ? (
-          <Spinner aria-label="Loading spinner" size="sm" />
+          <Spinner aria-label="Loading spinner" size="md" />
       ) : (
         <>
           {userPosts && (
@@ -111,7 +111,7 @@ export default function Sidebar() {
                   className="flex items-center bg-slate-100 dark:bg-gray-900 border-[1px] dark:border-gray-900 border-slate-100 rounded-full p-2 space-x-1"
                   onClick={() => setOpen(true)}
                 >
-                  <PlusIcon className="h-10 sm:h-8 dark:bg-gray-900 dark:text-gray-500 bg-gray-50 rounded-full text-gray-400" />
+                  <PlusIcon className="h-6 dark:bg-gray-900 dark:text-gray-500 bg-gray-50 rounded-full text-gray-400" />
                   <p className="font-bold text-sky-400 text-lg sm:text-sm cursor-pointer lg:inline">Add status</p>
                 </div>
               </div>
@@ -160,7 +160,7 @@ export default function Sidebar() {
        
          
          <div className='flex justify-between w-full items-center'>
-            <h2 className="font-bold ml-4 dark:text-gray-300 text-2xl sm:text-lg">Members</h2>
+            <h2 className="font-bold  dark:text-gray-300 text-2xl sm:text-lg">Members</h2>
     <Link href={'/members'}>
             <p className='text-xs text-blue-500 cursor-pointer ' >View all Members(<span>{formatNumber(posts.length)}</span>)</p>
           </Link>
@@ -230,8 +230,8 @@ export default function Sidebar() {
           {/* User Info */}
           <div className="flex-1 w-full">
             <div className="flex dark:text-gray-200 text-lg">
-              <p className="mr-1">{post?.name}</p>
-              <p className="mr-1">{post?.lastname}</p>
+              <p className="mr-1 w-16 truncate">{post?.name}</p>
+              <p className="mr-1 w-16 truncate">{post?.lastname}</p>
             </div>
             <div className="font-bold text-lg truncate w-28 sm:text-sm text-gray-500">
               @{post?.nickname}
