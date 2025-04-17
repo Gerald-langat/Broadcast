@@ -118,7 +118,7 @@ export default function Comment({ comment, commentId, originalPostId }) {
         await navigator.share({
           title: 'Check this out!',
           text: 'Sharing this amazing content.',
-          url: `https://broadcastke.com/${id}`
+           url: `https://broadcastke.com/constituencyposts(id)/${originalPostId}`
         });
       } catch (error) {
         console.error('Error sharing content:', error);

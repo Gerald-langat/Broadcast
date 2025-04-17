@@ -79,7 +79,7 @@ export default function Sidebar() {
   
 
   return (
-    <div className="dark:bg-gray-950 mr-1 w-full h-screen bg-white top-0 sticky  p-2 ">  
+    <div className="dark:bg-gray-950 mr-1 h-screen bg-white top-0 sticky  p-2 ">  
 {loading ? (
           <Spinner aria-label="Loading spinner" size="md" />
       ) : (

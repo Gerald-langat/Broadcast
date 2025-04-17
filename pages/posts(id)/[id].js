@@ -95,7 +95,7 @@ const toggleHome = () => {
       >
         <div
           onClick={(e) => e.stopPropagation()}
-          className="relative bg-white dark:bg-gray-950 w-64 h-full"
+          className="relative "
         >
           <Sidebar />
         </div>

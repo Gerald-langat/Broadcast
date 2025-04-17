@@ -113,7 +113,7 @@ export default function Comment({ comment, commentId, originalPostId }) {
         await navigator.share({
           title: 'Check this out!',
           text: 'Sharing this amazing content.',
-          url: `https://broadcastke.com/${id}`
+          url: `https://broadcastke.com/posts(id)/${originalPostId}`
         });
       } catch (error) {
         console.error('Error sharing content:', error);
@@ -490,7 +490,7 @@ export default function Comment({ comment, commentId, originalPostId }) {
 
               {/* image */}
         <div>
-        <p className="text-gray-800 text-sm sm:text-lg mb-2 dark:text-gray-300">
+        <p className="text-gray-800 text-sm sm:text-lg mb-2 dark:text-gray-300" onClick={() => router.push(`/posts(id)/${originalPostId}`)}>
           {comment?.comment} 
          </p>
         {comment?.images ? (
