@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 
-function post({ post }) {
+function post({ post, id }) {
   return (
     <div>
           {/* {post?.images?.length > 1 ? (

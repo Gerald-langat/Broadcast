@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 
-function Book({post}) {
+function Book({post, id}) {
   return (
 
        <div>

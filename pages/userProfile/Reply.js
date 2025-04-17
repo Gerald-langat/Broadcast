@@ -1,7 +1,6 @@
-import { Carousel } from 'flowbite-react';
 import Link from 'next/link';
 
-function Reply({ post }) {
+function Reply({ post, id }) {
   return (
     <div>
           {/* {post?.images?.length > 1 ? (
