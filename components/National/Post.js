@@ -539,7 +539,6 @@ const handleShare = async () => {
          {loading ? (
                <Button color="gray" className="border-0 ">
                  <Spinner aria-label="Loading spinner" size="sm" />
-               
                </Button>
              ) : (
                <>
