@@ -1,20 +1,34 @@
-import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from '@clerk/nextjs';
+import { useEffect } from 'react';
+import { useUser } from '@clerk/nextjs';
+import { useRouter } from 'next/router';
+import { db } from '../firebase';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 
-export default function Home() {
-  const { user } = useUser();
+export default function Index() {
+  const { user, isLoaded } = useUser();
+  const router = useRouter();
 
-  return (
-    <div className="flex flex-col justify-center items-center h-screen space-y-6">
-      <SignedOut>
-        <SignInButton />
-      </SignedOut>
+  useEffect(() => {
+    if (!isLoaded) return <div className="text-center mt-10">Loading...</div>;
 
-      <SignedIn>
-        <div className="flex items-center space-x-3">
-          <UserButton />
-          <p>Welcome, {user?.firstName} {user?.lastName}</p>
-        </div>
-      </SignedIn>
-    </div>
-  );
+    const checkUserExists = async () => {
+      try {
+        const userQuery = query(
+          collection(db, 'userPosts'),
+          where('uid', '==', user.id)
+        );
+        const querySnapshot = await getDocs(userQuery);
+
+        if (!querySnapshot.empty) {
+          router.push('/national');
+        } else {
+          router.push('/form');
+        }
+      } catch (error) {
+        console.error('Error checking user:', error);
+      }
+    };
+
+    checkUserExists();
+  }, [isLoaded, user?.id, router]);
 }
