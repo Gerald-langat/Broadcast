@@ -305,16 +305,33 @@ useEffect(() => {
           <div className='text-nowrap'>
             <span className="flex space-x-2">{formatNumber(userPosts.length)}{" "}posts</span>
           </div>
-          <div className="cursor-pointer" onClick={() => router.push("/followers")}>
+          {user?.id == post?.uid ? (
+            <div className="cursor-pointer" onClick={() => router.push("/followers")}>
             <p className="">
               <span className="font-bold mr-1">{formatNumber(followerCount)}</span>Followers
             </p>
           </div>
-          <div className="" onClick={() => router.push("/following")}>
-            <p className="">
+          ):(
+            <div>
+            <p>
+              <span className="font-bold mr-1">{formatNumber(followerCount)}</span>Followers
+            </p>
+          </div>
+          )}
+          {user?.id == post?.uid ? (
+          
+          <div className="cursor-pointer" onClick={() => router.push("/following")}>
+            <p>
               <span className="font-bold mr-1">{formatNumber(followingCount)}</span>following
             </p>
           </div>
+          ):(
+            <div>
+            <p>
+              <span className="font-bold mr-1">{formatNumber(followingCount)}</span>following
+            </p>
+          </div>
+          )}
         </div>
 
 
