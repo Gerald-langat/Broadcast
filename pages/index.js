@@ -17,7 +17,7 @@ import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 
 function Index() {
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
   const router = useRouter();
 
   useEffect(() => {
