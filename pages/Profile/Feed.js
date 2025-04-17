@@ -413,10 +413,10 @@ useEffect(() => {
         ) : (
           <>
     <div className='flex flex-col h-screen w-screen'>
-    <div className='p-2 flex space-x-1 items-center justify-center dark:text-gray-100 mt-4 z-40'>
-    <ArrowLeftIcon className='sm:h-8 sm:w-8 h-10 animate-pulse cursor-pointer' onClick={() => router.push('/national')}/>
-      <p className='sm:text-lg text-2xl'>post</p>
-    </div>
+    <div className='p-2 flex space-x-1 items-center sm:justify-center dark:text-gray-100 mt-2 z-40'>
+        <ArrowLeftIcon className='h-6 w-6 animate-pulse cursor-pointer' onClick={()=> router.back()}/>
+          <p>post</p>
+        </div>
 
     <div className='w-full px-2 sm:p-14 md:px-16 xl:px-28 justify-center flex'>
     {loading ? (
