@@ -60,7 +60,7 @@ function Home() {
         <div className="flex flex-1 min-h-screen sm:min-w-[768px] xl:max-w-7xl mx-auto mb-12">
           {/* Sidebar */}
           {isSidebarVisible && (
-            <div className="fixed inset-0 z-30 xl:hidden w-full" onClick={() => setIsSidebarVisible(false)}>
+            <div className="fixed inset-0 z-30 xl:hidden min-h-screen w-full" onClick={() => setIsSidebarVisible(false)}>
               <div onClick={(e) => e.stopPropagation()}>
                 <Sidebar />
               </div>
