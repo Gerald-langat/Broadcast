@@ -543,7 +543,7 @@ useEffect(
                                    </div>
                                    
                
-                                   <div className={`${userData?.name == post?.data()?.name ? 'hidden' : 'flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-800 '}`} >
+                                   <div className={`${userpost?.name == post?.data()?.name ? 'hidden' : 'flex gap-3 items-center font-bold cursor-pointer hover:bg-slate-100 dark:hover:bg-gray-800 '}`} >
                                    {hasFollowed[post?.data()?.uid] ? (
                                      <UserRemoveIcon className="h-6" />
                
