@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import { postIdMembers, modalStatus } from '../../atoms/modalAtom';
 import { HomeIcon, InboxInIcon, NewspaperIcon, OfficeBuildingIcon, PauseIcon, PlusIcon, UserIcon } from '@heroicons/react/outline';
 import Link from 'next/link';
-import {  useUser } from '@clerk/nextjs';
+import {  SignedOut, SignInButton, useUser } from '@clerk/nextjs';
 import { Spinner } from 'flowbite-react';
 
 
@@ -84,42 +84,55 @@ export default function Sidebar() {
           <Spinner aria-label="Loading spinner" size="md" />
       ) : (
         <>
-          {userPosts && (
-            <div className="flex space-x-2">
-              
-              {userPosts?.userImg ? (
-                <img
-                  src={userPosts.userImg}
-                  className="sm:h-11 sm:w-11 h-20 w-20 rounded-md cursor-pointer hover:brightness-95 shadow-gray-800 shadow-sm dark:shadow-gray-600"
-                />
-              ): (
-                <img
-                  src={userPosts.imageUrl}
-                  className="sm:h-11 sm:w-11 h-20 w-20 rounded-md cursor-pointer hover:brightness-95 shadow-gray-800 shadow-sm dark:shadow-gray-600"
-                />
-              )}
-                
-               
-              <div className="flex-1 flex-col">
-                <p className="font-bold text-lg sm:text-sm dark:text-gray-300">{userPosts.name}</p>
-                <p className="font-bold text-lg sm:text-sm text-gray-400">@{userPosts.nickname}</p>
-              </div>
-              
-              {/* Move PlusIcon and Add Status to the end */}
-              <div className="flex items-center ml-auto">
-                <div
-                  className="flex items-center bg-slate-100 dark:bg-gray-900 border-[1px] dark:border-gray-900 border-slate-100 rounded-full p-2 space-x-1"
-                  onClick={() => setOpen(true)}
-                >
-                  <PlusIcon className="h-6 dark:bg-gray-900 dark:text-gray-500 bg-gray-50 rounded-full text-gray-400" />
-                  <p className="font-bold text-sky-400 text-lg sm:text-sm cursor-pointer lg:inline">Add status</p>
-                </div>
-              </div>
-            </div>
+        {user?.id ? (
+  <>
+    {userPosts && (
+      <div className="flex space-x-2">
+        {userPosts?.userImg ? (
+          <img
+            src={userPosts.userImg}
+            className="sm:h-11 sm:w-11 h-20 w-20 rounded-md cursor-pointer hover:brightness-95 shadow-gray-800 shadow-sm dark:shadow-gray-600"
+          />
+        ) : (
+          <img
+            src={userPosts.imageUrl}
+            className="sm:h-11 sm:w-11 h-20 w-20 rounded-md cursor-pointer hover:brightness-95 shadow-gray-800 shadow-sm dark:shadow-gray-600"
+          />
+        )}
 
-          )}
-          
-          <div className=''>
+        <div className="flex-1 flex-col">
+          <p className="font-bold text-lg sm:text-sm dark:text-gray-300">{userPosts.name}</p>
+          <p className="font-bold text-lg sm:text-sm text-gray-400">@{userPosts.nickname}</p>
+        </div>
+
+        {/* PlusIcon and Add Status */}
+        <div className="flex items-center ml-auto">
+          <div
+            className="flex items-center bg-slate-100 dark:bg-gray-900 border-[1px] dark:border-gray-900 border-slate-100 rounded-full p-2 space-x-1"
+            onClick={() => setOpen(true)}
+          >
+            <PlusIcon className="h-6 dark:bg-gray-900 dark:text-gray-500 bg-gray-50 rounded-full text-gray-400" />
+            <p className="font-bold text-sky-400 text-lg sm:text-sm cursor-pointer lg:inline">Add status</p>
+          </div>
+        </div>
+      </div>
+    )}
+  </>
+) : (
+  <div className="flex items-center ml-auto">
+    <SignedOut>
+      <button
+        type="button"
+        className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+      >
+        <SignInButton />
+      </button>
+    </SignedOut>
+  </div>
+)}
+
+
+          <div>
           <Link href='/national'>
             <div className='flex cursor-pointer items-center space-x-4 dark:text-gray-200 dark:hover:bg-gray-900 hover:bg-gray-200 rounded-full w-full px-2 sm:py-2 py-4'>
               <HomeIcon className='h-6'/>
