@@ -1,55 +1,18 @@
-import { db } from '../firebase';
-import {
-  SignedIn,
-  SignedOut,
-  SignInButton,
-  UserButton,
-  useUser
-} from '@clerk/nextjs';
-import {
-  collection,
-  query,
-  where,
-  getDocs
-} from 'firebase/firestore';
-import Image from 'next/image';
+import { useEffect } from 'react';
 import { useRouter } from 'next/router';
-import React, { useEffect } from 'react';
+import Image from 'next/image';
 
 function Index() {
-  // const { user, isLoaded } = useUser();
   const router = useRouter();
 
-  // useEffect(() => {
-  //   if (!isLoaded || !user?.id) return;
-
-  //   // ✅ Make sure we only run this logic on the homepage
-  //   if (router.pathname !== '/') return;
-
-  //   const checkUserExists = async () => {
-  //     try {
-  //       const userQuery = query(
-  //         collection(db, 'userPosts'),
-  //         where('uid', '==', user.id)
-  //       );
-  //       const querySnapshot = await getDocs(userQuery);
-
-  //       if (!querySnapshot.empty) {
-  //         router.push('/national');
-  //       } else {
-  //         router.push('/form');
-  //       }
-  //     } catch (error) {
-  //       console.error('Error checking user:', error);
-  //     }
-  //   };
-
-  //   checkUserExists();
-  // }, [isLoaded, user?.id, router.pathname]);
   useEffect(() => {
-    router.push('/national');
-  }, [router]); // add router as a dependency
+    const { id } = router.query;
 
+    // Only redirect if no ID is present in the query or path
+    if (!id && router.pathname === '/') {
+      router.push('/national');
+    }
+  }, [router]);
 
   return (
     <div className="flex flex-col w-full justify-center items-center h-screen">
@@ -61,23 +24,6 @@ function Index() {
           className="rounded-md"
           alt="Broadcast"
         />
-
-        {/* <SignedOut>
-          <button
-            type="button"
-            className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-          >
-            <SignInButton />
-          </button>
-        </SignedOut>
-
-        <SignedIn>
-          <div className="flex flex-row items-center space-x-2">
-            <UserButton className="rounded-md" />
-            <p>{user?.firstName}</p>
-            <p>{user?.lastName}</p>
-          </div>
-        </SignedIn> */}
       </div>
     </div>
   );
