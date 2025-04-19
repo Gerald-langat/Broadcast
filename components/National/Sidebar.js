@@ -133,7 +133,7 @@ export default function Sidebar() {
 
 
           <div>
-          <Link href='/national'>
+          <Link href='/'>
             <div className='flex cursor-pointer items-center space-x-4 dark:text-gray-200 dark:hover:bg-gray-900 hover:bg-gray-200 rounded-full w-full px-2 sm:py-2 py-4'>
               <HomeIcon className='h-6'/>
               <span className='sm:text-lg'>Home</span>

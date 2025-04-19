@@ -57,7 +57,7 @@ function Form() {
           setShowAlert(true);
           setTimeout(() => {
             setShowAlert(false);
-            router.push('/national'); // ✅ Only push after alert is hidden
+            router.push('/'); // ✅ Only push after alert is hidden
           }, 1000);
         } else {
           return;
@@ -147,7 +147,7 @@ function Form() {
     setLoading(false);
 
     if (selectedWard !== 'Select Ward') {
-      router.push('/national');
+      router.push('/');
     }
 
   

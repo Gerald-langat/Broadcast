@@ -30,7 +30,7 @@ function AuthGuard({ children }) {
 
  useEffect(() => {
    if (!loading && !userData?.uid) {
-     router.push('/'); 
+     router.push('/form'); 
    }
  }, [loading, userData?.uid]);
 
@@ -45,7 +45,6 @@ export default function App({
 }) {
   return (
     <ClerkProvider>
-    
       <ThemeProvider enableSystem={true} attribute="class">
         <RecoilRoot>
           <FollowProvider>

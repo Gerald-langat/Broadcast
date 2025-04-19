@@ -179,7 +179,7 @@ export default function Widgets() {
           
           <div className='top-10 sticky '>
           <div className='flex space-x-2 p-2 justify-between'>
-              <Link href='/national'>
+              <Link href='/'>
               <button className='border-gray-200 bg-green-700 p-2 rounded-full hover:bg-gray-400 text-white font-semibold hover:text-white text-sm'>All
               </button>
               </Link>
