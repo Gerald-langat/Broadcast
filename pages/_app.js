@@ -7,11 +7,12 @@ import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 
 function AuthGuard({ children }) {
     const { user } = useUser();
     const router = useRouter()
- // 👈 Add a loading state
+    const [loading, setLoading] = useState(true); 
   const [userData, setUserData] = useState(null);
   
   useEffect(() => {
@@ -23,15 +24,23 @@ function AuthGuard({ children }) {
           setUserData(querySnapshot.docs[0].data());
         }
       }
+      setLoading(false); // Set loading to false after everything
     };
+
     fetchUserData();
   }, [user?.id]);
 
- useEffect(() => {
-   if (!userData?.uid) {
-     router.push('/form'); 
-   }
- }, [userData?.uid]);
+  useEffect(() => {
+    // 🔒 Only redirect AFTER loading is done
+    if (!loading && user && !userData) {
+      <div className="w-full h-screen flex items-center justify-center">
+      <Image src="/images/Broadcast.jpg" width={400} height={400} alt="Loading..." />
+    
+    </div>
+    }
+  }, [loading, userData, user, router]);
+
+  // 🌀 Show loading screen while data is being fetched
 
   return children;
 }

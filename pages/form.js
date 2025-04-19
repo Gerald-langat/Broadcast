@@ -43,7 +43,7 @@ function Form() {
   
   useEffect(() => {
     if (!user || !user?.id) return;
-  
+ 
     const checkUserExists = async () => {
       try {
         const userQuery = query(

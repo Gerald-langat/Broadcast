@@ -6,6 +6,10 @@ import Widgets from "../components/National/Widgets";
 import CommentModal from "../components/National/CommentModal";
 import StatusModal from "../components/National/StatusModal";
 import Feed from "../components/National/Feed";
+import { db } from "../firebase";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/router";
 
 
 
@@ -15,6 +19,35 @@ function Home() {
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [isWidgetsVisible, setIsWidgetsVisible] = useState(false);
   const [loading, setLoading] = useState(true);
+  const { user } = useUser()
+  const router = useRouter();
+
+  
+  
+  useEffect(() => {
+    if (!user || !user?.id) return;
+ 
+    const checkUserExists = async () => {
+      try {
+        const userQuery = query(
+          collection(db, 'userPosts'),
+          where('uid', '==', user.id)
+        );
+        const querySnapshot = await getDocs(userQuery);
+  
+        if (querySnapshot.empty) {
+          
+            router.push('/form'); // ✅ Only push after alert is hidden
+          }
+       
+      } catch (error) {
+        console.error('Error checking user:', error);
+      }
+    };
+  
+    checkUserExists();
+  }, [user?.id]);
+
 
   useEffect(() => {
     const timer = setTimeout(() => {
