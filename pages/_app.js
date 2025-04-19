@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react';
 function AuthGuard({ children }) {
     const { user } = useUser();
     const router = useRouter()
-    const [loading, setLoading] = useState(true); // 👈 Add a loading state
+ // 👈 Add a loading state
   const [userData, setUserData] = useState(null);
   
   useEffect(() => {
@@ -23,16 +23,15 @@ function AuthGuard({ children }) {
           setUserData(querySnapshot.docs[0].data());
         }
       }
-      setLoading(false); // 🔥 Important! Set loading to false after fetch finishes
     };
     fetchUserData();
   }, [user?.id]);
 
  useEffect(() => {
-   if (!loading && !userData?.uid) {
+   if (!userData?.uid) {
      router.push('/form'); 
    }
- }, [loading, userData?.uid]);
+ }, [userData?.uid]);
 
   return children;
 }
